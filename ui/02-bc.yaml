@@ -1,0 +1,29 @@
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: playground
+spec:
+  failedBuildsHistoryLimit: 5
+  nodeSelector: 
+  output:
+    to:
+      kind: ImageStreamTag
+      name: playground:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    contextDir: llama_stack/distribution/ui
+    git:
+      ref: main
+      uri: https://github.com/meta-llama/llama-stack.git
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: python-312:1-40.1747189120
+        namespace: llamastack
+    type: Source
+  successfulBuildsHistoryLimit: 5
