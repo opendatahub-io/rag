@@ -1,0 +1,693 @@
+# PIPELINE DEFINITION
+# Name: docling-convert-pipeline
+# Description: Converts PDF documents in a git repository to Markdown using Docling and generates embeddings
+# Inputs:
+#    embed_model_id: str [Default: 'sentence-transformers/all-MiniLM-L6-v2']
+#    input_docs_git_branch: str [Default: 'main']
+#    input_docs_git_folder: str [Default: '/tests/data/pdf/']
+#    input_docs_git_repo: str [Default: 'https://github.com/ChristianZaccaria/docling']
+#    max_tokens: int [Default: 2048.0]
+#    num_workers: int [Default: 1.0]
+#    service_url: str [Default: 'http://llama-test-milvus-kserve-service:8321']
+#    use_gpu: bool [Default: True]
+#    vector_db_id: str [Default: 'my_demo_vector_id']
+components:
+  comp-condition-3:
+    dag:
+      tasks:
+        docling-convert:
+          cachingOptions: {}
+          componentRef:
+            name: comp-docling-convert
+          inputs:
+            artifacts:
+              input_path:
+                componentInputArtifact: pipelinechannel--import-test-pdfs-output_path
+            parameters:
+              embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pdf_split:
+                componentInputParameter: pipelinechannel--create-pdf-splits-Output-loop-item
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: docling-convert
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-pdfs-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-pdf-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-condition-4:
+    dag:
+      tasks:
+        docling-convert-2:
+          cachingOptions: {}
+          componentRef:
+            name: comp-docling-convert-2
+          inputs:
+            artifacts:
+              input_path:
+                componentInputArtifact: pipelinechannel--import-test-pdfs-output_path
+            parameters:
+              embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pdf_split:
+                componentInputParameter: pipelinechannel--create-pdf-splits-Output-loop-item
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: docling-convert-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-pdfs-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-pdf-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-condition-branches-2:
+    dag:
+      tasks:
+        condition-3:
+          componentRef:
+            name: comp-condition-3
+          inputs:
+            artifacts:
+              pipelinechannel--import-test-pdfs-output_path:
+                componentInputArtifact: pipelinechannel--import-test-pdfs-output_path
+            parameters:
+              pipelinechannel--create-pdf-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-pdf-splits-Output-loop-item
+              pipelinechannel--embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: condition-3
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--use_gpu'] == true
+        condition-4:
+          componentRef:
+            name: comp-condition-4
+          inputs:
+            artifacts:
+              pipelinechannel--import-test-pdfs-output_path:
+                componentInputArtifact: pipelinechannel--import-test-pdfs-output_path
+            parameters:
+              pipelinechannel--create-pdf-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-pdf-splits-Output-loop-item
+              pipelinechannel--embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: condition-4
+          triggerPolicy:
+            condition: '!(inputs.parameter_values[''pipelinechannel--use_gpu''] ==
+              true)'
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-pdfs-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-pdf-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-create-pdf-splits:
+    executorLabel: exec-create-pdf-splits
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        num_splits:
+          parameterType: NUMBER_INTEGER
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: LIST
+  comp-docling-convert:
+    executorLabel: exec-docling-convert
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        embed_model_id:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        pdf_split:
+          parameterType: LIST
+        service_url:
+          parameterType: STRING
+        vector_db_id:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+  comp-docling-convert-2:
+    executorLabel: exec-docling-convert-2
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        embed_model_id:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        pdf_split:
+          parameterType: LIST
+        service_url:
+          parameterType: STRING
+        vector_db_id:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+  comp-for-loop-1:
+    dag:
+      tasks:
+        condition-branches-2:
+          componentRef:
+            name: comp-condition-branches-2
+          inputs:
+            artifacts:
+              pipelinechannel--import-test-pdfs-output_path:
+                componentInputArtifact: pipelinechannel--import-test-pdfs-output_path
+            parameters:
+              pipelinechannel--create-pdf-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-pdf-splits-Output-loop-item
+              pipelinechannel--embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: condition-branches-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-pdfs-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-pdf-splits-Output:
+          parameterType: LIST
+        pipelinechannel--create-pdf-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-import-test-pdfs:
+    executorLabel: exec-import-test-pdfs
+    inputDefinitions:
+      parameters:
+        input_docs_git_branch:
+          parameterType: STRING
+        input_docs_git_folder:
+          parameterType: STRING
+        input_docs_git_repo:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-create-pdf-splits:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - create_pdf_splits
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef create_pdf_splits(\n    input_path: dsl.InputPath(\"input-pdfs\"\
+          ),\n    num_splits: int,\n) -> List[List[str]]:\n    import pathlib\n\n\
+          \    # Split our entire directory of pdfs into n batches, where n == num_splits\n\
+          \    all_pdfs = [path.name for path in pathlib.Path(input_path).glob(\"\
+          *.pdf\")]\n    splits = [all_pdfs[i::num_splits] for i in range(num_splits)]\n\
+          \    return splits\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+    exec-docling-convert:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - docling_convert
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'docling' 'transformers'\
+          \ 'sentence-transformers' 'llama-stack' 'llama-stack-client' 'pymilvus'\
+          \ 'fire' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef docling_convert(\n    input_path: dsl.InputPath(\"input-pdfs\"\
+          ),\n    pdf_split: List[str],\n    output_path: dsl.OutputPath(\"output-md\"\
+          ),\n    embed_model_id: str,\n    max_tokens: int,\n    service_url: str,\n\
+          \    vector_db_id: str,\n):\n    import pathlib\n\n    from docling.datamodel.base_models\
+          \ import InputFormat, ConversionStatus\n    from docling.datamodel.pipeline_options\
+          \ import PdfPipelineOptions\n    from docling.document_converter import\
+          \ DocumentConverter, PdfFormatOption\n    from transformers import AutoTokenizer\n\
+          \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
+          \ import HybridChunker\n    import logging\n    from llama_stack_client\
+          \ import LlamaStackClient, RAGDocument\n    import uuid\n\n    _log = logging.getLogger(__name__)\n\
+          \n    # ---- Helper functions ----\n    def setup_chunker_and_embedder(embed_model_id:\
+          \ str, max_tokens: int):\n        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n\
+          \        embedding_model = SentenceTransformer(embed_model_id)\n       \
+          \ chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
+          \        return embedding_model, chunker\n\n    def embed_text(text: str,\
+          \ embedding_model) -> list[float]:\n        return embedding_model.encode([text],\
+          \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(conv_results):\n\
+          \        processed_docs = 0\n        for conv_res in conv_results:\n   \
+          \         if conv_res.status != ConversionStatus.SUCCESS:\n            \
+          \    _log.warning(f\"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}\"\
+          )\n                continue\n\n            processed_docs += 1\n       \
+          \     file_name = conv_res.input.file.stem\n            document = conv_res.document\n\
+          \            try:\n                document_markdown = document.export_to_markdown()\n\
+          \            except Exception as e:\n                _log.warning(f\"Failed\
+          \ to export document to markdown: {e}\")\n                document_markdown\
+          \ = \"\"\n\n            if document is None:\n                _log.warning(f\"\
+          Document conversion failed for {file_name}\")\n                continue\n\
+          \n            embedding_model, chunker = setup_chunker_and_embedder(embed_model_id,\
+          \ max_tokens)\n            for chunk in chunker.chunk(dl_doc=document):\n\
+          \                raw_chunk = chunker.serialize(chunk=chunk)\n          \
+          \      embedding = embed_text(raw_chunk, embedding_model)\n\n          \
+          \      rag_doc = RAGDocument(\n                    document_id=str(uuid.uuid4()),\n\
+          \                    content=raw_chunk,\n                    mime_type=\"\
+          text/markdown\",\n                    metadata={\n                     \
+          \   \"file_name\": file_name,\n                        \"full_document\"\
+          : document_markdown,\n                    },\n                    embedding=embedding,\n\
+          \                )\n\n                client.tool_runtime.rag_tool.insert(\n\
+          \                    documents=[rag_doc],\n                    vector_db_id=vector_db_id,\n\
+          \                    chunk_size_in_tokens=max_tokens,\n                )\n\
+          \n        _log.info(f\"Processed {processed_docs} documents successfully.\"\
+          )\n\n    # ---- Main logic ----\n    input_path = pathlib.Path(input_path)\n\
+          \    output_path = pathlib.Path(output_path)\n    output_path.mkdir(parents=True,\
+          \ exist_ok=True)\n\n    # Original code using splits\n    input_pdfs = [input_path\
+          \ / name for name in pdf_split]\n    # Alternative not using splits\n  \
+          \  # input_pdfs = pathlib.Path(input_path).glob(\"*.pdf\")\n\n    # Required\
+          \ models are automatically downloaded when they are\n    # not provided\
+          \ in PdfPipelineOptions initialization\n    pipeline_options = PdfPipelineOptions()\n\
+          \    pipeline_options.do_ocr = True\n    pipeline_options.generate_page_images\
+          \ = True\n\n    doc_converter = DocumentConverter(\n        format_options={InputFormat.PDF:\
+          \ PdfFormatOption(pipeline_options=pipeline_options)}\n    )\n\n    conv_results\
+          \ = doc_converter.convert_all(\n        input_pdfs,\n        raises_on_error=True,\n\
+          \    )\n\n    # Initialize LlamaStack client\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    # Process the conversion results and insert embeddings into the vector\
+          \ database\n    process_and_insert_embeddings(conv_results)\n\n"
+        image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e
+        resources:
+          accelerator:
+            count: '1'
+            resourceCount: '1'
+            resourceType: nvidia.com/gpu
+            type: nvidia.com/gpu
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 4.294967296
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 4Gi
+          resourceMemoryRequest: 2Gi
+    exec-docling-convert-2:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - docling_convert
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'docling' 'transformers'\
+          \ 'sentence-transformers' 'llama-stack' 'llama-stack-client' 'pymilvus'\
+          \ 'fire' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef docling_convert(\n    input_path: dsl.InputPath(\"input-pdfs\"\
+          ),\n    pdf_split: List[str],\n    output_path: dsl.OutputPath(\"output-md\"\
+          ),\n    embed_model_id: str,\n    max_tokens: int,\n    service_url: str,\n\
+          \    vector_db_id: str,\n):\n    import pathlib\n\n    from docling.datamodel.base_models\
+          \ import InputFormat, ConversionStatus\n    from docling.datamodel.pipeline_options\
+          \ import PdfPipelineOptions\n    from docling.document_converter import\
+          \ DocumentConverter, PdfFormatOption\n    from transformers import AutoTokenizer\n\
+          \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
+          \ import HybridChunker\n    import logging\n    from llama_stack_client\
+          \ import LlamaStackClient, RAGDocument\n    import uuid\n\n    _log = logging.getLogger(__name__)\n\
+          \n    # ---- Helper functions ----\n    def setup_chunker_and_embedder(embed_model_id:\
+          \ str, max_tokens: int):\n        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n\
+          \        embedding_model = SentenceTransformer(embed_model_id)\n       \
+          \ chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
+          \        return embedding_model, chunker\n\n    def embed_text(text: str,\
+          \ embedding_model) -> list[float]:\n        return embedding_model.encode([text],\
+          \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(conv_results):\n\
+          \        processed_docs = 0\n        for conv_res in conv_results:\n   \
+          \         if conv_res.status != ConversionStatus.SUCCESS:\n            \
+          \    _log.warning(f\"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}\"\
+          )\n                continue\n\n            processed_docs += 1\n       \
+          \     file_name = conv_res.input.file.stem\n            document = conv_res.document\n\
+          \            try:\n                document_markdown = document.export_to_markdown()\n\
+          \            except Exception as e:\n                _log.warning(f\"Failed\
+          \ to export document to markdown: {e}\")\n                document_markdown\
+          \ = \"\"\n\n            if document is None:\n                _log.warning(f\"\
+          Document conversion failed for {file_name}\")\n                continue\n\
+          \n            embedding_model, chunker = setup_chunker_and_embedder(embed_model_id,\
+          \ max_tokens)\n            for chunk in chunker.chunk(dl_doc=document):\n\
+          \                raw_chunk = chunker.serialize(chunk=chunk)\n          \
+          \      embedding = embed_text(raw_chunk, embedding_model)\n\n          \
+          \      rag_doc = RAGDocument(\n                    document_id=str(uuid.uuid4()),\n\
+          \                    content=raw_chunk,\n                    mime_type=\"\
+          text/markdown\",\n                    metadata={\n                     \
+          \   \"file_name\": file_name,\n                        \"full_document\"\
+          : document_markdown,\n                    },\n                    embedding=embedding,\n\
+          \                )\n\n                client.tool_runtime.rag_tool.insert(\n\
+          \                    documents=[rag_doc],\n                    vector_db_id=vector_db_id,\n\
+          \                    chunk_size_in_tokens=max_tokens,\n                )\n\
+          \n        _log.info(f\"Processed {processed_docs} documents successfully.\"\
+          )\n\n    # ---- Main logic ----\n    input_path = pathlib.Path(input_path)\n\
+          \    output_path = pathlib.Path(output_path)\n    output_path.mkdir(parents=True,\
+          \ exist_ok=True)\n\n    # Original code using splits\n    input_pdfs = [input_path\
+          \ / name for name in pdf_split]\n    # Alternative not using splits\n  \
+          \  # input_pdfs = pathlib.Path(input_path).glob(\"*.pdf\")\n\n    # Required\
+          \ models are automatically downloaded when they are\n    # not provided\
+          \ in PdfPipelineOptions initialization\n    pipeline_options = PdfPipelineOptions()\n\
+          \    pipeline_options.do_ocr = True\n    pipeline_options.generate_page_images\
+          \ = True\n\n    doc_converter = DocumentConverter(\n        format_options={InputFormat.PDF:\
+          \ PdfFormatOption(pipeline_options=pipeline_options)}\n    )\n\n    conv_results\
+          \ = doc_converter.convert_all(\n        input_pdfs,\n        raises_on_error=True,\n\
+          \    )\n\n    # Initialize LlamaStack client\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    # Process the conversion results and insert embeddings into the vector\
+          \ database\n    process_and_insert_embeddings(conv_results)\n\n"
+        image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e
+        resources:
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 4.294967296
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 4Gi
+          resourceMemoryRequest: 2Gi
+    exec-import-test-pdfs:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - import_test_pdfs
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'gitpython'\
+          \ && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef import_test_pdfs(\n    input_docs_git_repo: str,\n    input_docs_git_branch:\
+          \ str,\n    input_docs_git_folder: str,\n    output_path: dsl.OutputPath(\"\
+          output-json\"),\n):\n    import os\n    import shutil\n\n    from git import\
+          \ Repo\n\n    full_repo_path = os.path.join(output_path, \"docling\")\n\
+          \    Repo.clone_from(input_docs_git_repo, full_repo_path, branch=input_docs_git_branch)\n\
+          \n    # Copy the pdfs the root of the output folder\n    pdfs_path = os.path.join(full_repo_path,\
+          \ input_docs_git_folder.lstrip(\"/\"))\n    shutil.copytree(pdfs_path, output_path,\
+          \ dirs_exist_ok=True)\n\n    # Delete the repo\n    shutil.rmtree(full_repo_path)\n\
+          \n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+pipelineInfo:
+  description: Converts PDF documents in a git repository to Markdown using Docling
+    and generates embeddings
+  name: docling-convert-pipeline
+root:
+  dag:
+    tasks:
+      create-pdf-splits:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-create-pdf-splits
+        dependentTasks:
+        - import-test-pdfs
+        inputs:
+          artifacts:
+            input_path:
+              taskOutputArtifact:
+                outputArtifactKey: output_path
+                producerTask: import-test-pdfs
+          parameters:
+            num_splits:
+              componentInputParameter: num_workers
+        taskInfo:
+          name: create-pdf-splits
+      for-loop-1:
+        componentRef:
+          name: comp-for-loop-1
+        dependentTasks:
+        - create-pdf-splits
+        - import-test-pdfs
+        inputs:
+          artifacts:
+            pipelinechannel--import-test-pdfs-output_path:
+              taskOutputArtifact:
+                outputArtifactKey: output_path
+                producerTask: import-test-pdfs
+          parameters:
+            pipelinechannel--create-pdf-splits-Output:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-pdf-splits
+            pipelinechannel--embed_model_id:
+              componentInputParameter: embed_model_id
+            pipelinechannel--max_tokens:
+              componentInputParameter: max_tokens
+            pipelinechannel--service_url:
+              componentInputParameter: service_url
+            pipelinechannel--use_gpu:
+              componentInputParameter: use_gpu
+            pipelinechannel--vector_db_id:
+              componentInputParameter: vector_db_id
+        parameterIterator:
+          itemInput: pipelinechannel--create-pdf-splits-Output-loop-item
+          items:
+            inputParameter: pipelinechannel--create-pdf-splits-Output
+        taskInfo:
+          name: for-loop-1
+      import-test-pdfs:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-import-test-pdfs
+        inputs:
+          parameters:
+            input_docs_git_branch:
+              componentInputParameter: input_docs_git_branch
+            input_docs_git_folder:
+              componentInputParameter: input_docs_git_folder
+            input_docs_git_repo:
+              componentInputParameter: input_docs_git_repo
+        taskInfo:
+          name: import-test-pdfs
+  inputDefinitions:
+    parameters:
+      embed_model_id:
+        defaultValue: sentence-transformers/all-MiniLM-L6-v2
+        isOptional: true
+        parameterType: STRING
+      input_docs_git_branch:
+        defaultValue: main
+        description: git branch containing the documents to convert
+        isOptional: true
+        parameterType: STRING
+      input_docs_git_folder:
+        defaultValue: /tests/data/pdf/
+        description: git folder containing the documents to convert
+        isOptional: true
+        parameterType: STRING
+      input_docs_git_repo:
+        defaultValue: https://github.com/ChristianZaccaria/docling
+        description: git repository containing the documents to convert
+        isOptional: true
+        parameterType: STRING
+      max_tokens:
+        defaultValue: 2048.0
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      num_workers:
+        defaultValue: 1.0
+        description: Number of docling worker pods to use
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      service_url:
+        defaultValue: http://llama-test-milvus-kserve-service:8321
+        description: URL of the Milvus service
+        isOptional: true
+        parameterType: STRING
+      use_gpu:
+        defaultValue: true
+        description: Enable GPU in the docling workers
+        isOptional: true
+        parameterType: BOOLEAN
+      vector_db_id:
+        defaultValue: my_demo_vector_id
+        description: ID of the vector database to store embeddings
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.13.0
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-docling-convert:
+          nodeSelector:
+            nodeSelectorJson:
+              runtimeValue:
+                constant: {}
+          tolerations:
+          - effect: NoSchedule
+            key: nvidia.com/gpu
+            operator: Exists
