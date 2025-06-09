@@ -9,6 +9,7 @@ import logging
 import os
 import pathlib
 import sys
+import time
 import uuid
 
 import numpy as np
@@ -184,7 +185,7 @@ def llama_stack_style_chunker(text, chunk_size_in_tokens):
 def inject_documents_milvus(corpus, embedding_model_id, chunk_size_in_tokens):
     collection_name = f"beir_eval_{uuid.uuid4().hex}"
 
-    embedding_model = model.dense.SentenceTransformerEmbeddingFunction(model_name=embedding_model_id, device="cpu")
+    embedding_model = model.dense.SentenceTransformerEmbeddingFunction(model_name=embedding_model_id, device="mps")
     embedding_dimension = embedding_model.dim
 
     db_file = f"./milvus_{uuid.uuid4().hex[0:20]}.db"
@@ -212,21 +213,25 @@ class LlamaStackRAGRetriever:
 
     def retrieve(self, queries, top_k=None):
         results = {}
+        times = {}
         top_k = top_k or self.top_k
 
         for qid, query in queries.items():
+            start_time = time.perf_counter()
             rag_results = self.client.tool_runtime.rag_tool.query(
                 vector_db_ids=[self.vector_db_id],
                 content=query,
                 query_config={**self.query_config, "max_chunks": top_k},
             )
+            end_time = time.perf_counter()
+            times[qid] = end_time - start_time
 
             doc_ids = rag_results.metadata.get("document_ids", [])
             scores = {doc_id: 1.0 - (i * 0.01) for i, doc_id in enumerate(doc_ids)}
 
             results[qid] = scores
 
-        return results
+        return results, times
 
 
 class MilvusRetriever:
@@ -238,9 +243,11 @@ class MilvusRetriever:
 
     def retrieve(self, queries, top_k=None):
         results = {}
+        times = {}
         top_k = top_k or self.top_k
 
         for qid, query in queries.items():
+            start_time = time.perf_counter()
             data = self.embedding_model.encode_queries([query])
             hits = self.milvus_client.search(
                 collection_name=self.collection_name,
@@ -249,12 +256,15 @@ class MilvusRetriever:
                 anns_field="vector",
                 output_fields=["doc_id"],
             )[0]
+            end_time = time.perf_counter()
+            times[qid] = end_time - start_time
+
             doc_ids = [hit["entity"]["doc_id"] for hit in hits]
             scores = {doc_id: 1.0 - (i * 0.01) for i, doc_id in enumerate(doc_ids)}
 
             results[qid] = scores
 
-        return results
+        return results, times
 
 
 # Adapted from https://github.com/opendatahub-io/llama-stack-demos/blob/main/demos/rag_eval/Agentic_RAG_with_reference_eval.ipynb
@@ -297,13 +307,13 @@ def print_stats_significance(scores_a, scores_b, overview_label, label_a, label_
         print("  p_value<0.05 so this result is statistically significant")
         # Note that the logic below if wrong if the mean scores are equal, but that can't be true if p<1.
         higher_model_id = label_a if mean_score_a >= mean_score_b else label_b
-        print(f"  You can conclude that {higher_model_id} generation is better on data of this sort")
+        print(f"  You can conclude that {higher_model_id} generation has a higher score on data of this sort.")
         return True
     else:
         import math
 
         print("  p_value>=0.05 so this result is NOT statistically significant.")
-        print("  You can conclude that there is not enough data to tell which is better.")
+        print("  You can conclude that there is not enough data to tell which is higher.")
         num_samples = len(scores_a)
         margin_of_error = 1 / math.sqrt(num_samples)
         print(
@@ -342,7 +352,10 @@ def print_scores(all_scores):
                 is_significant = print_stats_significance(scores_a, scores_b, overview_label, label_a, label_b)
                 print()
                 print()
-                has_significant_difference = has_significant_difference or is_significant
+                if metric != "time":
+                    # we exclude time from the has_significant_difference computation because we only want to throw an error if there is a difference in behavior
+                    has_significant_difference = has_significant_difference or is_significant      
+
     return has_significant_difference
 
 
@@ -360,6 +373,9 @@ def evaluate_retrieval_with_and_without_llama_stack(
     for dataset_name in datasets:
         all_scores[dataset_name] = {}
         corpus, queries, qrels = load_beir_dataset(dataset_name)
+        
+        # Uncomment this line to select only a few documents for debugging
+        #corpus = pick_arbitrary_pairs(corpus)
 
         retrievers = {}
 
@@ -388,7 +404,7 @@ def evaluate_retrieval_with_and_without_llama_stack(
 
         for label, retriever in retrievers.items():
             logger.info(f"Retrieving from {label}")
-            results = retriever.retrieve(queries, top_k=10)
+            results, times = retriever.retrieve(queries, top_k=10)
 
             logger.info("Scoring")
             k_values = [10]
@@ -404,6 +420,8 @@ def evaluate_retrieval_with_and_without_llama_stack(
 
             evaluator = pytrec_eval.RelevanceEvaluator(qrels, metrics_strings)
             scores = evaluator.evaluate(results)
+            for qid, scores_for_qid in scores.items():
+                scores_for_qid["time"] = times[qid]
 
             all_scores[dataset_name][label] = scores
 
@@ -413,6 +431,34 @@ def evaluate_retrieval_with_and_without_llama_stack(
     if save_files:
         logger.info(f"All results in {results_dir}")
     return all_scores
+
+
+# From Gemini with edits
+def pick_arbitrary_pairs(input_dict, num_pairs=5):
+  """
+  Picks a specified number of arbitrary key-value pairs from a dictionary.
+
+  Args:
+    input_dict: The dictionary to pick from.
+    num_pairs: The number of key-value pairs to pick. Defaults to 5.
+
+  Returns:
+    A new dictionary containing the randomly selected key-value pairs.
+    If the input dictionary has fewer items than num_pairs,
+    all items from the input dictionary are returned.
+  """
+  if not isinstance(input_dict, dict):
+    raise TypeError("Input must be a dictionary.")
+  if not isinstance(num_pairs, int) or num_pairs < 0:
+    raise ValueError("Number of pairs must be a non-negative integer.")
+
+  all_items = list(input_dict.items())
+
+  if len(all_items) <= num_pairs:
+    return dict(all_items) # Return all items if fewer than num_pairs
+
+  picked_items = all_items[0:num_pairs]
+  return dict(picked_items)
 
 
 if __name__ == "__main__":
@@ -442,7 +488,7 @@ scifact map_cut_10
  MilvusRetriever                                   :     0.6879
  p_value                                           :     1.0000
   p_value>=0.05 so this result is NOT statistically significant.
-  You can conclude that there is not enough data to tell which is better.
+  You can conclude that there is not enough data to tell which is higher.
   Note that this data includes 300 questions which typically produces a margin of error of around +/-5.8%.
   So the two are probably roughly within that margin of error or so.
 
@@ -452,9 +498,17 @@ scifact ndcg_cut_10
  MilvusRetriever                                   :     0.7350
  p_value                                           :     1.0000
   p_value>=0.05 so this result is NOT statistically significant.
-  You can conclude that there is not enough data to tell which is better.
+  You can conclude that there is not enough data to tell which is higher.
   Note that this data includes 300 questions which typically produces a margin of error of around +/-5.8%.
   So the two are probably roughly within that margin of error or so.
+
+
+scifact time
+ LlamaStackRAGRetriever                            :     0.0225
+ MilvusRetriever                                   :     0.0173
+ p_value                                           :     0.0002
+  p_value<0.05 so this result is statistically significant
+  You can conclude that LlamaStackRAGRetriever generation has a higher score on data of this sort.
 
 
 fiqa map_cut_10
@@ -462,7 +516,7 @@ fiqa map_cut_10
  MilvusRetriever                                   :     0.3581
  p_value                                           :     1.0000
   p_value>=0.05 so this result is NOT statistically significant.
-  You can conclude that there is not enough data to tell which is better.
+  You can conclude that there is not enough data to tell which is higher.
   Note that this data includes 648 questions which typically produces a margin of error of around +/-3.9%.
   So the two are probably roughly within that margin of error or so.
 
@@ -472,9 +526,17 @@ fiqa ndcg_cut_10
  MilvusRetriever                                   :     0.4411
  p_value                                           :     1.0000
   p_value>=0.05 so this result is NOT statistically significant.
-  You can conclude that there is not enough data to tell which is better.
+  You can conclude that there is not enough data to tell which is higher.
   Note that this data includes 648 questions which typically produces a margin of error of around +/-3.9%.
   So the two are probably roughly within that margin of error or so.
+
+
+fiqa time
+ LlamaStackRAGRetriever                            :     0.0332
+ MilvusRetriever                                   :     0.0303
+ p_value                                           :     0.0002
+  p_value<0.05 so this result is statistically significant
+  You can conclude that LlamaStackRAGRetriever generation has a higher score on data of this sort.
 
 
 /Users/bmurdock/beir/beir-venv-310/lib/python3.10/site-packages/scipy/stats/_resampling.py:1492: RuntimeWarning: overflow encountered in scalar power
@@ -484,7 +546,7 @@ arguana map_cut_10
  MilvusRetriever                                   :     0.2927
  p_value                                           :     1.0000
   p_value>=0.05 so this result is NOT statistically significant.
-  You can conclude that there is not enough data to tell which is better.
+  You can conclude that there is not enough data to tell which is higher.
   Note that this data includes 1406 questions which typically produces a margin of error of around +/-2.7%.
   So the two are probably roughly within that margin of error or so.
 
@@ -494,7 +556,15 @@ arguana ndcg_cut_10
  MilvusRetriever                                   :     0.4251
  p_value                                           :     1.0000
   p_value>=0.05 so this result is NOT statistically significant.
-  You can conclude that there is not enough data to tell which is better.
+  You can conclude that there is not enough data to tell which is higher.
   Note that this data includes 1406 questions which typically produces a margin of error of around +/-2.7%.
   So the two are probably roughly within that margin of error or so.
+
+
+arguana time
+ LlamaStackRAGRetriever                            :     0.0303
+ MilvusRetriever                                   :     0.0239
+ p_value                                           :     0.0002
+  p_value<0.05 so this result is statistically significant
+  You can conclude that LlamaStackRAGRetriever generation has a higher score on data of this sort.
 """
