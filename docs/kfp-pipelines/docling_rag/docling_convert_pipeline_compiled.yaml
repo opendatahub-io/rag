@@ -2,12 +2,11 @@
 # Name: docling-convert-pipeline
 # Description: Converts PDF documents in a git repository to Markdown using Docling and generates embeddings
 # Inputs:
+#    base_url: str [Default: 'https://raw.githubusercontent.com/docling-project/docling/main/tests/data/pdf']
 #    embed_model_id: str [Default: 'sentence-transformers/all-MiniLM-L6-v2']
-#    input_docs_git_branch: str [Default: 'main']
-#    input_docs_git_folder: str [Default: '/tests/data/pdf/']
-#    input_docs_git_repo: str [Default: 'https://github.com/ChristianZaccaria/docling']
 #    max_tokens: int [Default: 2048.0]
 #    num_workers: int [Default: 1.0]
+#    pdf_filenames: str [Default: '2203.01017v2.pdf, 2206.01062.pdf, 2305.03393v1-pg9.pdf, amt_handbook_sample.pdf, code_and_formula.pdf, multi_page.pdf, picture_classification.pdf, redp5110_sampled.pdf, right_to_left_01.pdf, right_to_left_02.pdf, right_to_left_03.pdf']
 #    service_url: str [Default: 'http://llama-test-milvus-kserve-service:8321']
 #    use_gpu: bool [Default: True]
 #    vector_db_id: str [Default: 'my_demo_vector_id']
@@ -284,11 +283,9 @@ components:
     executorLabel: exec-import-test-pdfs
     inputDefinitions:
       parameters:
-        input_docs_git_branch:
+        base_url:
           parameterType: STRING
-        input_docs_git_folder:
-          parameterType: STRING
-        input_docs_git_repo:
+        pdf_filenames:
           parameterType: STRING
     outputDefinitions:
       artifacts:
@@ -328,8 +325,8 @@ deploymentSpec:
           ),\n    num_splits: int,\n) -> List[List[str]]:\n    import pathlib\n\n\
           \    # Split our entire directory of pdfs into n batches, where n == num_splits\n\
           \    all_pdfs = [path.name for path in pathlib.Path(input_path).glob(\"\
-          *.pdf\")]\n    splits = [all_pdfs[i::num_splits] for i in range(num_splits)]\n\
-          \    return splits\n\n"
+          *.pdf\")]\n    splits = [batch for batch in (all_pdfs[i::num_splits] for\
+          \ i in range(num_splits)) if batch]\n    return splits or [[]]\n\n"
         image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
     exec-docling-convert:
       container:
@@ -368,11 +365,12 @@ deploymentSpec:
           \ DocumentConverter, PdfFormatOption\n    from transformers import AutoTokenizer\n\
           \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
           \ import HybridChunker\n    import logging\n    from llama_stack_client\
-          \ import LlamaStackClient, RAGDocument\n    import uuid\n\n    _log = logging.getLogger(__name__)\n\
-          \n    # ---- Helper functions ----\n    def setup_chunker_and_embedder(embed_model_id:\
-          \ str, max_tokens: int):\n        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n\
-          \        embedding_model = SentenceTransformer(embed_model_id)\n       \
-          \ chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
+          \ import LlamaStackClient\n    import uuid\n    import json\n\n    _log\
+          \ = logging.getLogger(__name__)\n\n    # ---- Helper functions ----\n  \
+          \  def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
+          \        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n   \
+          \     embedding_model = SentenceTransformer(embed_model_id)\n        chunker\
+          \ = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
           \        return embedding_model, chunker\n\n    def embed_text(text: str,\
           \ embedding_model) -> list[float]:\n        return embedding_model.encode([text],\
           \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(conv_results):\n\
@@ -381,25 +379,30 @@ deploymentSpec:
           \    _log.warning(f\"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}\"\
           )\n                continue\n\n            processed_docs += 1\n       \
           \     file_name = conv_res.input.file.stem\n            document = conv_res.document\n\
-          \            try:\n                document_markdown = document.export_to_markdown()\n\
-          \            except Exception as e:\n                _log.warning(f\"Failed\
-          \ to export document to markdown: {e}\")\n                document_markdown\
-          \ = \"\"\n\n            if document is None:\n                _log.warning(f\"\
-          Document conversion failed for {file_name}\")\n                continue\n\
-          \n            embedding_model, chunker = setup_chunker_and_embedder(embed_model_id,\
-          \ max_tokens)\n            for chunk in chunker.chunk(dl_doc=document):\n\
-          \                raw_chunk = chunker.serialize(chunk=chunk)\n          \
-          \      embedding = embed_text(raw_chunk, embedding_model)\n\n          \
-          \      rag_doc = RAGDocument(\n                    document_id=str(uuid.uuid4()),\n\
-          \                    content=raw_chunk,\n                    mime_type=\"\
-          text/markdown\",\n                    metadata={\n                     \
-          \   \"file_name\": file_name,\n                        \"full_document\"\
-          : document_markdown,\n                    },\n                    embedding=embedding,\n\
-          \                )\n\n                client.tool_runtime.rag_tool.insert(\n\
-          \                    documents=[rag_doc],\n                    vector_db_id=vector_db_id,\n\
-          \                    chunk_size_in_tokens=max_tokens,\n                )\n\
-          \n        _log.info(f\"Processed {processed_docs} documents successfully.\"\
-          )\n\n    # ---- Main logic ----\n    input_path = pathlib.Path(input_path)\n\
+          \n            if document is None:\n                _log.warning(f\"Document\
+          \ conversion failed for {file_name}\")\n                continue\n\n   \
+          \         embedding_model, chunker = setup_chunker_and_embedder(embed_model_id,\
+          \ max_tokens)\n\n            chunks_with_embedding = []\n            for\
+          \ chunk in chunker.chunk(dl_doc=document):\n                raw_chunk =\
+          \ chunker.contextualize(chunk)\n                embedding = embed_text(raw_chunk,\
+          \ embedding_model)\n\n                chunk_id = str(uuid.uuid4())  # Generate\
+          \ a unique ID for the chunk\n                content_token_count = chunker.tokenizer.count_tokens(raw_chunk)\n\
+          \n                # Prepare metadata object\n                metadata_obj\
+          \ = {\n                    \"file_name\": file_name,\n                 \
+          \   \"document_id\": chunk_id,\n                    \"token_count\": content_token_count,\n\
+          \                }\n\n                metadata_str = json.dumps(metadata_obj)\n\
+          \                metadata_token_count = chunker.tokenizer.count_tokens(metadata_str)\n\
+          \                metadata_obj[\"metadata_token_count\"] = metadata_token_count\n\
+          \n                chunks_with_embedding.append(\n                    {\n\
+          \                        \"content\": raw_chunk,\n                     \
+          \   \"mime_type\": \"text/markdown\",\n                        \"embedding\"\
+          : embedding,\n                        \"metadata\": metadata_obj,\n    \
+          \                }\n                )\n            if chunks_with_embedding:\n\
+          \                try:\n                    client.vector_io.insert(vector_db_id=vector_db_id,\
+          \ chunks=chunks_with_embedding)\n                except Exception as e:\n\
+          \                    _log.error(f\"Failed to insert embeddings into vector\
+          \ database: {e}\")\n\n        _log.info(f\"Processed {processed_docs} documents\
+          \ successfully.\")\n\n    # ---- Main logic ----\n    input_path = pathlib.Path(input_path)\n\
           \    output_path = pathlib.Path(output_path)\n    output_path.mkdir(parents=True,\
           \ exist_ok=True)\n\n    # Original code using splits\n    input_pdfs = [input_path\
           \ / name for name in pdf_split]\n    # Alternative not using splits\n  \
@@ -465,11 +468,12 @@ deploymentSpec:
           \ DocumentConverter, PdfFormatOption\n    from transformers import AutoTokenizer\n\
           \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
           \ import HybridChunker\n    import logging\n    from llama_stack_client\
-          \ import LlamaStackClient, RAGDocument\n    import uuid\n\n    _log = logging.getLogger(__name__)\n\
-          \n    # ---- Helper functions ----\n    def setup_chunker_and_embedder(embed_model_id:\
-          \ str, max_tokens: int):\n        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n\
-          \        embedding_model = SentenceTransformer(embed_model_id)\n       \
-          \ chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
+          \ import LlamaStackClient\n    import uuid\n    import json\n\n    _log\
+          \ = logging.getLogger(__name__)\n\n    # ---- Helper functions ----\n  \
+          \  def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
+          \        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n   \
+          \     embedding_model = SentenceTransformer(embed_model_id)\n        chunker\
+          \ = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
           \        return embedding_model, chunker\n\n    def embed_text(text: str,\
           \ embedding_model) -> list[float]:\n        return embedding_model.encode([text],\
           \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(conv_results):\n\
@@ -478,25 +482,30 @@ deploymentSpec:
           \    _log.warning(f\"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}\"\
           )\n                continue\n\n            processed_docs += 1\n       \
           \     file_name = conv_res.input.file.stem\n            document = conv_res.document\n\
-          \            try:\n                document_markdown = document.export_to_markdown()\n\
-          \            except Exception as e:\n                _log.warning(f\"Failed\
-          \ to export document to markdown: {e}\")\n                document_markdown\
-          \ = \"\"\n\n            if document is None:\n                _log.warning(f\"\
-          Document conversion failed for {file_name}\")\n                continue\n\
-          \n            embedding_model, chunker = setup_chunker_and_embedder(embed_model_id,\
-          \ max_tokens)\n            for chunk in chunker.chunk(dl_doc=document):\n\
-          \                raw_chunk = chunker.serialize(chunk=chunk)\n          \
-          \      embedding = embed_text(raw_chunk, embedding_model)\n\n          \
-          \      rag_doc = RAGDocument(\n                    document_id=str(uuid.uuid4()),\n\
-          \                    content=raw_chunk,\n                    mime_type=\"\
-          text/markdown\",\n                    metadata={\n                     \
-          \   \"file_name\": file_name,\n                        \"full_document\"\
-          : document_markdown,\n                    },\n                    embedding=embedding,\n\
-          \                )\n\n                client.tool_runtime.rag_tool.insert(\n\
-          \                    documents=[rag_doc],\n                    vector_db_id=vector_db_id,\n\
-          \                    chunk_size_in_tokens=max_tokens,\n                )\n\
-          \n        _log.info(f\"Processed {processed_docs} documents successfully.\"\
-          )\n\n    # ---- Main logic ----\n    input_path = pathlib.Path(input_path)\n\
+          \n            if document is None:\n                _log.warning(f\"Document\
+          \ conversion failed for {file_name}\")\n                continue\n\n   \
+          \         embedding_model, chunker = setup_chunker_and_embedder(embed_model_id,\
+          \ max_tokens)\n\n            chunks_with_embedding = []\n            for\
+          \ chunk in chunker.chunk(dl_doc=document):\n                raw_chunk =\
+          \ chunker.contextualize(chunk)\n                embedding = embed_text(raw_chunk,\
+          \ embedding_model)\n\n                chunk_id = str(uuid.uuid4())  # Generate\
+          \ a unique ID for the chunk\n                content_token_count = chunker.tokenizer.count_tokens(raw_chunk)\n\
+          \n                # Prepare metadata object\n                metadata_obj\
+          \ = {\n                    \"file_name\": file_name,\n                 \
+          \   \"document_id\": chunk_id,\n                    \"token_count\": content_token_count,\n\
+          \                }\n\n                metadata_str = json.dumps(metadata_obj)\n\
+          \                metadata_token_count = chunker.tokenizer.count_tokens(metadata_str)\n\
+          \                metadata_obj[\"metadata_token_count\"] = metadata_token_count\n\
+          \n                chunks_with_embedding.append(\n                    {\n\
+          \                        \"content\": raw_chunk,\n                     \
+          \   \"mime_type\": \"text/markdown\",\n                        \"embedding\"\
+          : embedding,\n                        \"metadata\": metadata_obj,\n    \
+          \                }\n                )\n            if chunks_with_embedding:\n\
+          \                try:\n                    client.vector_io.insert(vector_db_id=vector_db_id,\
+          \ chunks=chunks_with_embedding)\n                except Exception as e:\n\
+          \                    _log.error(f\"Failed to insert embeddings into vector\
+          \ database: {e}\")\n\n        _log.info(f\"Processed {processed_docs} documents\
+          \ successfully.\")\n\n    # ---- Main logic ----\n    input_path = pathlib.Path(input_path)\n\
           \    output_path = pathlib.Path(output_path)\n    output_path.mkdir(parents=True,\
           \ exist_ok=True)\n\n    # Original code using splits\n    input_pdfs = [input_path\
           \ / name for name in pdf_split]\n    # Alternative not using splits\n  \
@@ -534,8 +543,8 @@ deploymentSpec:
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
           \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
           \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
-          \  python3 -m pip install --quiet --no-warn-script-location 'gitpython'\
-          \ && \"$0\" \"$@\"\n"
+          \  python3 -m pip install --quiet --no-warn-script-location 'requests' &&\
+          \ \"$0\" \"$@\"\n"
         - sh
         - -ec
         - 'program_path=$(mktemp -d)
@@ -547,15 +556,19 @@ deploymentSpec:
 
           '
         - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
-          \ *\n\ndef import_test_pdfs(\n    input_docs_git_repo: str,\n    input_docs_git_branch:\
-          \ str,\n    input_docs_git_folder: str,\n    output_path: dsl.OutputPath(\"\
-          output-json\"),\n):\n    import os\n    import shutil\n\n    from git import\
-          \ Repo\n\n    full_repo_path = os.path.join(output_path, \"docling\")\n\
-          \    Repo.clone_from(input_docs_git_repo, full_repo_path, branch=input_docs_git_branch)\n\
-          \n    # Copy the pdfs the root of the output folder\n    pdfs_path = os.path.join(full_repo_path,\
-          \ input_docs_git_folder.lstrip(\"/\"))\n    shutil.copytree(pdfs_path, output_path,\
-          \ dirs_exist_ok=True)\n\n    # Delete the repo\n    shutil.rmtree(full_repo_path)\n\
-          \n"
+          \ *\n\ndef import_test_pdfs(\n    base_url: str,\n    pdf_filenames: str,\n\
+          \    output_path: dsl.OutputPath(\"output-json\"),\n):\n    import os\n\
+          \    import requests\n    import shutil\n\n    os.makedirs(output_path,\
+          \ exist_ok=True)\n    filenames = [f.strip() for f in pdf_filenames.split(\"\
+          ,\") if f.strip()]\n\n    for filename in filenames:\n        url = f\"\
+          {base_url.rstrip('/')}/{filename}\"\n        file_path = os.path.join(output_path,\
+          \ filename)\n\n        try:\n            with requests.get(url, stream=True,\
+          \ timeout=10) as response:\n                response.raise_for_status()\n\
+          \                with open(file_path, \"wb\") as f:\n                  \
+          \  shutil.copyfileobj(response.raw, f)\n            print(f\"Downloaded\
+          \ {filename}\")\n        except requests.exceptions.RequestException as\
+          \ e:\n            print(f\"Failed to download {filename}: {e}, skipping.\"\
+          )\n\n"
         image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
 pipelineInfo:
   description: Converts PDF documents in a git repository to Markdown using Docling
@@ -622,37 +635,27 @@ root:
           name: comp-import-test-pdfs
         inputs:
           parameters:
-            input_docs_git_branch:
-              componentInputParameter: input_docs_git_branch
-            input_docs_git_folder:
-              componentInputParameter: input_docs_git_folder
-            input_docs_git_repo:
-              componentInputParameter: input_docs_git_repo
+            base_url:
+              componentInputParameter: base_url
+            pdf_filenames:
+              componentInputParameter: pdf_filenames
         taskInfo:
           name: import-test-pdfs
   inputDefinitions:
     parameters:
+      base_url:
+        defaultValue: https://raw.githubusercontent.com/docling-project/docling/main/tests/data/pdf
+        description: Base URL to fetch PDF files from
+        isOptional: true
+        parameterType: STRING
       embed_model_id:
         defaultValue: sentence-transformers/all-MiniLM-L6-v2
-        isOptional: true
-        parameterType: STRING
-      input_docs_git_branch:
-        defaultValue: main
-        description: git branch containing the documents to convert
-        isOptional: true
-        parameterType: STRING
-      input_docs_git_folder:
-        defaultValue: /tests/data/pdf/
-        description: git folder containing the documents to convert
-        isOptional: true
-        parameterType: STRING
-      input_docs_git_repo:
-        defaultValue: https://github.com/ChristianZaccaria/docling
-        description: git repository containing the documents to convert
+        description: Model ID for embedding generation
         isOptional: true
         parameterType: STRING
       max_tokens:
         defaultValue: 2048.0
+        description: Maximum number of tokens per chunk
         isOptional: true
         parameterType: NUMBER_INTEGER
       num_workers:
@@ -660,6 +663,13 @@ root:
         description: Number of docling worker pods to use
         isOptional: true
         parameterType: NUMBER_INTEGER
+      pdf_filenames:
+        defaultValue: 2203.01017v2.pdf, 2206.01062.pdf, 2305.03393v1-pg9.pdf, amt_handbook_sample.pdf,
+          code_and_formula.pdf, multi_page.pdf, picture_classification.pdf, redp5110_sampled.pdf,
+          right_to_left_01.pdf, right_to_left_02.pdf, right_to_left_03.pdf
+        description: Comma-separated list of PDF filenames to download and convert
+        isOptional: true
+        parameterType: STRING
       service_url:
         defaultValue: http://llama-test-milvus-kserve-service:8321
         description: URL of the Milvus service

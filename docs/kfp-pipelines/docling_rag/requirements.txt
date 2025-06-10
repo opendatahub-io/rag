@@ -1,4 +1,4 @@
 docling >= 2.0.0
-kfp >= 2.8.0
+kfp >= 2.13.0
 llamastackdistribution >= 0.1.0
 sqlalchemy >= 2.0.0
