@@ -1,9 +1,6 @@
-from ragas.metrics._domain_specific_rubrics import RubricsScore
-from ragas.llms import LlamaIndexLLMWrapper, llm_factory
 from ragas.evaluation import evaluate
 from ragas import EvaluationDataset
 
-from llama_index.core import VectorStoreIndex
 from llama_index.core.node_parser import MarkdownNodeParser
 from llama_index.readers.docling import DoclingReader
 from llama_index.core import VectorStoreIndex, get_response_synthesizer
@@ -11,7 +8,6 @@ from llama_index.core.retrievers import VectorIndexRetriever
 from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.llms import ChatMessage
 
-from scipy.stats import permutation_test
 import numpy as np
 import pandas as pd
 import itertools
