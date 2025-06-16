@@ -9,6 +9,7 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from llama_index.core.llms import ChatMessage
 
 from scipy.stats import permutation_test
+from text_to_num import alpha2digit
 
 import numpy as np
 import pandas as pd
@@ -17,6 +18,8 @@ import itertools
 import os
 import json
 import re
+import math
+
 
 from pathlib import Path
 import copy
@@ -27,23 +30,42 @@ import sys
 PROMPT_TEMPLATE="Context information is below.\n---------------------\n{context_str}\n---------------------\nGiven the context information and not prior knowledge, answer the query.\nQuery: {query_str}\nAnswer: "
 
 
-# Assisted by watsonx Code Assistant 
-def string_to_int(s):
+# Assisted by Google Gemini
+def find_first_number(text: str):
     """
-    Converts a string to an integer.
+    Finds the first number in a string and converts it to an integer.
 
-    If the string cannot be converted to an integer, returns None.
+    This function handles both numerals (e.g., "8") and number words 
+    (e.g., "eight") and ignores any other text in the string.
 
     Args:
-    s (str): The string to convert to an integer.
+        text (str): The input string to search for a number.
 
     Returns:
-    Union[int, None]: The integer representation of the string, or None if the string cannot be converted.
+        Union[int, None]: The first number found as an integer, or None if no number is found.
     """
-    try:
-        return int(s)
-    except ValueError:
+    if not isinstance(text, str):
         return None
+        
+    try:
+        # Step 1: Normalize the string to convert words like "eight" to "8"
+        # Example: "eight out of 10" becomes "8 out of 10"
+        normalized_text = alpha2digit(text, "en")
+    except (ValueError, TypeError):
+        # If alpha2digit fails, fall back to the original text
+        normalized_text = text
+
+    # Step 2: Use regex to find the first sequence of digits (with an optional negative sign)
+    # The pattern r'-?\d+' matches an optional '-' followed by one or more digits.
+    match = re.search(r"-?\d+", normalized_text)
+
+    # Step 3: If a match is found, convert it to an integer and return it
+    if match:
+        return int(match.group(0))
+
+    # If no number was found after all attempts, return None
+    return None
+
 
 def make_simple_index(file_paths, embed_model):
     # Doc string assisted by watsonx Code Assistant 
@@ -122,7 +144,7 @@ def run_reference_rag(qna, generator_model, idx, number_of_search_results=20, nu
     it is important to run this with the highest quality generator model and index that you can provide.  It retrieves more search results than
     it needs to generate answers then uses the generator model first to evaluate the quality of each passag separately, then it selects only
     the highest rated passages (which it records as "reference contexts", i.e., a proxy for "ground truth" for what search results are good).
-    It then generates anwers using those highest rated passages.  This would be too slow for most practical RAG applications, but it is useful
+    It then generates answers using those highest rated passages.  This would be too slow for most practical RAG applications, but it is useful
     for providing reference answers to compare other (presumably faster) RAG solutions to.
 
     Parameters:
@@ -134,7 +156,8 @@ def run_reference_rag(qna, generator_model, idx, number_of_search_results=20, nu
     minimum_score_for_a_reference_context (int): The minimum score a passage must have to be considered as a reference context. Default is 7.
 
     Returns:
-    list: The modified Q&A dataset with added "reference" and "reference_contexts" fields.
+    list: The modified Q&A dataset with added "reference" and "reference_contexts" fields.  For each question, the "reference_contexts" will
+    include anywhere from 0 to number_of_selected_results entries, and any entries included will have a score of at least minimum_score_for_a_reference_context.
     """
     dataset = copy.deepcopy(qna)
 
@@ -154,7 +177,7 @@ def run_reference_rag(qna, generator_model, idx, number_of_search_results=20, nu
             response = generator_model.chat(messages)
             text = response.message.blocks[0].text.strip().lower()
             response = text
-            score = string_to_int(response)
+            score = find_first_number(response)
             if score is None:
                 score = 3.5 # rank something that didn't get a valid score as better than something we know is very bad but worse than anything good
                 # Note that this 3.5 value only matters if minimum_score_for_a_reference_answer is below that value.  Otherwise, it will get discarded anyway.
@@ -163,7 +186,7 @@ def run_reference_rag(qna, generator_model, idx, number_of_search_results=20, nu
         # Sort from best to worst
         reference_search_results.sort(key=lambda x: -x[1])
 
-        # Pick the best ones
+        # Pick the best ones up to a limit of number_of_selected_results
         top_results = reference_search_results[0:number_of_selected_results]
 
         # Now eliminate any that are below the threshold for a reference context
@@ -197,7 +220,7 @@ def list_files(path):
     if os.path.isfile(path):
         return [path]
     files = []
-    for file in os.listdir(path):
+    for file in os.listdir(Path(path)):
         file_path = Path(os.path.join(path, file))
         if os.path.isfile(file_path):
             files.append(file_path)
@@ -322,8 +345,6 @@ def print_stats_significance(scores_a, scores_b, overview_label, label_a, label_
         print(f"  You can conclude that {higher_model_id} generation is better on data of this sort")
         return True, p_value, mean_score_a, mean_score_b
     else:
-        import math
-
         print("  p_value>=0.05 so this result is NOT statistically significant.")
         print("  You can conclude that there is not enough data to tell which is better.")
         num_samples = len(scores_a)
