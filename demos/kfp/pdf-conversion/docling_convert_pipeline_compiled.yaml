@@ -352,9 +352,9 @@ deploymentSpec:
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
           \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
           \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
-          \  python3 -m pip install --quiet --no-warn-script-location 'docling' 'transformers'\
-          \ 'sentence-transformers' 'llama-stack' 'llama-stack-client' 'pymilvus'\
-          \ 'fire' && \"$0\" \"$@\"\n"
+          \  python3 -m pip install --quiet --no-warn-script-location 'docling==2.39.0'\
+          \ 'transformers' 'sentence-transformers' 'llama-stack' 'llama-stack-client'\
+          \ 'pymilvus' 'fire' 'rapidocr-onnxruntime' && \"$0\" \"$@\"\n"
         - sh
         - -ec
         - 'program_path=$(mktemp -d)
@@ -371,16 +371,16 @@ deploymentSpec:
           ),\n    embed_model_id: str,\n    max_tokens: int,\n    service_url: str,\n\
           \    vector_db_id: str,\n):\n    import pathlib\n\n    from docling.datamodel.base_models\
           \ import InputFormat, ConversionStatus\n    from docling.datamodel.pipeline_options\
-          \ import PdfPipelineOptions\n    from docling.document_converter import\
-          \ DocumentConverter, PdfFormatOption\n    from transformers import AutoTokenizer\n\
-          \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
-          \ import HybridChunker\n    import logging\n    from llama_stack_client\
-          \ import LlamaStackClient\n    import uuid\n    import json\n\n    _log\
-          \ = logging.getLogger(__name__)\n\n    # ---- Helper functions ----\n  \
-          \  def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
-          \        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n   \
-          \     embedding_model = SentenceTransformer(embed_model_id)\n        chunker\
-          \ = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
+          \ import PdfPipelineOptions, RapidOcrOptions\n    from docling.document_converter\
+          \ import DocumentConverter, PdfFormatOption\n    from transformers import\
+          \ AutoTokenizer\n    from sentence_transformers import SentenceTransformer\n\
+          \    from docling.chunking import HybridChunker\n    import logging\n  \
+          \  from llama_stack_client import LlamaStackClient\n    import uuid\n  \
+          \  import json\n\n    _log = logging.getLogger(__name__)\n\n\n    # ----\
+          \ Helper functions ----\n    def setup_chunker_and_embedder(embed_model_id:\
+          \ str, max_tokens: int):\n        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n\
+          \        embedding_model = SentenceTransformer(embed_model_id)\n       \
+          \ chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
           \        return embedding_model, chunker\n\n    def embed_text(text: str,\
           \ embedding_model) -> list[float]:\n        return embedding_model.encode([text],\
           \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(conv_results):\n\
@@ -420,12 +420,13 @@ deploymentSpec:
           \ models are automatically downloaded when they are\n    # not provided\
           \ in PdfPipelineOptions initialization\n    pipeline_options = PdfPipelineOptions()\n\
           \    pipeline_options.do_ocr = True\n    pipeline_options.generate_page_images\
-          \ = True\n\n    doc_converter = DocumentConverter(\n        format_options={InputFormat.PDF:\
-          \ PdfFormatOption(pipeline_options=pipeline_options)}\n    )\n\n    conv_results\
-          \ = doc_converter.convert_all(\n        input_pdfs,\n        raises_on_error=True,\n\
-          \    )\n\n    # Initialize LlamaStack client\n    client = LlamaStackClient(base_url=service_url)\n\
-          \n    # Process the conversion results and insert embeddings into the vector\
-          \ database\n    process_and_insert_embeddings(conv_results)\n\n"
+          \ = True\n    pipeline_options.ocr_options = RapidOcrOptions()\n\n    doc_converter\
+          \ = DocumentConverter(\n        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}\n\
+          \    )\n\n    conv_results = doc_converter.convert_all(\n        input_pdfs,\n\
+          \        raises_on_error=True,\n    )\n\n    # Initialize LlamaStack client\n\
+          \    client = LlamaStackClient(base_url=service_url)\n\n    # Process the\
+          \ conversion results and insert embeddings into the vector database\n  \
+          \  process_and_insert_embeddings(conv_results)\n\n"
         image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e
         resources:
           accelerator:
@@ -455,9 +456,9 @@ deploymentSpec:
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
           \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
           \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
-          \  python3 -m pip install --quiet --no-warn-script-location 'docling' 'transformers'\
-          \ 'sentence-transformers' 'llama-stack' 'llama-stack-client' 'pymilvus'\
-          \ 'fire' && \"$0\" \"$@\"\n"
+          \  python3 -m pip install --quiet --no-warn-script-location 'docling==2.39.0'\
+          \ 'transformers' 'sentence-transformers' 'llama-stack' 'llama-stack-client'\
+          \ 'pymilvus' 'fire' 'rapidocr-onnxruntime' && \"$0\" \"$@\"\n"
         - sh
         - -ec
         - 'program_path=$(mktemp -d)
@@ -474,16 +475,16 @@ deploymentSpec:
           ),\n    embed_model_id: str,\n    max_tokens: int,\n    service_url: str,\n\
           \    vector_db_id: str,\n):\n    import pathlib\n\n    from docling.datamodel.base_models\
           \ import InputFormat, ConversionStatus\n    from docling.datamodel.pipeline_options\
-          \ import PdfPipelineOptions\n    from docling.document_converter import\
-          \ DocumentConverter, PdfFormatOption\n    from transformers import AutoTokenizer\n\
-          \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
-          \ import HybridChunker\n    import logging\n    from llama_stack_client\
-          \ import LlamaStackClient\n    import uuid\n    import json\n\n    _log\
-          \ = logging.getLogger(__name__)\n\n    # ---- Helper functions ----\n  \
-          \  def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
-          \        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n   \
-          \     embedding_model = SentenceTransformer(embed_model_id)\n        chunker\
-          \ = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
+          \ import PdfPipelineOptions, RapidOcrOptions\n    from docling.document_converter\
+          \ import DocumentConverter, PdfFormatOption\n    from transformers import\
+          \ AutoTokenizer\n    from sentence_transformers import SentenceTransformer\n\
+          \    from docling.chunking import HybridChunker\n    import logging\n  \
+          \  from llama_stack_client import LlamaStackClient\n    import uuid\n  \
+          \  import json\n\n    _log = logging.getLogger(__name__)\n\n\n    # ----\
+          \ Helper functions ----\n    def setup_chunker_and_embedder(embed_model_id:\
+          \ str, max_tokens: int):\n        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n\
+          \        embedding_model = SentenceTransformer(embed_model_id)\n       \
+          \ chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
           \        return embedding_model, chunker\n\n    def embed_text(text: str,\
           \ embedding_model) -> list[float]:\n        return embedding_model.encode([text],\
           \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(conv_results):\n\
@@ -523,12 +524,13 @@ deploymentSpec:
           \ models are automatically downloaded when they are\n    # not provided\
           \ in PdfPipelineOptions initialization\n    pipeline_options = PdfPipelineOptions()\n\
           \    pipeline_options.do_ocr = True\n    pipeline_options.generate_page_images\
-          \ = True\n\n    doc_converter = DocumentConverter(\n        format_options={InputFormat.PDF:\
-          \ PdfFormatOption(pipeline_options=pipeline_options)}\n    )\n\n    conv_results\
-          \ = doc_converter.convert_all(\n        input_pdfs,\n        raises_on_error=True,\n\
-          \    )\n\n    # Initialize LlamaStack client\n    client = LlamaStackClient(base_url=service_url)\n\
-          \n    # Process the conversion results and insert embeddings into the vector\
-          \ database\n    process_and_insert_embeddings(conv_results)\n\n"
+          \ = True\n    pipeline_options.ocr_options = RapidOcrOptions()\n\n    doc_converter\
+          \ = DocumentConverter(\n        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}\n\
+          \    )\n\n    conv_results = doc_converter.convert_all(\n        input_pdfs,\n\
+          \        raises_on_error=True,\n    )\n\n    # Initialize LlamaStack client\n\
+          \    client = LlamaStackClient(base_url=service_url)\n\n    # Process the\
+          \ conversion results and insert embeddings into the vector database\n  \
+          \  process_and_insert_embeddings(conv_results)\n\n"
         image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e
         resources:
           cpuLimit: 4.0
