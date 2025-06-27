@@ -124,6 +124,18 @@ def docling_convert(
 
     _log = logging.getLogger(__name__)
 
+    # Monkey patch for hashlib
+    import hashlib
+    original_md5 = hashlib.md5
+
+    def patched_md5(*args, **kwargs):
+        try:
+            return original_md5(*args, usedforsecurity=False,**kwargs)
+        except TypeError:
+            return original_md5(*args, **kwargs)
+    hashlib.md5 = patched_md5
+
+
     # ---- Helper functions ----
     def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):
         tokenizer = AutoTokenizer.from_pretrained(embed_model_id)
@@ -295,7 +307,6 @@ def docling_convert_pipeline(
             convert_task.set_cpu_limit("4")
             convert_task.set_memory_request("2Gi")
             convert_task.set_memory_limit("6Gi")
-            
 
 if __name__ == "__main__":
     compiler.Compiler().compile(docling_convert_pipeline, package_path=__file__.replace(".py", "_compiled.yaml"))

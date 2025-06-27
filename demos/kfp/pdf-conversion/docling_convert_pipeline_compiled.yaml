@@ -376,8 +376,12 @@ deploymentSpec:
           \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
           \ import HybridChunker\n    import logging\n    from llama_stack_client\
           \ import LlamaStackClient\n    import uuid\n    import json\n\n    _log\
-          \ = logging.getLogger(__name__)\n\n    # ---- Helper functions ----\n  \
-          \  def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
+          \ = logging.getLogger(__name__)\n\n    # Monkey patch for hashlib\n    import\
+          \ hashlib\n    original_md5 = hashlib.md5\n\n    def patched_md5(*args,\
+          \ **kwargs):\n        try:\n            return original_md5(*args, usedforsecurity=False,**kwargs)\n\
+          \        except TypeError:\n            return original_md5(*args, **kwargs)\n\
+          \    hashlib.md5 = patched_md5\n\n\n    # ---- Helper functions ----\n \
+          \   def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
           \        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n   \
           \     embedding_model = SentenceTransformer(embed_model_id)\n        chunker\
           \ = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
@@ -479,8 +483,12 @@ deploymentSpec:
           \    from sentence_transformers import SentenceTransformer\n    from docling.chunking\
           \ import HybridChunker\n    import logging\n    from llama_stack_client\
           \ import LlamaStackClient\n    import uuid\n    import json\n\n    _log\
-          \ = logging.getLogger(__name__)\n\n    # ---- Helper functions ----\n  \
-          \  def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
+          \ = logging.getLogger(__name__)\n\n    # Monkey patch for hashlib\n    import\
+          \ hashlib\n    original_md5 = hashlib.md5\n\n    def patched_md5(*args,\
+          \ **kwargs):\n        try:\n            return original_md5(*args, usedforsecurity=False,**kwargs)\n\
+          \        except TypeError:\n            return original_md5(*args, **kwargs)\n\
+          \    hashlib.md5 = patched_md5\n\n\n    # ---- Helper functions ----\n \
+          \   def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):\n\
           \        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)\n   \
           \     embedding_model = SentenceTransformer(embed_model_id)\n        chunker\
           \ = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)\n\
