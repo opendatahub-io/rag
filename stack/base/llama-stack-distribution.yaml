@@ -26,6 +26,6 @@ spec:
       name: llama-stack
       port: 8321
     distribution:
-      image: quay.io/opendatahub/llama-stack:odh
+      name: rh-dev
     storage:
       size: "5Gi"

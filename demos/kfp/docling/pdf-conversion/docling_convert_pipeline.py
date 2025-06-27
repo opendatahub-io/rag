@@ -121,16 +121,17 @@ def create_pdf_splits(
 @dsl.component(
     base_image=PYTORCH_CUDA_IMAGE,
     packages_to_install=[
-        "docling",
+        "docling>=2.43.0",
         "transformers",
         "sentence-transformers",
         "llama-stack",
         "llama-stack-client",
         "pymilvus",
         "fire",
+        "rapidocr-onnxruntime",
     ],
 )
-def docling_convert_and_ingest(
+def docling_convert(
     input_path: dsl.InputPath("input-pdfs"),
     pdf_split: List[str],
     output_path: dsl.OutputPath("output-md"),
@@ -142,7 +143,7 @@ def docling_convert_and_ingest(
     import pathlib
 
     from docling.datamodel.base_models import InputFormat, ConversionStatus
-    from docling.datamodel.pipeline_options import PdfPipelineOptions
+    from docling.datamodel.pipeline_options import PdfPipelineOptions, RapidOcrOptions
     from docling.document_converter import DocumentConverter, PdfFormatOption
     from transformers import AutoTokenizer
     from sentence_transformers import SentenceTransformer
@@ -150,6 +151,7 @@ def docling_convert_and_ingest(
     import logging
     from llama_stack_client import LlamaStackClient
     import uuid
+
     import json
 
     _log = logging.getLogger(__name__)
@@ -239,6 +241,7 @@ def docling_convert_and_ingest(
     pipeline_options = PdfPipelineOptions()
     pipeline_options.do_ocr = True
     pipeline_options.generate_page_images = True
+    pipeline_options.ocr_options = RapidOcrOptions()
 
     doc_converter = DocumentConverter(
         format_options={
@@ -304,7 +307,7 @@ def docling_convert_pipeline(
 
     with dsl.ParallelFor(pdf_splits.output) as pdf_split:
         with dsl.If(use_gpu == True):
-            convert_task = docling_convert_and_ingest(
+            convert_task = docling_convert(
                 input_path=import_task.output,
                 pdf_split=pdf_split,
                 embed_model_id=embed_model_id,
@@ -331,7 +334,7 @@ def docling_convert_pipeline(
             )
             add_node_selector_json(convert_task, {})
         with dsl.Else():
-            convert_task = docling_convert_and_ingest(
+            convert_task = docling_convert(
                 input_path=import_task.output,
                 pdf_split=pdf_split,
                 embed_model_id=embed_model_id,
