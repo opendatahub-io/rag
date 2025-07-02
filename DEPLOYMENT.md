@@ -24,7 +24,7 @@ oc new-project rag-stack
 
 ### 3. Deploy the Stack
 
-The project offers three deployment options:
+The project offers multiple deployment options:
 
 #### Option A: Default Setup (KServe vLLM + Llama 3.2)
 ```bash
@@ -41,6 +41,27 @@ oc apply -k stack/overlays/vllm-standalone-granite3.3
 oc apply -k stack/overlays/vllm-standalone-llama3.2
 oc patch secret hf-token-secret --type='merge' -p='{"data":{"HF_TOKEN":"'$(echo -n "hf_your_token" | base64)'"}}'
 ```
+
+#### Option D: setup using an inference model deployed remotely
+
+Note: do not use VLLM_TLS_VERIFY=false in production environments
+```bash
+# Create secret llama-stack-remote-inference-model-secret providing remote model info
+export INFERENCE_MODEL=llama-3-2-3b
+export VLLM_URL=https://llama-3-2-3b.apps.remote-cluster.com:443/v1
+export VLLM_TLS_VERIFY=false
+export VLLM_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXX
+
+oc create secret generic llama-stack-remote-inference-model-secret \
+  --from-literal INFERENCE_MODEL=$INFERENCE_MODEL   \
+  --from-literal VLLM_URL=$VLLM_URL                 \
+  --from-literal VLLM_TLS_VERIFY=$VLLM_TLS_VERIFY   \
+  --from-literal VLLM_API_TOKEN=$VLLM_API_TOKEN     
+  
+# Deploy the LlamaStackDistribution
+oc apply -k stack/overlays/vllm-remote-inference-model
+```
+
 
 ### 4. Verify Deployment
 
