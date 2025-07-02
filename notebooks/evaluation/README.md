@@ -21,19 +21,19 @@ The primary goal is to offer a reproducible methodology for comparing RAG system
 
 This directory includes the following components:
 
-* **Jupyter Notebooks**:
+- **Jupyter Notebooks**:
     * [`make-sample-questions.ipynb`](./make-sample-questions.ipynb): Generates a dataset of sample questions and reference answers from a source document.
     * [`evaluate-using-sample-questions-lls-vs-li.ipynb`](./evaluate-using-sample-questions-lls-vs-li.ipynb): Runs Llama Stack and LlamaIndex RAG pipelines on the generated questions, evaluates their responses using the Ragas framework, and performs statistical significance testing with SciPy.
 
-* **Supporting Code**:
+- **Supporting Code**:
     * [`evaluation_utilities.py`](./evaluation_utilities.py): Utility functions and helper code for the evaluation notebooks.
 
-* **Sample Data**:
-    * [`qna-ibm-2024-2250-2239.json`](./qna-ibm-2024-2250-2239.json): A Q\&A dataset generated from the IBM 2024 annual report without special instructions.
-    * [`qna-ibm-2024b-2220-2196.json`](./qna-ibm-2024b-2220-2196.json): A Q\&A dataset generated from the same report, but using the default special instructions in the notebook to produce more diverse questions.
+- **Sample Data**:
+    * [`qna-ibm-2024-2250-2239.json`](./qna-ibm-2024-2250-2239.json): A Q&A dataset generated from the IBM 2024 annual report without special instructions.
+    * [`qna-ibm-2024b-2220-2196.json`](./qna-ibm-2024b-2220-2196.json): A Q&A dataset generated from the same report, but using the default special instructions in the notebook to produce more diverse questions.
     * **Note on filenames**: The numbers in the JSON filenames (`{configured_questions}-{final_question_count}`) may not perfectly match the final counts in the file due to de-duplication steps.
 
-* **Configuration**:
+- **Configuration**:
     * [`requirements.txt`](./requirements.txt): A list of Python libraries required to run the notebooks.
     * [`run.yaml`](./run.yaml): A configuration file for the Llama Stack server.
 
@@ -41,7 +41,7 @@ This directory includes the following components:
 
 Follow these steps to reproduce the evaluation.
 
-### 1\. Install Dependencies
+### 1. Install Dependencies
 
 Install all the necessary Python libraries using pip:
 
@@ -49,7 +49,7 @@ Install all the necessary Python libraries using pip:
 pip install -r requirements.txt
 ```
 
-### 2\. Start the Llama Stack Server
+### 2. Start the Llama Stack Server
 
 The evaluation notebook requires a running Llama Stack server. Start it from your command line using the provided configuration:
 
@@ -57,10 +57,10 @@ The evaluation notebook requires a running Llama Stack server. Start it from you
 llama stack run run.yaml --image-type venv
 ```
 
-### 3\. Run the Notebooks
+### 3. Run the Notebooks
 
-1.  **(Optional)** Run `make-sample-questions.ipynb` if you want to generate your own question-answer dataset from a new document.
-2.  Run `evaluate-using-sample-questions-lls-vs-li.ipynb` to execute the comparison between Llama Stack and LlamaIndex using one of the sample `.json` files.
+1. **(Optional)** Run `make-sample-questions.ipynb` if you want to generate your own question-answer dataset from a new document.
+2. Run `evaluate-using-sample-questions-lls-vs-li.ipynb` to execute the comparison between Llama Stack and LlamaIndex using one of the sample `.json` files.
 
 > **Note on Scale**: Both notebooks are configured by default to run on a limited number of questions for quick results. Instructions are included within the notebooks on how to adjust the configuration to run on the full datasets.
 
@@ -68,8 +68,8 @@ llama stack run run.yaml --image-type venv
 
 Across both datasets, our results show:
 
-  * **Higher Accuracy for Llama Stack**: Llama Stack consistently achieved a small but statistically significant advantage in accuracy metrics (`nv_accuracy` and `domain_specific_rubrics`) for questions that had reference answers.
-  * **Superior Handling of Unanswerable Questions**: Llama Stack demonstrated a much stronger ability to correctly identify and refuse to answer questions that were designed to be unanswerable based on the source document. A higher "Percent Unanswered" score is better in this context.
+- **Higher Accuracy for Llama Stack**: Llama Stack consistently achieved a small but statistically significant advantage in accuracy metrics (`nv_accuracy` and `domain_specific_rubrics`) for questions that had reference answers.
+- **Superior Handling of Unanswerable Questions**: Llama Stack demonstrated a much stronger ability to correctly identify and refuse to answer questions that were designed to be unanswerable based on the source document. A higher "Percent Unanswered" score is better in this context.
 
 We hypothesize these differences may stem from variations in model prompting, document chunking strategies, or text processing between the two frameworks.
 
@@ -101,13 +101,13 @@ The tables below summarize the performance metrics from our full runs. All p-val
 
 While these results are informative, it is crucial to consider their limitations:
 
-1.  **Single Dataset**: This evaluation uses only one document. Performance could vary significantly with different data types, topics, or multiple documents.
-2.  **Synthetic Questions**: Questions generated by an LLM may not perfectly represent the questions real users would ask. While we used prompt engineering to increase diversity, it is not a substitute for real-world query logs.
-3.  **Imperfect Ground Truth**: Our reference answers were generated by a powerful RAG system (using `gpt-4o`), not by humans. This introduces noise into the evaluation, though we assume it affects both systems equally.
-4.  **Assumption on Unanswerable Questions**: We assume that if our reference RAG system doesn't answer a question, it is truly unanswerable. This assumption may be flawed and could contribute to the low scores for refusing to answer.
-5.  **Potential for Framework Bias**: Since the reference RAG system was built with LlamaIndex, it could theoretically introduce a bias in favor of LlamaIndex. However, the results show Llama Stack outperforming, suggesting any such bias is likely minimal.
-6.  **Evaluation Metric Imperfections**: The Ragas metrics and the `gpt-4o` model used to power them are not perfect. This is another source of potential noise.
-7.  **Custom Metric Validity**: The custom prompt used to determine if a question was answered has not been rigorously validated, though it appears to function well upon casual inspection.
+1. **Single Dataset**: This evaluation uses only one document. Performance could vary significantly with different data types, topics, or multiple documents.
+2. **Synthetic Questions**: Questions generated by an LLM may not perfectly represent the questions real users would ask. While we used prompt engineering to increase diversity, it is not a substitute for real-world query logs.
+3. **Imperfect Ground Truth**: Our reference answers were generated by a powerful RAG system (using `gpt-4o`), not by humans. This introduces noise into the evaluation, though we assume it affects both systems equally.
+4. **Assumption on Unanswerable Questions**: We assume that if our reference RAG system doesn't answer a question, it is truly unanswerable. This assumption may be flawed and could contribute to the low scores for refusing to answer.
+5. **Potential for Framework Bias**: Since the reference RAG system was built with LlamaIndex, it could theoretically introduce a bias in favor of LlamaIndex. However, the results show Llama Stack outperforming, suggesting any such bias is likely minimal.
+6. **Evaluation Metric Imperfections**: The Ragas metrics and the `gpt-4o` model used to power them are not perfect. This is another source of potential noise.
+7. **Custom Metric Validity**: The custom prompt used to determine if a question was answered has not been rigorously validated, though it appears to function well upon casual inspection.
 
 ## Further Observations
 
