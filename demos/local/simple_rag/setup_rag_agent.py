@@ -38,7 +38,7 @@ LLAMA_STACK_URL = "http://localhost:8081"  # URL where your llama-stack is runni
 INFERENCE_MODEL = "vllm"                   # Model used to generate answers (LLM)
 EMBEDDING_MODEL = "granite-embedding-125m"  # Model used to create embeddings (converts text to vectors)
 EMBEDDING_DIM = 768                        # Dimension of the embedding vectors
-AGENT_NAME = "RAG Team Agent 2.0"            # Human-readable name for your agent
+AGENT_NAME = "RAG Team Agent 3.0"            # Human-readable name for your agent
 
 # Document processing settings
 INPUT_FOLDER = "input_files"               # Folder where your documents are stored
@@ -469,7 +469,7 @@ def create_rag_agent(client, vector_db_id):
     
 
     # Create the agent using the exact same pattern as the working notebook
-    # Use simple instructions like the working notebook
+    # Use simple instructions like the working notebook (no name parameter supported)
     agent = Agent(
         client,
         model=llm_model.identifier,                     # Which LLM to use for generating answers
