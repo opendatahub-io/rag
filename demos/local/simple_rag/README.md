@@ -2,6 +2,32 @@
 
 A didactic example for **facilitating the creation of RAG agents in llama-stack**. This demo provides a streamlined approach to quickly deploy agents with RAG capabilities using PDF and TXT documents as inputs, making it ideal for development lifecycle workflows.
 
+## 🚀 Recent Improvements - Advanced RAG Processing
+
+This script has been enhanced with advanced processing techniques based on the high-performance KFP pipeline implementation:
+
+### ✨ **Enhanced Document Processing**
+- **HybridChunker**: Uses document-aware chunking instead of simple token-based splitting
+- **Advanced PDF Processing**: Enables OCR, table structure extraction, and page image generation
+- **Better Text Extraction**: Preserves document structure and metadata
+
+### 🧠 **Improved Embedding Generation**
+- **Manual Embedding Control**: Uses SentenceTransformer for direct embedding generation
+- **Larger Chunk Size**: Increased from 256 to 512 tokens for better context
+- **Rich Metadata**: Includes token counts, document IDs, and processing information
+
+### 🗄️ **Advanced Vector Database Operations**
+- **Direct Vector Insertion**: Uses `client.vector_io.insert()` for pre-computed embeddings
+- **Better Chunk Management**: Contextualizes chunks with document structure
+- **Enhanced Metadata**: Detailed tracking of document processing statistics
+
+### 🎯 **Performance Benefits**
+- **Better Retrieval Quality**: Document-aware chunking preserves semantic meaning
+- **Improved Answer Accuracy**: Larger context windows provide more comprehensive answers
+- **Enhanced PDF Support**: OCR and table extraction handle complex documents better
+
+These improvements should provide significantly better RAG results compared to the basic version.
+
 ## Purpose
 
 This simple RAG script is designed to **facilitate the development lifecycle** by providing a quick and easy way to:
