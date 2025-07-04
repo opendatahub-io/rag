@@ -35,4 +35,3 @@ spec:
         name: triton
       - emptyDir: {}
         name: config
-

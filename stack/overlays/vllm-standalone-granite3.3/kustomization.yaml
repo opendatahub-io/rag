@@ -7,5 +7,3 @@ patches:
     target:
       kind: Deployment
       name: vllm
-
-

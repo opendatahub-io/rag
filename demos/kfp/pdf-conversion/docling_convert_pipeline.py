@@ -1,3 +1,17 @@
+# Copyright 2025 IBM, Red Hat
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # ruff: noqa: PLC0415,UP007,UP035,UP006,E712
 # SPDX-License-Identifier: Apache-2.0
 from typing import List
@@ -6,9 +20,7 @@ import logging
 from kfp import compiler, dsl
 from kfp.kubernetes import add_node_selector_json, add_toleration_json
 
-PYTHON_BASE_IMAGE = (
-    "registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168"
-)
+PYTHON_BASE_IMAGE = "registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168"
 
 # Workbench Runtime Image: Pytorch with CUDA and Python 3.11 (UBI 9)
 # The images for each release can be found in
@@ -16,6 +28,7 @@ PYTHON_BASE_IMAGE = (
 PYTORCH_CUDA_IMAGE = "quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e"
 
 _log = logging.getLogger(__name__)
+
 
 @dsl.component(
     base_image=PYTHON_BASE_IMAGE,
@@ -31,10 +44,14 @@ def register_vector_db(
     client = LlamaStackClient(base_url=service_url)
 
     models = client.models.list()
-    matching_model = next((m for m in models if m.provider_resource_id == embed_model_id), None)
+    matching_model = next(
+        (m for m in models if m.provider_resource_id == embed_model_id), None
+    )
 
     if not matching_model:
-        raise ValueError(f"Model with ID '{embed_model_id}' not found on LlamaStack server.")
+        raise ValueError(
+            f"Model with ID '{embed_model_id}' not found on LlamaStack server."
+        )
 
     if matching_model.model_type != "embedding":
         raise ValueError(f"Model '{embed_model_id}' is not an embedding model")
@@ -48,7 +65,9 @@ def register_vector_db(
         embedding_dimension=embedding_dimension,
         provider_id="milvus",
     )
-    print(f"Registered vector DB '{vector_db_id}' with embedding model '{embed_model_id}'.")
+    print(
+        f"Registered vector DB '{vector_db_id}' with embedding model '{embed_model_id}'."
+    )
 
 
 @dsl.component(
@@ -92,13 +111,24 @@ def create_pdf_splits(
 
     # Split our entire directory of pdfs into n batches, where n == num_splits
     all_pdfs = [path.name for path in pathlib.Path(input_path).glob("*.pdf")]
-    splits = [batch for batch in (all_pdfs[i::num_splits] for i in range(num_splits)) if batch]
+    splits = [
+        batch for batch in (all_pdfs[i::num_splits] for i in range(num_splits)) if batch
+    ]
     return splits or [[]]
+
 
 # This component converts PDFs to Markdown and ingests the embeddings into LlamaStack's vector store
 @dsl.component(
     base_image=PYTORCH_CUDA_IMAGE,
-    packages_to_install=["docling", "transformers", "sentence-transformers", "llama-stack", "llama-stack-client", "pymilvus", "fire"],
+    packages_to_install=[
+        "docling",
+        "transformers",
+        "sentence-transformers",
+        "llama-stack",
+        "llama-stack-client",
+        "pymilvus",
+        "fire",
+    ],
 )
 def docling_convert_and_ingest(
     input_path: dsl.InputPath("input-pdfs"),
@@ -128,7 +158,9 @@ def docling_convert_and_ingest(
     def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):
         tokenizer = AutoTokenizer.from_pretrained(embed_model_id)
         embedding_model = SentenceTransformer(embed_model_id)
-        chunker = HybridChunker(tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True)
+        chunker = HybridChunker(
+            tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True
+        )
         return embedding_model, chunker
 
     def embed_text(text: str, embedding_model) -> list[float]:
@@ -138,7 +170,9 @@ def docling_convert_and_ingest(
         processed_docs = 0
         for conv_res in conv_results:
             if conv_res.status != ConversionStatus.SUCCESS:
-                _log.warning(f"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}")
+                _log.warning(
+                    f"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}"
+                )
                 continue
 
             processed_docs += 1
@@ -149,7 +183,9 @@ def docling_convert_and_ingest(
                 _log.warning(f"Document conversion failed for {file_name}")
                 continue
 
-            embedding_model, chunker = setup_chunker_and_embedder(embed_model_id, max_tokens)
+            embedding_model, chunker = setup_chunker_and_embedder(
+                embed_model_id, max_tokens
+            )
 
             chunks_with_embedding = []
             for chunk in chunker.chunk(dl_doc=document):
@@ -180,7 +216,9 @@ def docling_convert_and_ingest(
                 )
             if chunks_with_embedding:
                 try:
-                    client.vector_io.insert(vector_db_id=vector_db_id, chunks=chunks_with_embedding)
+                    client.vector_io.insert(
+                        vector_db_id=vector_db_id, chunks=chunks_with_embedding
+                    )
                 except Exception as e:
                     _log.error(f"Failed to insert embeddings into vector database: {e}")
 
@@ -203,7 +241,9 @@ def docling_convert_and_ingest(
     pipeline_options.generate_page_images = True
 
     doc_converter = DocumentConverter(
-        format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
+        format_options={
+            InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+        }
     )
 
     conv_results = doc_converter.convert_all(
@@ -279,7 +319,16 @@ def docling_convert_pipeline(
             convert_task.set_memory_limit("6Gi")
             convert_task.set_accelerator_type("nvidia.com/gpu")
             convert_task.set_accelerator_limit(1)
-            add_toleration_json(convert_task, [{"effect": "NoSchedule", "key": "nvidia.com/gpu", "operator": "Exists"}])
+            add_toleration_json(
+                convert_task,
+                [
+                    {
+                        "effect": "NoSchedule",
+                        "key": "nvidia.com/gpu",
+                        "operator": "Exists",
+                    }
+                ],
+            )
             add_node_selector_json(convert_task, {})
         with dsl.Else():
             convert_task = docling_convert_and_ingest(
@@ -295,7 +344,9 @@ def docling_convert_pipeline(
             convert_task.set_cpu_limit("4")
             convert_task.set_memory_request("2Gi")
             convert_task.set_memory_limit("6Gi")
-            
+
 
 if __name__ == "__main__":
-    compiler.Compiler().compile(docling_convert_pipeline, package_path=__file__.replace(".py", "_compiled.yaml"))
+    compiler.Compiler().compile(
+        docling_convert_pipeline, package_path=__file__.replace(".py", "_compiled.yaml")
+    )

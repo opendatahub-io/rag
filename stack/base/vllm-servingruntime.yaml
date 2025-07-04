@@ -42,5 +42,3 @@ spec:
       medium: Memory
       sizeLimit: 2Gi
     name: shm
-
-
