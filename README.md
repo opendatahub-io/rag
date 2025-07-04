@@ -1,7 +1,7 @@
 # RAG
 
 ## Project Overview
-The RAG project serves as a repository of comprehensive demonstrations, benchmarking scripts, and deployment guides for the RAG Stack on Kubernetes/OpenShift. 
+The RAG project serves as a repository of comprehensive demonstrations, benchmarking scripts, and deployment guides for the RAG Stack on Kubernetes/OpenShift.
 
 ## Getting Started
 ### Deployment

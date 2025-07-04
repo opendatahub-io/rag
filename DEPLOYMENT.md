@@ -242,7 +242,7 @@ To completely remove the project and all its resources from OpenShift, follow th
    ```bash
    # Check for processes using port 8080
    lsof -i :8080
-   
+
    # Kill the process if found (replace PID with the actual process ID)
    kill <PID>
    ```
@@ -253,4 +253,4 @@ After completing these steps, all resources associated with the RAG stack will b
 
 - [OpenShift Documentation](https://docs.openshift.com/)
 - [KServe Documentation](https://kserve.github.io/website/)
-- [vLLM Documentation](https://vllm.readthedocs.io/) 
+- [vLLM Documentation](https://vllm.readthedocs.io/)

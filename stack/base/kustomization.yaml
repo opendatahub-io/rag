@@ -7,4 +7,3 @@ resources:
 - vllm-inferenceservice.yaml
 - llama-stack-distribution.yaml
 - route.yaml
-

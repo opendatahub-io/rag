@@ -19,5 +19,3 @@ spec:
         env:
         - name: VLLM_PORT
           value: '8000'
-
-
