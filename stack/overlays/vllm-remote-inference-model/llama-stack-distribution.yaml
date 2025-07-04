@@ -1,0 +1,51 @@
+---
+apiVersion: llamastack.io/v1alpha1
+kind: LlamaStackDistribution
+metadata:
+  name: lsd-llama-milvus
+spec:
+  replicas: 1
+  server:
+    containerSpec:
+      resources:
+        requests:
+          cpu: "250m"
+          memory: "500Mi"
+        limits:
+          cpu: "2"
+          memory: "12Gi"
+      env:
+        - name: INFERENCE_MODEL
+          valueFrom:
+            secretKeyRef:
+              key: INFERENCE_MODEL
+              name: llama-stack-inference-model-secret
+              optional: true
+        - name: VLLM_URL
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_URL
+              name: llama-stack-inference-model-secret
+              optional: true
+        - name: VLLM_TLS_VERIFY
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_TLS_VERIFY
+              name: llama-stack-inference-model-secret
+              optional: true
+        - name: VLLM_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_API_TOKEN
+              name: llama-stack-inference-model-secret
+              optional: true
+        - name: MILVUS_DB_PATH
+          value: ~/.llama/milvus.db
+        - name: FMS_ORCHESTRATOR_URL
+          value: "http://localhost"
+      name: llama-stack
+      port: 8321
+    distribution:
+      image: quay.io/opendatahub/llama-stack:odh
+    storage:
+      size: "5Gi"
