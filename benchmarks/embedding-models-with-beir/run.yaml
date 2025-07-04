@@ -47,6 +47,13 @@ providers:
       responses_store:
         type: sqlite
         db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/ollama}/responses_store.db
+  telemetry:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config:
+      service_name: "${env.OTEL_SERVICE_NAME:=\u200B}"
+      sinks: ${env.TELEMETRY_SINKS:=console,sqlite}
+      sqlite_db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/ollama}/trace_store.db
   eval:
   - provider_id: meta-reference
     provider_type: inline::meta-reference
@@ -128,12 +135,6 @@ models:
   model_id: ${env.INFERENCE_MODEL}
   provider_id: ollama
   model_type: llm
-- metadata:
-    embedding_dimension: 384
-  model_id: all-MiniLM-L6-v2
-  provider_id: sentence-transformers
-  provider_model_id: sentence-transformers/all-MiniLM-L6-v2
-  model_type: embedding
 - metadata:
     embedding_dimension: 768
   model_id: granite-embedding-125m
