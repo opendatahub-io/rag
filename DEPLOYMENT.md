@@ -44,15 +44,19 @@ oc patch secret hf-token-secret --type='merge' -p='{"data":{"HF_TOKEN":"'$(echo 
 
 #### Option D: setup using an inference model deployed remotely
 
-Note: do not use VLLM_TLS_VERIFY=false in production environments
+
 ```bash
-# Create secret llama-stack-remote-inference-model-secret providing remote model info
+# Create secret llama-stack-inference-model-secret providing model info
+# Important: 
+#  - Make sure that the value for INFERENCE_MODEL is correct (it doesn't have points)
+#  - In VLLM_URL you can use internal or external endpoints for the model. Add /v1 at the end
+#  - Do not use VLLM_TLS_VERIFY=false in production environments
 export INFERENCE_MODEL=llama-3-2-3b
 export VLLM_URL=https://llama-3-2-3b.apps.remote-cluster.com:443/v1
 export VLLM_TLS_VERIFY=false
 export VLLM_API_TOKEN=XXXXXXXXXXXXXXXXXXXXXXX
 
-oc create secret generic llama-stack-remote-inference-model-secret \
+oc create secret generic llama-stack-inference-model-secret \
   --from-literal INFERENCE_MODEL=$INFERENCE_MODEL   \
   --from-literal VLLM_URL=$VLLM_URL                 \
   --from-literal VLLM_TLS_VERIFY=$VLLM_TLS_VERIFY   \

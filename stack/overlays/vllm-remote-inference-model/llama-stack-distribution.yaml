@@ -19,25 +19,25 @@ spec:
           valueFrom:
             secretKeyRef:
               key: INFERENCE_MODEL
-              name: llama-stack-remote-inference-model-secret
+              name: llama-stack-inference-model-secret
               optional: true
         - name: VLLM_URL
           valueFrom:
             secretKeyRef:
               key: VLLM_URL
-              name: llama-stack-remote-inference-model-secret
+              name: llama-stack-inference-model-secret
               optional: true
         - name: VLLM_TLS_VERIFY
           valueFrom:
             secretKeyRef:
               key: VLLM_TLS_VERIFY
-              name: llama-stack-remote-inference-model-secret
+              name: llama-stack-inference-model-secret
               optional: true
         - name: VLLM_API_TOKEN
           valueFrom:
             secretKeyRef:
               key: VLLM_API_TOKEN
-              name: llama-stack-remote-inference-model-secret
+              name: llama-stack-inference-model-secret
               optional: true
         - name: MILVUS_DB_PATH
           value: ~/.llama/milvus.db
