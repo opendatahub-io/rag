@@ -98,7 +98,14 @@ def create_pdf_splits(
 # This component converts PDFs to Markdown and ingests the embeddings into LlamaStack's vector store
 @dsl.component(
     base_image=PYTORCH_CUDA_IMAGE,
-    packages_to_install=["docling", "transformers", "sentence-transformers", "llama-stack", "llama-stack-client", "pymilvus", "fire"],
+    packages_to_install=["docling==2.39.0",
+                         "transformers",
+                         "sentence-transformers",
+                         "llama-stack",
+                         "llama-stack-client",
+                         "pymilvus",
+                         "fire",
+                         "rapidocr-onnxruntime"],
 )
 def docling_convert_and_ingest(
     input_path: dsl.InputPath("input-pdfs"),
@@ -112,7 +119,7 @@ def docling_convert_and_ingest(
     import pathlib
 
     from docling.datamodel.base_models import InputFormat, ConversionStatus
-    from docling.datamodel.pipeline_options import PdfPipelineOptions
+    from docling.datamodel.pipeline_options import PdfPipelineOptions, RapidOcrOptions
     from docling.document_converter import DocumentConverter, PdfFormatOption
     from transformers import AutoTokenizer
     from sentence_transformers import SentenceTransformer
@@ -123,6 +130,7 @@ def docling_convert_and_ingest(
     import json
 
     _log = logging.getLogger(__name__)
+
 
     # ---- Helper functions ----
     def setup_chunker_and_embedder(embed_model_id: str, max_tokens: int):
@@ -201,6 +209,7 @@ def docling_convert_and_ingest(
     pipeline_options = PdfPipelineOptions()
     pipeline_options.do_ocr = True
     pipeline_options.generate_page_images = True
+    pipeline_options.ocr_options = RapidOcrOptions()
 
     doc_converter = DocumentConverter(
         format_options={InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)}
@@ -295,7 +304,6 @@ def docling_convert_pipeline(
             convert_task.set_cpu_limit("4")
             convert_task.set_memory_request("2Gi")
             convert_task.set_memory_limit("6Gi")
-            
 
 if __name__ == "__main__":
     compiler.Compiler().compile(docling_convert_pipeline, package_path=__file__.replace(".py", "_compiled.yaml"))
