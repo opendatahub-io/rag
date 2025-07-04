@@ -92,3 +92,22 @@ When contributing to the `stack/` directory:
 - **Document any new overlays** or configurations in the [DEPLOYMENT.md](DEPLOYMENT.md) guide
 - **Test deployments** on both OpenShift or Kubernetes when possible
 - **Include resource requirements** in documentation
+
+### pre-commit
+
+This project is configured to use pre-commit for every new PR.
+You can find instructions for installing pre-commit [here](https://pre-commit.com/#installation)
+
+## Setup pre-commit for the RAG project
+
+Run the following command to allow pre-commit to run before each commit:
+
+``` bash
+pre-commit install
+```
+
+To run pre-commit without commiting run:
+
+``` bash
+pre-commit run --all-files
+```
