@@ -1,0 +1,797 @@
+# PIPELINE DEFINITION
+# Name: docling-convert-pipeline
+# Description: Converts image documents to text using Docling OCR and generates embeddings
+# Inputs:
+#    base_url: str [Default: 'https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/images']
+#    embed_model_id: str [Default: 'ibm-granite/granite-embedding-125m-english']
+#    image_filenames: str [Default: 'RAG_flow_diagram.png, RAG_key_market_usecases.png']
+#    max_tokens: int [Default: 512.0]
+#    num_workers: int [Default: 1.0]
+#    service_url: str [Default: 'http://lsd-llama-milvus-service:8321']
+#    use_gpu: bool [Default: False]
+#    vector_db_id: str [Default: 'ocr-vector-db']
+components:
+  comp-condition-3:
+    dag:
+      tasks:
+        docling-convert-and-ingest-images:
+          cachingOptions: {}
+          componentRef:
+            name: comp-docling-convert-and-ingest-images
+          inputs:
+            artifacts:
+              input_path:
+                componentInputArtifact: pipelinechannel--import-test-images-output_path
+            parameters:
+              embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              image_split:
+                componentInputParameter: pipelinechannel--create-image-splits-Output-loop-item
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: docling-convert-and-ingest-images
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-images-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-image-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-condition-4:
+    dag:
+      tasks:
+        docling-convert-and-ingest-images-2:
+          cachingOptions: {}
+          componentRef:
+            name: comp-docling-convert-and-ingest-images-2
+          inputs:
+            artifacts:
+              input_path:
+                componentInputArtifact: pipelinechannel--import-test-images-output_path
+            parameters:
+              embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              image_split:
+                componentInputParameter: pipelinechannel--create-image-splits-Output-loop-item
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: docling-convert-and-ingest-images-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-images-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-image-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-condition-branches-2:
+    dag:
+      tasks:
+        condition-3:
+          componentRef:
+            name: comp-condition-3
+          inputs:
+            artifacts:
+              pipelinechannel--import-test-images-output_path:
+                componentInputArtifact: pipelinechannel--import-test-images-output_path
+            parameters:
+              pipelinechannel--create-image-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-image-splits-Output-loop-item
+              pipelinechannel--embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: condition-3
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--use_gpu'] == true
+        condition-4:
+          componentRef:
+            name: comp-condition-4
+          inputs:
+            artifacts:
+              pipelinechannel--import-test-images-output_path:
+                componentInputArtifact: pipelinechannel--import-test-images-output_path
+            parameters:
+              pipelinechannel--create-image-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-image-splits-Output-loop-item
+              pipelinechannel--embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: condition-4
+          triggerPolicy:
+            condition: '!(inputs.parameter_values[''pipelinechannel--use_gpu''] ==
+              true)'
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-images-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-image-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-create-image-splits:
+    executorLabel: exec-create-image-splits
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        num_splits:
+          parameterType: NUMBER_INTEGER
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: LIST
+  comp-docling-convert-and-ingest-images:
+    executorLabel: exec-docling-convert-and-ingest-images
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        embed_model_id:
+          parameterType: STRING
+        image_split:
+          parameterType: LIST
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        service_url:
+          parameterType: STRING
+        vector_db_id:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+  comp-docling-convert-and-ingest-images-2:
+    executorLabel: exec-docling-convert-and-ingest-images-2
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        embed_model_id:
+          parameterType: STRING
+        image_split:
+          parameterType: LIST
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        service_url:
+          parameterType: STRING
+        vector_db_id:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+  comp-for-loop-1:
+    dag:
+      tasks:
+        condition-branches-2:
+          componentRef:
+            name: comp-condition-branches-2
+          inputs:
+            artifacts:
+              pipelinechannel--import-test-images-output_path:
+                componentInputArtifact: pipelinechannel--import-test-images-output_path
+            parameters:
+              pipelinechannel--create-image-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-image-splits-Output-loop-item
+              pipelinechannel--embed_model_id:
+                componentInputParameter: pipelinechannel--embed_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_db_id:
+                componentInputParameter: pipelinechannel--vector_db_id
+          taskInfo:
+            name: condition-branches-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-test-images-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-image-splits-Output:
+          parameterType: LIST
+        pipelinechannel--create-image-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--embed_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_db_id:
+          parameterType: STRING
+  comp-import-test-images:
+    executorLabel: exec-import-test-images
+    inputDefinitions:
+      parameters:
+        base_url:
+          parameterType: STRING
+        image_filenames:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+  comp-register-vector-db:
+    executorLabel: exec-register-vector-db
+    inputDefinitions:
+      parameters:
+        embed_model_id:
+          parameterType: STRING
+        service_url:
+          parameterType: STRING
+        vector_db_id:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-create-image-splits:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - create_image_splits
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef create_image_splits(\n    input_path: dsl.InputPath(\"input-images\"\
+          ),\n    num_splits: int,\n) -> List[List[str]]:\n    import pathlib\n\n\
+          \    # Split our entire directory of images into n batches, where n == num_splits\n\
+          \    # Support multiple image formats\n    all_images = []\n    image_extensions\
+          \ = [\n        \"*.png\",\n        \"*.jpg\",\n        \"*.jpeg\",\n   \
+          \     \"*.tiff\",\n        \"*.bmp\",\n        \"*.webp\",\n    ]\n\n  \
+          \  for ext in image_extensions:\n        all_images.extend([path.name for\
+          \ path in pathlib.Path(input_path).glob(ext)])\n\n    splits = [\n     \
+          \   batch\n        for batch in (all_images[i::num_splits] for i in range(num_splits))\n\
+          \        if batch\n    ]\n    return splits or [[]]\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+    exec-docling-convert-and-ingest-images:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - docling_convert_and_ingest_images
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'docling' 'transformers'\
+          \ 'sentence-transformers' 'llama-stack' 'llama-stack-client' 'pymilvus'\
+          \ 'fire' 'requests' 'Pillow' 'huggingface_hub' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef docling_convert_and_ingest_images(\n    input_path: dsl.InputPath(\"\
+          input-images\"),\n    image_split: List[str],\n    output_path: dsl.OutputPath(\"\
+          output-md\"),\n    embed_model_id: str,\n    max_tokens: int,\n    service_url:\
+          \ str,\n    vector_db_id: str,\n) -> None:\n    import pathlib\n    import\
+          \ json\n    import uuid\n    import logging\n    import os\n    from docling.datamodel.pipeline_options\
+          \ import RapidOcrOptions\n    from huggingface_hub import snapshot_download\n\
+          \    from docling.datamodel.base_models import InputFormat, ConversionStatus\n\
+          \    from docling.datamodel.document import ConversionResult\n    from docling.document_converter\
+          \ import DocumentConverter, ImageFormatOption\n    from transformers import\
+          \ AutoTokenizer\n    from sentence_transformers import SentenceTransformer\n\
+          \    from docling_core.transforms.chunker.hybrid_chunker import HybridChunker\n\
+          \    from llama_stack_client import LlamaStackClient\n\n    _log = logging.getLogger(__name__)\n\
+          \n    def setup_chunker_and_embedder(\n        embed_model_id: str, max_tokens:\
+          \ int\n    ) -> Tuple[SentenceTransformer, HybridChunker]:\n        \"\"\
+          \"Setup embedding model and chunker for text processing\"\"\"\n        tokenizer\
+          \ = AutoTokenizer.from_pretrained(embed_model_id)\n        embedding_model\
+          \ = SentenceTransformer(embed_model_id)\n        chunker = HybridChunker(\n\
+          \            tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True\n\
+          \        )\n        return embedding_model, chunker\n\n    def embed_text(text:\
+          \ str, embedding_model: SentenceTransformer) -> List[float]:\n        \"\
+          \"\"Generate embeddings for text content\"\"\"\n        return embedding_model.encode([text],\
+          \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(\n\
+          \        conv_results: Iterator[ConversionResult], client: LlamaStackClient\n\
+          \    ) -> None:\n        processed_docs = 0\n        embedding_model, chunker\
+          \ = setup_chunker_and_embedder(\n            embed_model_id, max_tokens\n\
+          \        )\n\n        for conv_res in conv_results:\n            if conv_res.status\
+          \ != ConversionStatus.SUCCESS:\n                _log.warning(\n        \
+          \            f\"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}\"\
+          \n                )\n                continue\n\n            processed_docs\
+          \ += 1\n            file_name = conv_res.input.file.stem\n            document\
+          \ = conv_res.document\n\n            if document is None:\n            \
+          \    _log.warning(f\"Document conversion failed for {file_name}\")\n   \
+          \             continue\n\n            chunks_with_embedding = []\n     \
+          \       for chunk in chunker.chunk(dl_doc=document):\n                raw_chunk\
+          \ = chunker.contextualize(chunk)\n                embedding = embed_text(raw_chunk,\
+          \ embedding_model)\n                chunk_id = str(uuid.uuid4())\n     \
+          \           content_token_count = chunker.tokenizer.count_tokens(raw_chunk)\n\
+          \n                # Prepare metadata object\n                metadata_obj\
+          \ = {\n                    \"file_name\": file_name,\n                 \
+          \   \"document_id\": chunk_id,\n                    \"token_count\": content_token_count,\n\
+          \                }\n\n                metadata_str = json.dumps(metadata_obj)\n\
+          \                metadata_token_count = chunker.tokenizer.count_tokens(metadata_str)\n\
+          \                metadata_obj[\"metadata_token_count\"] = metadata_token_count\n\
+          \n                # Create a new embedding object with the required fields\n\
+          \                new_embedding = {\n                    \"content\": raw_chunk,\n\
+          \                    \"mime_type\": \"text/markdown\",\n               \
+          \     \"embedding\": embedding,\n                    \"metadata\": metadata_obj,\n\
+          \                }\n\n                print(f\"New embedding: {new_embedding}\"\
+          )\n\n                chunks_with_embedding.append(new_embedding)\n\n   \
+          \         if chunks_with_embedding:\n                try:\n            \
+          \        client.vector_io.insert(\n                        vector_db_id=vector_db_id,\
+          \ chunks=chunks_with_embedding\n                    )\n                except\
+          \ Exception as e:\n                    _log.error(f\"Failed to insert embeddings\
+          \ into vector database: {e}\")\n\n        _log.info(f\"Processed {processed_docs}\
+          \ documents successfully.\")\n\n    input_path = pathlib.Path(input_path)\n\
+          \    output_path = pathlib.Path(output_path)\n    output_path.mkdir(parents=True,\
+          \ exist_ok=True)\n\n    input_images = [input_path / name for name in image_split]\n\
+          \n    # Download RapidOCR models from HuggingFace\n    print(\"Downloading\
+          \ RapidOCR models\")\n    download_path = snapshot_download(repo_id=\"SWHL/RapidOCR\"\
+          )\n\n    # Setup RapidOcrOptions for english detection\n    det_model_path\
+          \ = os.path.join(\n        download_path, \"PP-OCRv4\", \"en_PP-OCRv3_det_infer.onnx\"\
+          \n    )\n    rec_model_path = os.path.join(\n        download_path, \"PP-OCRv4\"\
+          , \"ch_PP-OCRv4_rec_server_infer.onnx\"\n    )\n    cls_model_path = os.path.join(\n\
+          \        download_path, \"PP-OCRv3\", \"ch_ppocr_mobile_v2.0_cls_train.onnx\"\
+          \n    )\n\n    image_format_options = ImageFormatOption(\n        do_ocr=True,\n\
+          \        ocr_options=RapidOcrOptions(\n            det_model_path=det_model_path,\n\
+          \            rec_model_path=rec_model_path,\n            cls_model_path=cls_model_path,\n\
+          \        ),\n    )\n\n    # Create Docling OCR converter\n    docling_ocr_converter\
+          \ = DocumentConverter(\n        format_options={InputFormat.IMAGE: image_format_options}\n\
+          \    )\n\n    # Convert all image files to text\n    conv_results = docling_ocr_converter.convert_all(\n\
+          \        input_images,\n        raises_on_error=True,\n    )\n\n    client\
+          \ = LlamaStackClient(base_url=service_url)\n\n    process_and_insert_embeddings(conv_results,\
+          \ client)\n\n"
+        image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e
+        resources:
+          accelerator:
+            count: '1'
+            resourceCount: '1'
+            resourceType: nvidia.com/gpu
+            type: nvidia.com/gpu
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+    exec-docling-convert-and-ingest-images-2:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - docling_convert_and_ingest_images
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'docling' 'transformers'\
+          \ 'sentence-transformers' 'llama-stack' 'llama-stack-client' 'pymilvus'\
+          \ 'fire' 'requests' 'Pillow' 'huggingface_hub' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef docling_convert_and_ingest_images(\n    input_path: dsl.InputPath(\"\
+          input-images\"),\n    image_split: List[str],\n    output_path: dsl.OutputPath(\"\
+          output-md\"),\n    embed_model_id: str,\n    max_tokens: int,\n    service_url:\
+          \ str,\n    vector_db_id: str,\n) -> None:\n    import pathlib\n    import\
+          \ json\n    import uuid\n    import logging\n    import os\n    from docling.datamodel.pipeline_options\
+          \ import RapidOcrOptions\n    from huggingface_hub import snapshot_download\n\
+          \    from docling.datamodel.base_models import InputFormat, ConversionStatus\n\
+          \    from docling.datamodel.document import ConversionResult\n    from docling.document_converter\
+          \ import DocumentConverter, ImageFormatOption\n    from transformers import\
+          \ AutoTokenizer\n    from sentence_transformers import SentenceTransformer\n\
+          \    from docling_core.transforms.chunker.hybrid_chunker import HybridChunker\n\
+          \    from llama_stack_client import LlamaStackClient\n\n    _log = logging.getLogger(__name__)\n\
+          \n    def setup_chunker_and_embedder(\n        embed_model_id: str, max_tokens:\
+          \ int\n    ) -> Tuple[SentenceTransformer, HybridChunker]:\n        \"\"\
+          \"Setup embedding model and chunker for text processing\"\"\"\n        tokenizer\
+          \ = AutoTokenizer.from_pretrained(embed_model_id)\n        embedding_model\
+          \ = SentenceTransformer(embed_model_id)\n        chunker = HybridChunker(\n\
+          \            tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True\n\
+          \        )\n        return embedding_model, chunker\n\n    def embed_text(text:\
+          \ str, embedding_model: SentenceTransformer) -> List[float]:\n        \"\
+          \"\"Generate embeddings for text content\"\"\"\n        return embedding_model.encode([text],\
+          \ normalize_embeddings=True).tolist()[0]\n\n    def process_and_insert_embeddings(\n\
+          \        conv_results: Iterator[ConversionResult], client: LlamaStackClient\n\
+          \    ) -> None:\n        processed_docs = 0\n        embedding_model, chunker\
+          \ = setup_chunker_and_embedder(\n            embed_model_id, max_tokens\n\
+          \        )\n\n        for conv_res in conv_results:\n            if conv_res.status\
+          \ != ConversionStatus.SUCCESS:\n                _log.warning(\n        \
+          \            f\"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}\"\
+          \n                )\n                continue\n\n            processed_docs\
+          \ += 1\n            file_name = conv_res.input.file.stem\n            document\
+          \ = conv_res.document\n\n            if document is None:\n            \
+          \    _log.warning(f\"Document conversion failed for {file_name}\")\n   \
+          \             continue\n\n            chunks_with_embedding = []\n     \
+          \       for chunk in chunker.chunk(dl_doc=document):\n                raw_chunk\
+          \ = chunker.contextualize(chunk)\n                embedding = embed_text(raw_chunk,\
+          \ embedding_model)\n                chunk_id = str(uuid.uuid4())\n     \
+          \           content_token_count = chunker.tokenizer.count_tokens(raw_chunk)\n\
+          \n                # Prepare metadata object\n                metadata_obj\
+          \ = {\n                    \"file_name\": file_name,\n                 \
+          \   \"document_id\": chunk_id,\n                    \"token_count\": content_token_count,\n\
+          \                }\n\n                metadata_str = json.dumps(metadata_obj)\n\
+          \                metadata_token_count = chunker.tokenizer.count_tokens(metadata_str)\n\
+          \                metadata_obj[\"metadata_token_count\"] = metadata_token_count\n\
+          \n                # Create a new embedding object with the required fields\n\
+          \                new_embedding = {\n                    \"content\": raw_chunk,\n\
+          \                    \"mime_type\": \"text/markdown\",\n               \
+          \     \"embedding\": embedding,\n                    \"metadata\": metadata_obj,\n\
+          \                }\n\n                print(f\"New embedding: {new_embedding}\"\
+          )\n\n                chunks_with_embedding.append(new_embedding)\n\n   \
+          \         if chunks_with_embedding:\n                try:\n            \
+          \        client.vector_io.insert(\n                        vector_db_id=vector_db_id,\
+          \ chunks=chunks_with_embedding\n                    )\n                except\
+          \ Exception as e:\n                    _log.error(f\"Failed to insert embeddings\
+          \ into vector database: {e}\")\n\n        _log.info(f\"Processed {processed_docs}\
+          \ documents successfully.\")\n\n    input_path = pathlib.Path(input_path)\n\
+          \    output_path = pathlib.Path(output_path)\n    output_path.mkdir(parents=True,\
+          \ exist_ok=True)\n\n    input_images = [input_path / name for name in image_split]\n\
+          \n    # Download RapidOCR models from HuggingFace\n    print(\"Downloading\
+          \ RapidOCR models\")\n    download_path = snapshot_download(repo_id=\"SWHL/RapidOCR\"\
+          )\n\n    # Setup RapidOcrOptions for english detection\n    det_model_path\
+          \ = os.path.join(\n        download_path, \"PP-OCRv4\", \"en_PP-OCRv3_det_infer.onnx\"\
+          \n    )\n    rec_model_path = os.path.join(\n        download_path, \"PP-OCRv4\"\
+          , \"ch_PP-OCRv4_rec_server_infer.onnx\"\n    )\n    cls_model_path = os.path.join(\n\
+          \        download_path, \"PP-OCRv3\", \"ch_ppocr_mobile_v2.0_cls_train.onnx\"\
+          \n    )\n\n    image_format_options = ImageFormatOption(\n        do_ocr=True,\n\
+          \        ocr_options=RapidOcrOptions(\n            det_model_path=det_model_path,\n\
+          \            rec_model_path=rec_model_path,\n            cls_model_path=cls_model_path,\n\
+          \        ),\n    )\n\n    # Create Docling OCR converter\n    docling_ocr_converter\
+          \ = DocumentConverter(\n        format_options={InputFormat.IMAGE: image_format_options}\n\
+          \    )\n\n    # Convert all image files to text\n    conv_results = docling_ocr_converter.convert_all(\n\
+          \        input_images,\n        raises_on_error=True,\n    )\n\n    client\
+          \ = LlamaStackClient(base_url=service_url)\n\n    process_and_insert_embeddings(conv_results,\
+          \ client)\n\n"
+        image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e
+        resources:
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+    exec-import-test-images:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - import_test_images
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'requests' &&\
+          \ \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef import_test_images(\n    base_url: str,\n    image_filenames:\
+          \ str,\n    output_path: dsl.OutputPath(\"input-images\"),\n) -> None:\n\
+          \    import os\n    import requests\n    import shutil\n\n    os.makedirs(output_path,\
+          \ exist_ok=True)\n    filenames = [f.strip() for f in image_filenames.split(\"\
+          ,\") if f.strip()]\n\n    for filename in filenames:\n        url = f\"\
+          {base_url.rstrip('/')}/{filename}\"\n        file_path = os.path.join(output_path,\
+          \ filename)\n\n        try:\n            with requests.get(url, stream=True,\
+          \ timeout=10) as response:\n                response.raise_for_status()\n\
+          \                with open(file_path, \"wb\") as f:\n                  \
+          \  shutil.copyfileobj(response.raw, f)\n            print(f\"Downloaded\
+          \ {filename}\")\n        except requests.exceptions.RequestException as\
+          \ e:\n            print(f\"Failed to download {filename}: {e}, skipping.\"\
+          )\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+    exec-register-vector-db:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_vector_db
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.13.0'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client'\
+          \ 'fire' 'requests' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef register_vector_db(\n    service_url: str,\n    vector_db_id:\
+          \ str,\n    embed_model_id: str,\n) -> None:\n    from llama_stack_client\
+          \ import LlamaStackClient\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    models = client.models.list()\n    matching_model = next(\n      \
+          \  (m for m in models if m.provider_resource_id == embed_model_id), None\n\
+          \    )\n\n    if not matching_model:\n        raise ValueError(\n      \
+          \      f\"Model with ID '{embed_model_id}' not found on LlamaStack server.\"\
+          \n        )\n\n    if matching_model.model_type != \"embedding\":\n    \
+          \    raise ValueError(f\"Model '{embed_model_id}' is not an embedding model\"\
+          )\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
+          ]\n\n    _ = client.vector_dbs.register(\n        vector_db_id=vector_db_id,\n\
+          \        embedding_model=matching_model.identifier,\n        embedding_dimension=embedding_dimension,\n\
+          \        provider_id=\"milvus\",\n    )\n    print(\n        f\"Registered\
+          \ vector DB '{vector_db_id}' with embedding model '{embed_model_id}'.\"\n\
+          \    )\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+pipelineInfo:
+  description: Converts image documents to text using Docling OCR and generates embeddings
+  name: docling-convert-pipeline
+root:
+  dag:
+    tasks:
+      create-image-splits:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-create-image-splits
+        dependentTasks:
+        - import-test-images
+        inputs:
+          artifacts:
+            input_path:
+              taskOutputArtifact:
+                outputArtifactKey: output_path
+                producerTask: import-test-images
+          parameters:
+            num_splits:
+              componentInputParameter: num_workers
+        taskInfo:
+          name: create-image-splits
+      for-loop-1:
+        componentRef:
+          name: comp-for-loop-1
+        dependentTasks:
+        - create-image-splits
+        - import-test-images
+        inputs:
+          artifacts:
+            pipelinechannel--import-test-images-output_path:
+              taskOutputArtifact:
+                outputArtifactKey: output_path
+                producerTask: import-test-images
+          parameters:
+            pipelinechannel--create-image-splits-Output:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-image-splits
+            pipelinechannel--embed_model_id:
+              componentInputParameter: embed_model_id
+            pipelinechannel--max_tokens:
+              componentInputParameter: max_tokens
+            pipelinechannel--service_url:
+              componentInputParameter: service_url
+            pipelinechannel--use_gpu:
+              componentInputParameter: use_gpu
+            pipelinechannel--vector_db_id:
+              componentInputParameter: vector_db_id
+        parameterIterator:
+          itemInput: pipelinechannel--create-image-splits-Output-loop-item
+          items:
+            inputParameter: pipelinechannel--create-image-splits-Output
+        taskInfo:
+          name: for-loop-1
+      import-test-images:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-import-test-images
+        inputs:
+          parameters:
+            base_url:
+              componentInputParameter: base_url
+            image_filenames:
+              componentInputParameter: image_filenames
+        taskInfo:
+          name: import-test-images
+      register-vector-db:
+        cachingOptions: {}
+        componentRef:
+          name: comp-register-vector-db
+        inputs:
+          parameters:
+            embed_model_id:
+              componentInputParameter: embed_model_id
+            service_url:
+              componentInputParameter: service_url
+            vector_db_id:
+              componentInputParameter: vector_db_id
+        taskInfo:
+          name: register-vector-db
+  inputDefinitions:
+    parameters:
+      base_url:
+        defaultValue: https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/images
+        description: Base URL to fetch image files from
+        isOptional: true
+        parameterType: STRING
+      embed_model_id:
+        defaultValue: ibm-granite/granite-embedding-125m-english
+        description: Model ID for embedding generation
+        isOptional: true
+        parameterType: STRING
+      image_filenames:
+        defaultValue: RAG_flow_diagram.png, RAG_key_market_usecases.png
+        description: Comma-separated list of image filenames to download and convert
+        isOptional: true
+        parameterType: STRING
+      max_tokens:
+        defaultValue: 512.0
+        description: Maximum number of tokens per chunk
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      num_workers:
+        defaultValue: 1.0
+        description: Number of docling worker pods to use
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      service_url:
+        defaultValue: http://lsd-llama-milvus-service:8321
+        description: URL of the LlamaStack service
+        isOptional: true
+        parameterType: STRING
+      use_gpu:
+        defaultValue: false
+        description: boolean to enable/disable gpu in the docling workers
+        isOptional: true
+        parameterType: BOOLEAN
+      vector_db_id:
+        defaultValue: ocr-vector-db
+        description: ID of the vector database to store embeddings
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.13.0
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-docling-convert-and-ingest-images:
+          nodeSelector:
+            nodeSelectorJson:
+              runtimeValue:
+                constant: {}
+          tolerations:
+          - effect: NoSchedule
+            key: nvidia.com/gpu
+            operator: Exists

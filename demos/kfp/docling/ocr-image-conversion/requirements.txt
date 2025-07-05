@@ -1,0 +1,5 @@
+docling >= 2.0.0
+kfp[kubernetes] >= 2.13.0
+llama-stack >= 0.1.0
+sqlalchemy >= 2.0.0
+huggingface_hub
