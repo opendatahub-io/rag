@@ -4,7 +4,7 @@ fastapi==0.115.12
 ibm_watson_machine_learning==1.0.367
 ibm_watsonx_ai==1.3.23
 litellm==1.73.1
-llama-index==0.12.40
+llama-index==0.12.41
 llama-index-embeddings-huggingface==0.5.4
 llama-index-llms-ibm==0.4.0
 llama-index-llms-llama-api==0.4.1
