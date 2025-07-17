@@ -1,3 +1,0 @@
-beir>=2.2.0
-llama-stack>=0.2.13
-pymilvus>=2.5.11
