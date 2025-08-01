@@ -1,4 +1,4 @@
-beir>=2.2.0
-llama-stack>=0.2.15
-llama-stack-client>=0.2.15
-pymilvus>=2.5.12
+beir==2.2.0
+llama-stack==0.2.17
+llama-stack-client==0.2.17
+pymilvus==2.5.12

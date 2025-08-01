@@ -1,0 +1,89 @@
+name: Embeddings Model Benchmark
+
+on:
+  workflow_dispatch:
+    inputs:
+      python-version:
+        description: The Python version to use
+        required: false
+        default: "3.12"
+      embedding-models:
+        description: Embedding models to benchmark
+        required: false
+        default: '["all-MiniLM-L6-v2", "granite-embedding-125m"]'
+      dataset-names:
+        description: The Beir datasets to test information retrieval performance
+        required: false
+        default: '["nfcorpus"]'
+      batch-size:
+        description: Batch size for document ingestion
+        required: false
+        default: "2"
+
+
+jobs:
+  embeddings-model-benchmark:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: ${{ inputs.python-version }}
+          activate-environment: true
+          version: 0.7.6
+
+      - name: Setup Ollama
+        uses: ./.github/actions/setup-ollama
+
+      - name: Install dependencies
+        run: |
+          uv venv .venv --python ${{ inputs.python-version }} --seed
+          uv pip install -r benchmarks/beir-benchmarks/requirements.txt
+
+          uv run --with llama-stack llama stack build --distro starter --image-type venv
+
+      - name: Run the Benchmark
+        id: benchmark
+        run: |
+          set -e
+          set -o pipefail
+
+          echo "Using the following dataset names: ${{ inputs.dataset-names }}"
+          echo "Using the following embedding models: ${{ inputs.embedding-models }}"
+          echo "Using the following batch size: ${{ inputs.batch-size }}"
+
+          echo "Running the Benchmark (capturing output to benchmark_results.txt)"
+          # Use tee to capture output while showing logs in real-time
+          DATASET_NAMES='${{ inputs.dataset-names }}'
+          EMBEDDING_MODELS='${{ inputs.embedding-models }}'
+          BATCH_SIZE="${{ inputs.batch-size }}"
+
+          # Convert JSON arrays to space-separated values
+          DATASET_ARGS=$(echo "$DATASET_NAMES" | jq -r '.[]' | tr '\n' ' ')
+          EMBEDDING_ARGS=$(echo "$EMBEDDING_MODELS" | jq -r '.[]' | tr '\n' ' ')
+
+          MILVUS_URL=milvus OLLAMA_URL=http://localhost:11434 uv run python beir_benchmarks.py \
+            --dataset-names $DATASET_ARGS \
+            --embedding-models $EMBEDDING_ARGS \
+            --batch-size "$BATCH_SIZE" | tee benchmark_output.txt
+
+        working-directory: benchmarks/beir-benchmarks
+
+      - name: Upload Benchmark Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: |
+            benchmarks/beir-benchmarks/results/
+            benchmarks/beir-benchmarks/benchmark_output.txt
+          retention-days: 30
