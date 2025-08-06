@@ -23,5 +23,5 @@ torch==2.7.1
 torchaudio==2.7.1
 
 # Embedding and text processing
-transformers==4.52.4
+transformers==4.53.0
 whisper==1.1.10
