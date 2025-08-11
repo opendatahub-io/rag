@@ -21,7 +21,7 @@ Prepare your environment by running:
 ``` bash
 # The run.yaml file is based on starter template https://github.com/meta-llama/llama-stack/tree/main/llama_stack/templates/starter
 # We run a build here to install all of the dependencies for the starter template
-llama stack build --template starter --image-type venv
+llama stack build --distro starter --image-type venv
 ```
 
 ## Running Instructions
@@ -31,7 +31,7 @@ To run the script with default settings:
 
 ```bash
 # Update OLLAMA_INFERENCE_MODEL to your preferred model or similar for other inference providers
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run python beir_benchmarks.py
 ```
 
 ## Supported Embedding Models
@@ -46,7 +46,7 @@ It is possible to add more embedding models using the [Llama Stack Python Client
 Below is an example of how you can add more embedding models to the models list.
 ``` bash
 # First run the llama stack server via the run file
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run llama stack run run.yaml
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run llama stack run run.yaml
 ```
 ``` bash
 # Adding the all-MiniLM-L6-v2 model via the llama-stack-client
@@ -156,29 +156,29 @@ dataset-name.zip/
 
 **Basic benchmarking with default settings:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run python beir_benchmarks.py
 ```
 
 **Basic benchmarking with larger batch size:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py --batch-size 300
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run python beir_benchmarks.py --batch-size 300
 ```
 
 **Benchmark multiple datasets:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py \
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run python beir_benchmarks.py \
  --dataset-names scifact scidocs
 ```
 
 **Compare specific embedding models:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py \
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run python beir_benchmarks.py \
   --embedding-models granite-embedding-30m all-MiniLM-L6-v2
 ```
 
 **Use custom datasets:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py \
+OLLAMA_URL=http://localhost:11434 MILVUS_URL=milvus uv run python beir_benchmarks.py \
   --dataset-names my-dataset \
   --custom-datasets-urls https://example.com/my-beir-dataset.zip
 ```
