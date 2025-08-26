@@ -40,7 +40,7 @@ spec:
               name: llama-stack-inference-model-secret
               optional: true
         - name: MILVUS_DB_PATH
-          value: ~/.llama/milvus.db
+          value: ~/.llama/distributions/rh/milvus.db
         - name: FMS_ORCHESTRATOR_URL
           value: "http://localhost"
       name: llama-stack
