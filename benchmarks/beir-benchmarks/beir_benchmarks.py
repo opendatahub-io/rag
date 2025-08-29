@@ -19,9 +19,11 @@ import pathlib
 from beir import util, LoggingHandler
 from beir.datasets.data_loader import GenericDataLoader
 
-from llama_stack.distribution.library_client import LlamaStackAsLibraryClient
+from llama_stack.core.library_client import LlamaStackAsLibraryClient
 from llama_stack.apis.tools import RAGQueryConfig
 from llama_stack_client.types import Document
+
+from warnings import filterwarnings
 
 import numpy as np
 import pytrec_eval
@@ -35,9 +37,13 @@ DEFAULT_CUSTOM_DATASETS_URLS = []
 DEFAULT_EMBEDDING_MODELS = ["granite-embedding-30m", "granite-embedding-125m"]
 DEFAULT_BATCH_SIZE = 150
 
+
 """
 TODO: Add an arg for specifying the benchmark type when new benchmarks are added.
 """
+
+# FutureWarning interfering with logging
+filterwarnings("ignore", category=FutureWarning)
 
 
 def parse_args():
@@ -86,6 +92,7 @@ logging.basicConfig(
     handlers=[LoggingHandler()],
 )
 
+
 """
 Common classes and functions for BEIR benchmarks.
 """
@@ -111,17 +118,21 @@ class LlamaStackRAGRetriever:
         top_k = top_k or self.top_k
 
         for qid, query in queries.items():
-            start_time = time.perf_counter()
-            rag_results = self.llama_stack_client.tool_runtime.rag_tool.query(
-                vector_db_ids=[self.vector_db_id],
-                content=query,
-                query_config={**self.query_config, "max_chunks": top_k},
-            )
-            end_time = time.perf_counter()
-            times[qid] = end_time - start_time
+            try:
+                start_time = time.perf_counter()
+                rag_results = self.llama_stack_client.tool_runtime.rag_tool.query(
+                    vector_db_ids=[self.vector_db_id],
+                    content=query,
+                    query_config={**self.query_config, "max_chunks": top_k},
+                )
+                end_time = time.perf_counter()
+                times[qid] = end_time - start_time
 
-            doc_ids = rag_results.metadata.get("document_ids", [])
-            scores = {doc_id: 1.0 - (i * 0.01) for i, doc_id in enumerate(doc_ids)}
+                doc_ids = rag_results.metadata.get("document_ids", [])
+                scores = {doc_id: 1.0 - (i * 0.01) for i, doc_id in enumerate(doc_ids)}
+            except Exception as e:
+                logging.error(f"Error during query {qid}: {e}")
+                exit(1)
 
             results[qid] = scores
 
@@ -340,7 +351,7 @@ class BenchmarkEmbeddingModels:
 
                 query_config = RAGQueryConfig(max_chunks=10, mode="vector").model_dump()
                 retriever = LlamaStackRAGRetriever(
-                    llama_stack_client, vector_db_id, query_config, top_k=10
+                    self.llama_stack_client, vector_db_id, query_config, top_k=10
                 )
 
                 print("Retrieving")
@@ -392,7 +403,9 @@ if __name__ == "__main__":
         )
 
     # Run LlamaStack Client
-    llama_stack_client = LlamaStackAsLibraryClient("./run.yaml")
+    llama_stack_client = LlamaStackAsLibraryClient(
+        os.path.join(pathlib.Path(__file__).parent.absolute(), "run.yaml")
+    )
     llama_stack_client.initialize()
 
     """

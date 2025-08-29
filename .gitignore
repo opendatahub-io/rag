@@ -3,3 +3,6 @@
 .vscode
 .venv
 .env
+
+benchmarks/beir-benchmarks/results/
+benchmarks/beir-benchmarks/datasets/
