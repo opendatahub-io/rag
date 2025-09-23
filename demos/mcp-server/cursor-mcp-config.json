@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "mcp-for-electroshop-sales-server": {
+      "command": "/Users/schimuneck/projects/redhat/llamastack/llamastack-rag-mcp-demo/.venv/bin/python",
+      "args": [
+        "/Users/schimuneck/projects/redhat/llamastack/llamastack-rag-mcp-demo/mcp_server/mcp_server.py"
+      ],
+      "description": "MCP server for Calabaceira Sales"
+    }
+  }
+}

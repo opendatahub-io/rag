@@ -1,0 +1,106 @@
+FROM registry.access.redhat.com/ubi9/python-312:latest
+
+# Switch to root to install packages
+USER root
+
+# Enable additional repositories and install PostgreSQL
+RUN dnf update -y && \
+    dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-aarch64/pgdg-redhat-repo-latest.noarch.rpm && \
+    dnf install -y postgresql15-server postgresql15-contrib && \
+    dnf clean all
+
+# Create application directory with proper permissions for OpenShift
+RUN mkdir -p /opt/app-root && \
+    chown -R 1001:0 /opt/app-root && \
+    chmod -R g+rwX /opt/app-root
+
+# Set working directory
+WORKDIR /opt/app-root
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip3 install --upgrade pip && \
+    pip3 install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY mcp_server/ ./mcp_server/
+COPY scripts/ ./scripts/
+
+# Initialize PostgreSQL data directory
+RUN mkdir -p /opt/app-root/pgdata && \
+    chown -R 1001:0 /opt/app-root/pgdata && \
+    chmod -R g+rwX /opt/app-root/pgdata
+
+# Create startup script
+RUN cat > /opt/app-root/start.sh << 'EOF'
+#!/bin/bash
+set -e
+
+export PATH=/usr/pgsql-15/bin:$PATH
+export PGDATA=/opt/app-root/pgdata
+export PGUSER=postgres
+export PGDATABASE=postgres
+
+# Initialize PostgreSQL if not already done
+if [ ! -f "$PGDATA/PG_VERSION" ]; then
+    echo "Initializing PostgreSQL database..."
+    /usr/pgsql-15/bin/initdb -D $PGDATA
+    
+    # Configure PostgreSQL
+    echo "host all all 0.0.0.0/0 trust" >> $PGDATA/pg_hba.conf
+    echo "listen_addresses = '*'" >> $PGDATA/postgresql.conf
+    echo "port = 5432" >> $PGDATA/postgresql.conf
+fi
+
+# Start PostgreSQL
+echo "Starting PostgreSQL..."
+/usr/pgsql-15/bin/postgres -D $PGDATA &
+PG_PID=$!
+
+# Wait for PostgreSQL to be ready
+echo "Waiting for PostgreSQL to start..."
+until /usr/pgsql-15/bin/pg_isready -h localhost -p 5432 -U postgres; do
+    sleep 1
+done
+
+# Run database initialization script
+echo "Setting up database..."
+export PGHOST=localhost
+export PGUSER=postgres
+export PGPASSWORD=""
+cd /opt/app-root && bash scripts/create_db_and_insert_data.sh
+
+# Start MCP server
+echo "Starting RedBank Financials MCP Server..."
+cd /opt/app-root/mcp_server
+exec python3 mcp_server.py
+EOF
+
+RUN chmod +x /opt/app-root/start.sh
+
+# Update database manager for local connection
+RUN sed -i 's/host="postgres"/host="localhost"/' /opt/app-root/mcp_server/database_manager.py && \
+    sed -i 's/password="postgres"/password=""/' /opt/app-root/mcp_server/database_manager.py
+
+# Update database script for local connection
+RUN sed -i 's/export PGHOST=postgres/export PGHOST=localhost/' /opt/app-root/scripts/create_db_and_insert_data.sh && \
+    sed -i 's/export PGPASSWORD=postgres/export PGPASSWORD=""/' /opt/app-root/scripts/create_db_and_insert_data.sh
+
+# Set proper permissions for OpenShift
+RUN chown -R 1001:0 /opt/app-root && \
+    chmod -R g+rwX /opt/app-root && \
+    chmod +x /opt/app-root/start.sh
+
+# Switch to non-root user
+USER 1001
+
+# Expose port
+EXPOSE 8000
+
+# Set environment variables
+ENV PYTHONPATH=/opt/app-root
+ENV PYTHONUNBUFFERED=1
+ENV PATH=/usr/pgsql-15/bin:$PATH
+
+# Start the application
+CMD ["/opt/app-root/start.sh"]

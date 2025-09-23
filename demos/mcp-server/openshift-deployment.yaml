@@ -1,0 +1,100 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: redbank-financials
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redbank-mcp-server
+  namespace: redbank-financials
+  labels:
+    app: redbank-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redbank-mcp-server
+  template:
+    metadata:
+      labels:
+        app: redbank-mcp-server
+    spec:
+      containers:
+      - name: mcp-server
+        image: redbank-mcp-server:latest
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /mcp
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /mcp
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: pgdata-volume
+          mountPath: /opt/app-root/pgdata
+      volumes:
+      - name: pgdata-volume
+        emptyDir: {}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        fsGroup: 0
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redbank-mcp-service
+  namespace: redbank-financials
+  labels:
+    app: redbank-mcp-server
+spec:
+  selector:
+    app: redbank-mcp-server
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: redbank-mcp-route
+  namespace: redbank-financials
+  labels:
+    app: redbank-mcp-server
+spec:
+  to:
+    kind: Service
+    name: redbank-mcp-service
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
