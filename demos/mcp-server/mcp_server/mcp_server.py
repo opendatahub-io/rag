@@ -17,6 +17,7 @@ from fastmcp import FastMCP
 from logger import setup_logger
 from database_manager import DatabaseManager
 import sys
+import os
 import psycopg
 
 
@@ -182,11 +183,25 @@ def get_transactions(statement_id: int) -> List[Dict[str, Any]]:
 
 
 if __name__ == "__main__":
-    logger.info("Starting RedBank Financials MCP server on http://127.0.0.1:8000/mcp")
+    logger.info("Starting RedBank Financials MCP server")
     try:
-        # this is will be used for Llama Stack
-        mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp")
-        # asyncio.run(mcp.run()) # this is will be used for Cursor testing
+        # Check transport mode
+        transport_mode = os.getenv("MCP_TRANSPORT", "stdio")
+        
+        if transport_mode == "sse":
+            host = os.getenv("MCP_HOST", "0.0.0.0")
+            port = int(os.getenv("MCP_PORT", "8000"))
+            logger.info(f"Starting SSE server on {host}:{port}")
+            mcp.run(transport="sse", host=host, port=port)
+        elif transport_mode == "http":
+            host = os.getenv("MCP_HOST", "0.0.0.0")
+            port = int(os.getenv("MCP_PORT", "8000"))
+            logger.info(f"Starting HTTP server on {host}:{port}")
+            mcp.run(transport="http", host=host, port=port)
+        else:
+            # Use stdio transport for Cursor compatibility
+            logger.info("Starting stdio transport")
+            mcp.run()
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
         db.close()

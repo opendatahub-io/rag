@@ -1,31 +1,9 @@
-#!/bin/bash
-# Copyright 2025 IBM, Red Hat
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+-- Create bank_statements database
+CREATE DATABASE bank_statements;
 
-# Set PostgreSQL connection parameters for local/container
-export PGHOST=localhost
-export PGUSER=postgres
-export PGPASSWORD=postgres
+-- Connect to bank_statements database
+\c bank_statements;
 
-# Terminate active connections to the database
-psql -d postgres -c "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = 'bank_statements' AND pid <> pg_backend_pid();"
-
-# Drop the database
-psql -d postgres -c "DROP DATABASE IF EXISTS bank_statements;"
-psql -d postgres -c "CREATE DATABASE bank_statements;"
-
-psql -d bank_statements <<'SQL'
 -- Drop tables in correct order (child tables first)
 DROP TABLE IF EXISTS transactions CASCADE;
 DROP TABLE IF EXISTS statements CASCADE;
@@ -122,4 +100,3 @@ INSERT INTO transactions (statement_id, description, price, date) VALUES
 (6, 'Car Lease', -400.00, '2024-01-03'),
 (6, 'Grocery Store', -200.25, '2024-01-07'),
 (6, 'Shopping', -299.50, '2024-01-15');
-SQL
