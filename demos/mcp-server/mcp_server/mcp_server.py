@@ -26,7 +26,7 @@ db = DatabaseManager.get_instance()
 mcp = FastMCP("redbank_financials")
 logger.info("MCP Server initialized: RedBank Financials")
 
-    
+
 @mcp.tool()
 def get_user_by_phone(phone_number: str) -> Dict[str, Any]:
     """Get a specific bank user by their phone number
