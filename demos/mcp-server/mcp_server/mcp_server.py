@@ -120,7 +120,6 @@ def get_statements(user_id: int) -> List[Dict[str, Any]]:
         )
 
 
-
 @mcp.tool()
 def get_transactions(statement_id: int) -> List[Dict[str, Any]]:
     """Get transactions for a specific statement
