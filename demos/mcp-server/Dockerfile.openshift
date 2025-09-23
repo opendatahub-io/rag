@@ -45,7 +45,7 @@ export PGDATABASE=postgres
 if [ ! -f "$PGDATA/PG_VERSION" ]; then
     echo "Initializing PostgreSQL database..."
     /usr/pgsql-15/bin/initdb -D $PGDATA
-    
+
     # Configure PostgreSQL
     echo "host all all 0.0.0.0/0 trust" >> $PGDATA/pg_hba.conf
     echo "listen_addresses = '*'" >> $PGDATA/postgresql.conf

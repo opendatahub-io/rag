@@ -72,7 +72,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "📤 Pushing image to registry..."
     ${CONTAINER_CMD} push ${FULL_IMAGE_NAME}
     echo "✅ Image pushed successfully"
-    
+
     # Update deployment with correct image
     sed -i.bak "s|image: redbank-mcp-server:latest|image: ${FULL_IMAGE_NAME}|g" openshift-deployment.yaml
     echo "✅ Updated deployment manifest with image: ${FULL_IMAGE_NAME}"
@@ -84,21 +84,21 @@ read -p "🎯 Deploy to OpenShift? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo "🚀 Deploying to OpenShift..."
-    
+
     # Check if logged in to OpenShift
     if ! oc whoami >/dev/null 2>&1; then
         echo "❌ Error: Not logged in to OpenShift. Please run 'oc login' first."
         exit 1
     fi
-    
+
     # Apply the deployment
     oc apply -f openshift-deployment.yaml
-    
+
     echo "✅ Deployment applied successfully"
     echo ""
     echo "📊 Checking deployment status..."
     oc get pods -n redbank-financials
-    
+
     echo ""
     echo "🌐 Getting route URL..."
     sleep 5

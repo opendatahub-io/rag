@@ -32,7 +32,7 @@ The OpenShift deployment uses a single container approach with:
    ```bash
    # Using Docker
    docker build -f Dockerfile.openshift -t redbank-mcp-server:latest .
-   
+
    # Using Podman
    podman build -f Dockerfile.openshift -t redbank-mcp-server:latest .
    ```
@@ -41,7 +41,7 @@ The OpenShift deployment uses a single container approach with:
    ```bash
    # Tag for your registry
    docker tag redbank-mcp-server:latest quay.io/your-username/redbank-mcp-server:latest
-   
+
    # Push to registry
    docker push quay.io/your-username/redbank-mcp-server:latest
    ```
