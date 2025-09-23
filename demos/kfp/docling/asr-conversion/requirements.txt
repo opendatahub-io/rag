@@ -19,7 +19,7 @@ requests==2.32.4
 sentence-transformers==5.0.0
 
 sqlalchemy==2.0.41
-torch==2.7.1
+torch==2.8.0
 torchaudio==2.7.1
 
 # Embedding and text processing
