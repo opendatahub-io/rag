@@ -47,7 +47,7 @@ def get_user_by_phone(phone_number: str) -> Dict[str, Any]:
         logger.info(f"Successfully retrieved user: {user['name']} (ID: {user['user_id']})")
         return user
 
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         db.conn.rollback()
         logger.error(f"Database error: {e}")
         raise RuntimeError(f"Failed to retrieve user due to database error: {str(e)}")
@@ -94,7 +94,7 @@ def get_statements(user_id: int) -> List[Dict[str, Any]]:
         logger.info(f"Retrieved {len(statements)} statements for user_id: {user_id}")
         return statements
 
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         db.conn.rollback()
         logger.error(f"Database error: {e}")
         raise RuntimeError(f"Failed to retrieve statements due to database error: {str(e)}")
@@ -147,7 +147,7 @@ def get_transactions(statement_id: int) -> List[Dict[str, Any]]:
         logger.info(f"Retrieved {len(transaction_list)} transactions for statement_id: {statement_id}")
         return transaction_list
         
-    except psycopg2.Error as e:
+    except psycopg.Error as e:
         db.conn.rollback()
         logger.error(f"Database error during transaction retrieval: {e}")
         raise RuntimeError(f"Failed to retrieve transactions due to database error: {str(e)}")

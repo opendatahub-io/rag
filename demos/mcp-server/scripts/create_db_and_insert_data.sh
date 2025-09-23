@@ -1,3 +1,4 @@
+#!/bin/bash
 # Set PostgreSQL connection parameters for Docker
 export PGHOST=postgres
 export PGUSER=postgres
