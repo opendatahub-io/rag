@@ -64,8 +64,10 @@ data:
     -- Insert sample users
     INSERT INTO users (name, date_of_birth, address, phone_number) VALUES
     ('John Smith', '1985-03-15', '123 Main St, New York, NY 10001', '+1-555-123-4567'),
-    ('Jane Doe', '1990-07-22', '456 Oak Ave, Los Angeles, CA 90210', '+1-555-987-6543'),
-    ('Bob Johnson', '1978-11-08', '789 Pine Rd, Chicago, IL 60601', '+1-555-456-7890');
+    ('Sarah Johnson', '1990-07-22', '456 Oak Ave, Los Angeles, CA 90210', '+1-555-987-6543'),
+    ('Michael Brown', '1978-11-08', '789 Pine Rd, Chicago, IL 60601', '+1-555-456-7890'),
+    ('Emily Davis', '1992-05-30', '321 Elm St, Houston, TX 77001', '+1-555-321-0987'),
+    ('Ignas Baranauskas', '1988-06-12', '15 Grafton Street, Dublin 2, Ireland', '+353 85 148 0072');
     
     -- Insert sample statements
     INSERT INTO statements (user_id, date, total) VALUES
