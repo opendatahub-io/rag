@@ -1,0 +1,226 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-credentials
+  namespace: ragathon-team-1
+type: Opaque
+data:
+  POSTGRES_USER: cG9zdGdyZXM=  # base64 encoded 'postgres'
+  POSTGRES_PASSWORD: cG9zdGdyZXM=  # base64 encoded 'postgres'
+  POSTGRES_DB: YmFua19zdGF0ZW1lbnRz  # base64 encoded 'bank_statements'
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: ragathon-team-1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+  namespace: ragathon-team-1
+data:
+  init-bank-db.sql: |
+    -- Create bank_statements database
+    CREATE DATABASE bank_statements;
+    
+    -- Connect to bank_statements database
+    \c bank_statements;
+    
+    -- Create users table
+    CREATE TABLE users (
+        user_id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        date_of_birth DATE,
+        address TEXT,
+        phone_number VARCHAR(20) UNIQUE NOT NULL
+    );
+    
+    -- Create statements table
+    CREATE TABLE statements (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(user_id),
+        date DATE NOT NULL,
+        total DECIMAL(10, 2) NOT NULL
+    );
+    
+    -- Create transactions table
+    CREATE TABLE transactions (
+        id SERIAL PRIMARY KEY,
+        statement_id INTEGER REFERENCES statements(id),
+        description VARCHAR(255) NOT NULL,
+        price DECIMAL(10, 2) NOT NULL,
+        date DATE NOT NULL
+    );
+    
+    -- Insert sample users
+    INSERT INTO users (name, date_of_birth, address, phone_number) VALUES
+    ('John Smith', '1985-03-15', '123 Main St, New York, NY 10001', '+1-555-123-4567'),
+    ('Jane Doe', '1990-07-22', '456 Oak Ave, Los Angeles, CA 90210', '+1-555-987-6543'),
+    ('Bob Johnson', '1978-11-08', '789 Pine Rd, Chicago, IL 60601', '+1-555-456-7890');
+    
+    -- Insert sample statements
+    INSERT INTO statements (user_id, date, total) VALUES
+    (1, '2024-01-31', 2450.75),
+    (1, '2024-02-29', 1890.25),
+    (2, '2024-01-31', 3200.50),
+    (2, '2024-02-29', 2875.80),
+    (3, '2024-01-31', 1650.25),
+    (3, '2024-02-29', 1425.90);
+    
+    -- Insert sample transactions for John Smith (user_id = 1)
+    -- January 2024 statement (statement_id = 1)
+    INSERT INTO transactions (statement_id, description, price, date) VALUES
+    (1, 'Salary Deposit', 3000.00, '2024-01-01'),
+    (1, 'Grocery Store', -125.50, '2024-01-03'),
+    (1, 'Gas Station', -45.00, '2024-01-05'),
+    (1, 'Restaurant', -78.25, '2024-01-10'),
+    (1, 'Phone Bill', -75.00, '2024-01-15'),
+    (1, 'Insurance', -250.00, '2024-01-20'),
+    (1, 'Online Shopping', -75.50, '2024-01-25');
+    
+    -- February 2024 statement (statement_id = 2)
+    INSERT INTO transactions (statement_id, description, price, date) VALUES
+    (2, 'Salary Deposit', 3000.00, '2024-02-01'),
+    (2, 'Grocery Store', -145.30, '2024-02-02'),
+    (2, 'Phone Bill', -75.00, '2024-02-05'),
+    (2, 'Insurance', -250.00, '2024-02-08'),
+    (2, 'Restaurant', -89.45, '2024-02-14'),
+    (2, 'Gas Station', -50.00, '2024-02-18'),
+    (2, 'Online Shopping', -500.00, '2024-02-25');
+    
+    -- Insert sample transactions for Jane Doe (user_id = 2)
+    -- January 2024 statement (statement_id = 3)
+    INSERT INTO transactions (statement_id, description, price, date) VALUES
+    (3, 'Salary Deposit', 3500.00, '2024-01-01'),
+    (3, 'Rent', -1200.00, '2024-01-01'),
+    (3, 'Grocery Store', -89.50, '2024-01-04'),
+    (3, 'Utilities', -150.00, '2024-01-08'),
+    (3, 'Coffee Shop', -25.00, '2024-01-12'),
+    (3, 'Movie Theater', -35.00, '2024-01-15');
+    
+    -- February 2024 statement (statement_id = 4)
+    INSERT INTO transactions (statement_id, description, price, date) VALUES
+    (4, 'Salary Deposit', 3500.00, '2024-02-01'),
+    (4, 'Rent', -1200.00, '2024-02-01'),
+    (4, 'Grocery Store', -95.20, '2024-02-03'),
+    (4, 'Utilities', -145.00, '2024-02-07'),
+    (4, 'Gym Membership', -50.00, '2024-02-10'),
+    (4, 'Restaurant', -134.00, '2024-02-14');
+    
+    -- Insert sample transactions for Bob Johnson (user_id = 3)
+    -- January 2024 statement (statement_id = 5)
+    INSERT INTO transactions (statement_id, description, price, date) VALUES
+    (5, 'Freelance Payment', 2000.00, '2024-01-05'),
+    (5, 'Mortgage', -800.00, '2024-01-01'),
+    (5, 'Car Payment', -350.00, '2024-01-01'),
+    (5, 'Grocery Store', -110.75, '2024-01-06'),
+    (5, 'Gas Station', -65.00, '2024-01-08'),
+    (5, 'Internet Bill', -89.00, '2024-01-15');
+    
+    -- February 2024 statement (statement_id = 6)
+    INSERT INTO transactions (statement_id, description, price, date) VALUES
+    (6, 'Freelance Payment', 1800.00, '2024-02-03'),
+    (6, 'Mortgage', -800.00, '2024-02-01'),
+    (6, 'Car Payment', -350.00, '2024-02-01'),
+    (6, 'Grocery Store', -98.10, '2024-02-04'),
+    (6, 'Gas Station', -55.00, '2024-02-07'),
+    (6, 'Internet Bill', -89.00, '2024-02-15'),
+    (6, 'Home Repair', -125.00, '2024-02-20');
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: ragathon-team-1
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          value: postgres
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        - name: init-script
+          mountPath: /docker-entrypoint-initdb.d
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - pg_isready -U postgres
+          initialDelaySeconds: 15
+          periodSeconds: 5
+        livenessProbe:
+          exec:
+            command:
+              - /bin/sh
+              - -c
+              - pg_isready -U postgres
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+      - name: init-script
+        configMap:
+          name: postgres-init-script
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: ragathon-team-1
+  labels:
+    app: postgres
+spec:
+  selector:
+    app: postgres
+  ports:
+  - name: postgres
+    port: 5432
+    targetPort: 5432
+  type: ClusterIP

@@ -1,0 +1,147 @@
+2025-09-24 09:06:00,022 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:06:00,023 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:06:00,023 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:06:00,023 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:06:00,023 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:06:00,023 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:06:00,344 - ERROR - ❌ Error finding RedBank group: 400 Client Error: Bad Request for url: https://api.evoapicloud.com/group/fetchAllGroups/e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:06:00,347 - ERROR - ❌ Cannot start bot without RedBank group
+2025-09-24 09:06:57,900 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:06:57,901 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:06:57,901 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:06:57,901 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:06:57,901 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:06:57,901 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:07:07,890 - ERROR - ❌ Error finding RedBank group: 'list' object has no attribute 'get'
+2025-09-24 09:07:07,893 - ERROR - ❌ Cannot start bot without RedBank group
+2025-09-24 09:07:28,728 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:07:28,728 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:07:28,729 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:07:28,729 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:07:28,729 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:07:28,729 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:07:38,739 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:07:38,740 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:10:15,147 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:10:15,147 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:10:15,147 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:10:15,147 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:10:15,147 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:10:15,147 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:10:25,118 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:10:25,120 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:10:37,047 - INFO - 👋 Bot stopped by user
+2025-09-24 09:12:57,356 - INFO - 👋 Bot stopped by user
+2025-09-24 09:12:59,933 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:12:59,934 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:12:59,934 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:12:59,934 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:12:59,934 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:12:59,934 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:13:11,882 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:13:11,891 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:13:12,405 - INFO - 📭 No recent messages found in RedBank group
+2025-09-24 09:13:22,986 - INFO - 📭 No recent messages found in RedBank group
+2025-09-24 09:13:33,750 - INFO - 📭 No recent messages found in RedBank group
+2025-09-24 09:13:44,247 - INFO - 📭 No recent messages found in RedBank group
+2025-09-24 09:13:50,349 - INFO - 👋 Bot stopped by user
+2025-09-24 09:17:20,010 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:17:20,010 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:17:20,010 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:17:20,010 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:17:20,010 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:17:20,010 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:17:30,022 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:17:30,024 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:17:30,457 - INFO - 📬 Found 3 recent messages in RedBank group:
+2025-09-24 09:17:30,458 - INFO - 🆕 NEW MESSAGE at 09:13:09 from Ignas: Hi
+2025-09-24 09:17:31,078 - INFO - ✅ Sent welcome message to RedBank group
+2025-09-24 09:17:31,079 - INFO - ✅ Replied to Ignas
+2025-09-24 09:17:33,084 - INFO - 🆕 NEW MESSAGE at 09:13:26 from Ignas: Hi
+2025-09-24 09:17:33,682 - INFO - ✅ Sent welcome message to RedBank group
+2025-09-24 09:17:33,683 - INFO - ✅ Replied to Ignas
+2025-09-24 09:17:35,684 - INFO - 📊 Processed 2 new messages
+2025-09-24 09:17:46,225 - INFO - 📬 Found 2 recent messages in RedBank group:
+2025-09-24 09:19:10,486 - INFO - 👋 Bot stopped by user
+2025-09-24 09:19:50,345 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:19:50,345 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:19:50,345 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:19:50,345 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:19:50,345 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:19:50,345 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:20:00,353 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:20:00,356 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:20:00,789 - INFO - 📬 Found 4 recent messages in RedBank group:
+2025-09-24 09:20:00,789 - INFO - ⏭️  Skipping own message: 3EB00103B3613A6EA971DF30A3D03DBEA753AA44
+2025-09-24 09:20:00,789 - INFO - 🆕 NEW MESSAGE at 09:17:30 from Ignas: Hi
+2025-09-24 09:20:01,377 - INFO - ✅ Sent welcome message to RedBank group
+2025-09-24 09:20:01,378 - INFO - ✅ Replied to Ignas
+2025-09-24 09:20:03,382 - INFO - ⏭️  Skipping own message: 3EB0020AA93FDD7A759B2DDFB78E4AB5642A817F
+2025-09-24 09:20:03,383 - INFO - ⏭️  Skipping own message: 3EB0A951E74194DA4255DDB733FCE06D0B280E12
+2025-09-24 09:20:03,383 - INFO - 📊 Processed 1 new messages
+2025-09-24 09:20:13,802 - INFO - 📬 Found 1 recent messages in RedBank group:
+2025-09-24 09:20:13,802 - INFO - ⏭️  Skipping own message: 3EB020D6574909ABB0EC8ED6ED4F22DC3384B210
+2025-09-24 09:23:22,978 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:23:22,978 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:23:22,978 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:23:22,978 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:23:22,978 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:23:49,493 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:23:49,493 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:23:49,493 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:23:49,493 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:23:49,493 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:23:49,493 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:23:59,585 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:23:59,591 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:24:00,053 - INFO - 📬 Found 2 recent messages in RedBank group:
+2025-09-24 09:24:00,053 - INFO - 🆕 NEW MESSAGE at 09:20:00 from Ignas: Hi
+2025-09-24 09:24:00,636 - INFO - ✅ Sent welcome message to RedBank group
+2025-09-24 09:24:00,637 - INFO - ✅ Replied to Ignas
+2025-09-24 09:24:03,642 - INFO - ⏭️  Skipping own message: 3EB020D6574909ABB0EC8ED6ED4F22DC3384B210
+2025-09-24 09:24:03,642 - INFO - 📊 Processed 1 new messages
+2025-09-24 09:24:14,100 - INFO - 📬 Found 1 recent messages in RedBank group:
+2025-09-24 09:24:14,101 - INFO - 🆕 NEW MESSAGE at 09:24:04 from Ignas: [Audio - 3s]
+2025-09-24 09:24:14,101 - INFO - 🎤 Voice message detected from Ignas
+2025-09-24 09:24:14,519 - ERROR - ❌ Error downloading voice message: 'NoneType' object has no attribute 'get'
+2025-09-24 09:24:14,524 - ERROR - ❌ Failed to download voice message from Ignas
+2025-09-24 09:24:15,104 - INFO - ✅ Sent welcome message to RedBank group
+2025-09-24 09:24:15,106 - INFO - 📝 Sent text reply instead to Ignas
+2025-09-24 09:24:18,110 - INFO - 📊 Processed 1 new messages
+2025-09-24 09:24:28,551 - INFO - 📬 Found 1 recent messages in RedBank group:
+2025-09-24 09:24:28,551 - INFO - ⏭️  Skipping own message: 3EB0E55E8F0A13F1A8238EE41C0F4CBD074D70E7
+2025-09-24 09:24:30,183 - INFO - 👋 Bot stopped by user
+2025-09-24 09:29:46,715 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:29:46,716 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:29:46,716 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:29:46,716 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:29:46,716 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:29:46,716 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:29:56,917 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:29:56,919 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:30:07,827 - INFO - 📬 Found 1 recent messages in RedBank group:
+2025-09-24 09:30:07,828 - INFO - 🆕 NEW MESSAGE at 09:30:06 from Ignas: [Audio - 3s]
+2025-09-24 09:30:07,828 - INFO - 🎤 Voice message detected from Ignas
+2025-09-24 09:30:08,213 - ERROR - ❌ Error downloading voice message: 'NoneType' object has no attribute 'get'
+2025-09-24 09:30:08,214 - ERROR - ❌ Failed to download voice message from Ignas
+2025-09-24 09:30:08,792 - INFO - ✅ Sent custom message to RedBank group: Welcome to RedBank...
+2025-09-24 09:30:08,793 - INFO - 📝 Sent text reply instead to Ignas
+2025-09-24 09:30:11,796 - INFO - 📊 Processed 1 new messages
+2025-09-24 09:35:12,062 - INFO - 🤖 RedBank Bot initialized
+2025-09-24 09:35:12,062 - INFO - 📱 Instance ID: e940c744-7903-478b-b3fa-6c14b68f74d0
+2025-09-24 09:35:12,062 - INFO - 🎯 Target Group: redbank
+2025-09-24 09:35:12,062 - INFO - 💬 Welcome Message: Welcome to RedBank
+2025-09-24 09:35:12,062 - INFO - ⏱️  Poll Interval: 10s
+2025-09-24 09:35:12,062 - INFO - 🚀 Starting RedBank Bot...
+2025-09-24 09:35:22,160 - INFO - ✅ Found RedBank group: RedBank (120363422549041630@g.us)
+2025-09-24 09:35:22,162 - INFO - 🔄 Starting polling loop (every 10s)
+2025-09-24 09:36:04,571 - INFO - 📬 Found 1 recent messages in RedBank group:
+2025-09-24 09:36:04,572 - INFO - 🆕 NEW MESSAGE at 09:35:59 from Ignas: [Audio - 2s]
+2025-09-24 09:36:04,572 - INFO - 🎤 Voice message detected from Ignas
+2025-09-24 09:36:04,950 - ERROR - ❌ Error downloading voice message: 'NoneType' object has no attribute 'get'
+2025-09-24 09:36:04,951 - ERROR - ❌ Failed to download voice message from Ignas
+2025-09-24 09:36:04,951 - INFO - 🎤 Trying audio URL reply to Ignas
+2025-09-24 09:36:05,352 - INFO - ✅ Sent audio message to RedBank group
+2025-09-24 09:36:05,352 - INFO - 🎤 Sent audio reply to Ignas
+2025-09-24 09:36:08,357 - INFO - 📊 Processed 1 new messages
+2025-09-24 09:57:43,716 - INFO - 👋 Bot stopped by user

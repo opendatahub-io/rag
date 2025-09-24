@@ -1,0 +1,115 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redbank-mcp-server
+  namespace: ragathon-team-1
+  labels:
+    app: redbank-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redbank-mcp-server
+  template:
+    metadata:
+      labels:
+        app: redbank-mcp-server
+    spec:
+      containers:
+      - name: mcp-server
+        image: image-registry.openshift-image-registry.svc:5000/ragathon-team-1/redbank-mcp-server:latest
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: MCP_TRANSPORT
+          value: "sse"
+        - name: MCP_HOST
+          value: "0.0.0.0"
+        - name: MCP_PORT
+          value: "8000"
+        - name: DB_HOST
+          value: "postgres-service"
+        - name: DB_NAME
+          value: "bank_statements"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_PASSWORD
+        - name: DB_PORT
+          value: "5432"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        readinessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+      securityContext:
+        runAsNonRoot: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redbank-mcp-service
+  namespace: ragathon-team-1
+  labels:
+    app: redbank-mcp-server
+spec:
+  selector:
+    app: redbank-mcp-server
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: redbank-mcp-route
+  namespace: ragathon-team-1
+  labels:
+    app: redbank-mcp-server
+spec:
+  to:
+    kind: Service
+    name: redbank-mcp-service
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None

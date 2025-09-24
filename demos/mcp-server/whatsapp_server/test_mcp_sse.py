@@ -13,13 +13,14 @@ from mcp.client.sse import sse_client
 async def test_mcp_sse():
     """Test the MCP server using SSE transport"""
     
-    server_url = "http://localhost:8000/sse"
+    server_url = "http://localhost:8001/sse"
     
     print("🏦 Testing RedBank MCP Server with SSE")
     print(f"📡 Connecting to: {server_url}")
     print("=" * 50)
     
     try:
+        # Connect to local port-forwarded MCP server
         async with sse_client(server_url) as (read, write):
             async with ClientSession(read, write) as session:
                 

@@ -1,0 +1,37 @@
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: redbank-mcp-server
+  namespace: ragathon-team-1
+  labels:
+    app: redbank-mcp-server
+spec:
+  lookupPolicy:
+    local: false
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: redbank-mcp-server-build
+  namespace: ragathon-team-1
+  labels:
+    app: redbank-mcp-server
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: redbank-mcp-server:latest
+  source:
+    type: Git
+    git:
+      uri: https://github.com/Schimuneck/rag.git
+      ref: feature/redbank-mcp-server-demo
+    contextDir: demos/mcp-server
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile.mcp
+  triggers:
+  - type: ConfigChange
+  runPolicy: Serial

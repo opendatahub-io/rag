@@ -1,0 +1,4465 @@
+{
+	"info": {
+		"_postman_id": "fb6b0134-ce6f-4054-977b-6a08c145e356",
+		"name": "Evolution API | Cloud",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "48737993",
+		"_collection_link": "https://www.postman.com/agenciadgcode/evolution-api/collection/t1qju2s/evolution-api-cloud?action=share&source=collection_link&creator=48737993"
+	},
+	"item": [
+		{
+			"name": "Projects",
+			"item": [
+				{
+					"name": "Create Project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"project name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/project/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"project",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch all Projects",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/project/fetchAll",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"project",
+								"fetchAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/project/fetch/:projectId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"project",
+								"fetch",
+								":projectId"
+							],
+							"variable": [
+								{
+									"key": "projectId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"project name\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/project/update/:projectId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"project",
+								"update",
+								":projectId"
+							],
+							"variable": [
+								{
+									"key": "projectId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Project",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/project/delete/:projectId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"project",
+								"delete",
+								":projectId"
+							],
+							"variable": [
+								{
+									"key": "projectId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Customer",
+			"item": [
+				{
+					"name": "Create Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"projectId\": \"37dff098-6008-4746-b132-ecb31df73659\",\r\n    \"firstName\": \"Jhon\",\r\n    \"lastName\": \"Doe\", // (Optional)\r\n    \"email\": \"jhon.doe@email.com\",\r\n    \"instancesLimit\": 1,\r\n    \"usersLimit\": 1,\r\n    \"contactsLimit\": 1,\r\n    \"channelsAvailable\": [\r\n        \"WHATSAPP-WHATSMEOW\",\r\n        \"WHATSAPP-BUSINESS\",\r\n        \"EVOLUTION\",\r\n        \"META-FACEBOOK\",\r\n        \"META-INSTAGRAM\"\r\n    ],\r\n    \"modulesAvailable\": [\r\n        \"CRM\",\r\n        \"EVENTS_WEBHOOK\",\r\n        \"EVENTS_WEBSOCKET\",\r\n        \"EVENTS_RABBITMQ\",\r\n        \"EVENTS_PUSHER\",\r\n        \"CHATBOTS_EVOLUTION_BOT\",\r\n        \"CHATBOTS_CHATWOOT\",\r\n        \"CHATBOTS_TYPEBOT\",\r\n        \"CHATBOTS_OPENAI\",\r\n        \"CHATBOTS_DIFY\",\r\n        \"CHATBOTS_FLOWISE\",\r\n        \"CHATBOTS_LANGFLOW\"\r\n    ],\r\n    \"createUser\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customer/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch all Customers",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/fetchAll",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"fetchAll"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/fetch/:customerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"fetch",
+								":customerId"
+							],
+							"variable": [
+								{
+									"key": "customerId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"projectId\": \"37dff098-6008-4746-b132-ecb31df73659\",\r\n    \"firstName\": \"Jhon\",\r\n    \"lastName\": \"Doe\", // (Optional)\r\n    \"email\": \"jhon.doe@email.com\",\r\n    \"instancesLimit\": 1,\r\n    \"usersLimit\": 1,\r\n    \"contactsLimit\": 1,\r\n    \"channelsAvailable\": [\r\n        \"WHATSAPP-WHATSMEOW\",\r\n        \"WHATSAPP-BUSINESS\",\r\n        \"EVOLUTION\",\r\n        \"META-FACEBOOK\",\r\n        \"META-INSTAGRAM\"\r\n    ],\r\n    \"modulesAvailable\": [\r\n        \"CRM\",\r\n        \"EVENTS_WEBHOOK\",\r\n        \"EVENTS_WEBSOCKET\",\r\n        \"EVENTS_RABBITMQ\",\r\n        \"EVENTS_PUSHER\",\r\n        \"CHATBOTS_EVOLUTION_BOT\",\r\n        \"CHATBOTS_CHATWOOT\",\r\n        \"CHATBOTS_TYPEBOT\",\r\n        \"CHATBOTS_OPENAI\",\r\n        \"CHATBOTS_DIFY\",\r\n        \"CHATBOTS_FLOWISE\",\r\n        \"CHATBOTS_LANGFLOW\"\r\n    ],\r\n    \"createUser\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customer/update/:customerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"update",
+								":customerId"
+							],
+							"variable": [
+								{
+									"key": "customerId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customer/delete/:customerId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"customer",
+								"delete",
+								":customerId"
+							],
+							"variable": [
+								{
+									"key": "customerId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Instance",
+			"item": [
+				{
+					"name": "Create Instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('hash')) {\r",
+									"  pm.collectionVariables.set(\"apikey\", pm.response.json().hash);\r",
+									"}\r",
+									"\r",
+									"if (pm.response.json().hasOwnProperty('qrcode')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().qrcode.base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // instance\r\n    \"projectId\": \"37dff098-6008-4746-b132-ecb31df73659\",\r\n    \"customerId\": \"ff7f3b71-24e1-4a65-8409-cd28e293266e\",\r\n    \"instanceId\": \"e986708e-5d38-4b79-896d-356c21a0e781\", // (Optional)\r\n    \"instanceName\": \"instancia\",\r\n    // \"token\": \"{{apikey}}\", // (Optional)\r\n    // \"number\": \"{{number}}\", // (Optional)\r\n    // \"businessId\": \"{{businessId}}\",\r\n    \"qrcode\": true, // (Optional)\r\n    \"integration\": \"WHATSAPP-WHATSMEOW\" // WHATSAPP-WHATSMEOW | WHATSAPP-BUSINESS | EVOLUTION | META-FACEBOOK | META-INSTAGRAM\r\n    // \"status\": \"close\", // (optional)  \"open\", \"connecting\", \"close\"\r\n    // \"ownerJid\": \"557499879409\", // (optional)\r\n    // \"profileName\": \"Evolution\", // (optional)\r\n    // \"profilePicUrl\": \"url,\" // (optional)\r\n    // settings (Optional)\r\n    // \"rejectCall\": false,\r\n    // \"msgCall\": \"\",\r\n    // \"groupsIgnore\": false,\r\n    // \"alwaysOnline\": false,\r\n    // \"readMessages\": false,\r\n    // \"readStatus\": false,\r\n    // \"syncFullHistory\": false,\r\n    // webhook (Optional)\r\n    // \"webhook\": {\r\n    //     \"url\": \"\",\r\n    //     \"byEvents\": false,\r\n    //     \"base64\": true,\r\n    //     \"headers\": {\r\n    //         \"autorization\": \"Bearer TOKEN\",\r\n    //         \"Content-Type\": \"application/json\"\r\n    //     },\r\n    //     \"events\": [\r\n    //         \"APPLICATION_STARTUP\",\r\n    //         \"QRCODE_UPDATED\",\r\n    //         \"MESSAGES_SET\",\r\n    //         \"MESSAGES_UPSERT\",\r\n    //         \"MESSAGES_UPDATE\",\r\n    //         \"MESSAGES_DELETE\",\r\n    //         \"SEND_MESSAGE\",\r\n    //         \"CONTACTS_SET\",\r\n    //         \"CONTACTS_UPSERT\",\r\n    //         \"CONTACTS_UPDATE\",\r\n    //         \"PRESENCE_UPDATE\",\r\n    //         \"CHATS_SET\",\r\n    //         \"CHATS_UPSERT\",\r\n    //         \"CHATS_UPDATE\",\r\n    //         \"CHATS_DELETE\",\r\n    //         \"GROUPS_UPSERT\",\r\n    //         \"GROUP_UPDATE\",\r\n    //         \"GROUP_PARTICIPANTS_UPDATE\",\r\n    //         \"CONNECTION_UPDATE\",\r\n    //         \"LABELS_EDIT\",\r\n    //         \"LABELS_ASSOCIATION\",\r\n    //         \"CALL\",\r\n    //         \"TYPEBOT_START\",\r\n    //         \"TYPEBOT_CHANGE_STATUS\"\r\n    //     ]\r\n    // },\r\n    // // rabbitmq (Optional)\r\n    // \"rabbitmq\": {\r\n    //     \"enabled\": true,\r\n    //     \"events\": [\r\n    //         \"APPLICATION_STARTUP\",\r\n    //         \"QRCODE_UPDATED\",\r\n    //         \"MESSAGES_SET\",\r\n    //         \"MESSAGES_UPSERT\",\r\n    //         \"MESSAGES_UPDATE\",\r\n    //         \"MESSAGES_DELETE\",\r\n    //         \"SEND_MESSAGE\",\r\n    //         \"CONTACTS_SET\",\r\n    //         \"CONTACTS_UPSERT\",\r\n    //         \"CONTACTS_UPDATE\",\r\n    //         \"PRESENCE_UPDATE\",\r\n    //         \"CHATS_SET\",\r\n    //         \"CHATS_UPSERT\",\r\n    //         \"CHATS_UPDATE\",\r\n    //         \"CHATS_DELETE\",\r\n    //         \"GROUPS_UPSERT\",\r\n    //         \"GROUP_UPDATE\",\r\n    //         \"GROUP_PARTICIPANTS_UPDATE\",\r\n    //         \"CONNECTION_UPDATE\",\r\n    //         \"LABELS_EDIT\",\r\n    //         \"LABELS_ASSOCIATION\",\r\n    //         \"CALL\",\r\n    //         \"TYPEBOT_START\",\r\n    //         \"TYPEBOT_CHANGE_STATUS\"\r\n    //     ]\r\n    // },\r\n    // // sqs (Optional)\r\n    // \"sqs\": {\r\n    //     \"enabled\": true,\r\n    //     \"events\": [\r\n    //         \"APPLICATION_STARTUP\",\r\n    //         \"QRCODE_UPDATED\",\r\n    //         \"MESSAGES_SET\",\r\n    //         \"MESSAGES_UPSERT\",\r\n    //         \"MESSAGES_UPDATE\",\r\n    //         \"MESSAGES_DELETE\",\r\n    //         \"SEND_MESSAGE\",\r\n    //         \"CONTACTS_SET\",\r\n    //         \"CONTACTS_UPSERT\",\r\n    //         \"CONTACTS_UPDATE\",\r\n    //         \"PRESENCE_UPDATE\",\r\n    //         \"CHATS_SET\",\r\n    //         \"CHATS_UPSERT\",\r\n    //         \"CHATS_UPDATE\",\r\n    //         \"CHATS_DELETE\",\r\n    //         \"GROUPS_UPSERT\",\r\n    //         \"GROUP_UPDATE\",\r\n    //         \"GROUP_PARTICIPANTS_UPDATE\",\r\n    //         \"CONNECTION_UPDATE\",\r\n    //         \"LABELS_EDIT\",\r\n    //         \"LABELS_ASSOCIATION\",\r\n    //         \"CALL\",\r\n    //         \"TYPEBOT_START\",\r\n    //         \"TYPEBOT_CHANGE_STATUS\"\r\n    //     ]\r\n    // },\r\n    // // chatwoot (Optional)\r\n    // \"chatwootAccountId\": \"1\",\r\n    // \"chatwootToken\": \"TOKEN\",\r\n    // \"chatwootUrl\": \"https://chatoot.com\",\r\n    // \"chatwootSignMsg\": true,\r\n    // \"chatwootReopenConversation\": true,\r\n    // \"chatwootConversationPending\": false,\r\n    // \"chatwootImportContacts\": true,\r\n    // \"chatwootNameInbox\": \"evolution\",\r\n    // \"chatwootOrganization\": \"Evolution Bot\",\r\n    // \"chatwootLogo\": \"https://evolution-api.com/files/evolution-api-favicon.png\",\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instance/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Instances",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{apikey}}",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/instance/fetchInstances",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"fetchInstances"
+							],
+							"query": [
+								{
+									"key": "instanceId",
+									"value": "{{instance}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Instance Connect",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('base64')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/instance/connect/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"connect",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "number",
+									"value": "{{number}}",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Restart Instance",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('base64')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/instance/restart/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"restart",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Set Presence",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.json().hasOwnProperty('base64')) {\r",
+									"  let template = ` <img src='{{img}}'/> `;\r",
+									"  pm.visualizer.set(template, { img: pm.response.json().base64 });\r",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"presence\": \"available\" /* available, unavailable */\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/instance/setPresence/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"setPresence",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Connection Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/instance/connectionState/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"connectionState",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout Instance",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/instance/logout/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"logout",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Instance",
+					"request": {
+						"auth": {
+							"type": "apikey",
+							"apikey": [
+								{
+									"key": "value",
+									"value": "{{globalApikey}}",
+									"type": "string"
+								},
+								{
+									"key": "key",
+									"value": "apikey",
+									"type": "string"
+								},
+								{
+									"key": "in",
+									"value": "header",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/instance/delete/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"instance",
+								"delete",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Settings",
+			"item": [
+				{
+					"name": "Set Settings",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n\t\"rejectCall\": true,\r\n    \"msgCall\": \"I do not accept calls\",\r\n    \"groupsIgnore\": false,\r\n    \"alwaysOnline\": true,\r\n    \"readMessages\": false,\r\n    \"syncFullHistory\": false,\r\n    \"readStatus\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/settings/set/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"settings",
+								"set",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/settings/find/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"settings",
+								"find",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Send Message",
+			"item": [
+				{
+					"name": "Send Text",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"text\": \"teste de envio\"\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"linkPreview\": false,\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendText/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendText",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Media URL",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"mediatype\": \"image\", // image, video or document\r\n    \"mimetype\": \"image/png\",\r\n    \"caption\": \"Teste de caption\",\r\n    \"media\": \"https://s3.amazonaws.com/atendai/company-3708fcdf-954b-48f8-91ff-25babaccac67/1712605171932.jpeg\", /* url or base64 */\r\n    \"fileName\": \"Imagem.png\"\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendMedia/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendMedia",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Media File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendMedia/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendMedia",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send PTV",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"video\": \"https://evolution-api.com/files/video.mp4\", /* url or base64 */\r\n    // options\r\n    \"delay\": 1200\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendPtv/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendPtv",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send PTV File",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "number",
+									"value": "{{remoteJid}}",
+									"type": "text"
+								},
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendPtv/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendPtv",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Narrated Audio",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"audio\": \"https://evolution-api.com/files/narratedaudio.mp3\" /* url or base64 */\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ],\r\n    // \"encoding\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendWhatsAppAudio/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendWhatsAppAudio",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Status/Stories",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"type\": \"text\", /* text, image, video, audio */\r\n    \"content\": \"Hi, how are you today?\", /* text or url */\r\n    \"caption\": \"This is my status/storie image\", /* Optional for image or video */\r\n    \"backgroundColor\": \"#008000\",\r\n    \"font\": 1, /* Optional for text only. Accept the options below:\r\n                      1 = SERIF\r\n                      2 = NORICAN_REGULAR\r\n                      3 = BRYNDAN_WRITE\r\n                      4 = BEBASNEUE_REGULAR\r\n                      5 = OSWALD_HEAVY */\r\n    \"allContacts\": false, /* true to send to all contacts or false to send to statusJidList below */\r\n    \"statusJidList\": [\r\n        \"{{remoteJid}}@s.whatsapp.net\"\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendStatus/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendStatus",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Sticker",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"sticker\": \"https://evolution-api.com/files/sticker.png\" /* url or base64 */\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendSticker/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendSticker",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Location",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"name\": \"Bora Bora\",\r\n    \"address\": \"French Polynesian\",\r\n    \"latitude\": -16.505538233564373,\r\n    \"longitude\": -151.7422770494996\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendLocation/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendLocation",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Contact",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"contact\": [\r\n        {\r\n            \"fullName\": \"Contact Name\",\r\n            \"wuid\": \"559999999999\",\r\n            \"phoneNumber\": \"+55 99 9 9999-9999\",\r\n            \"organization\": \"Company Name\", /* Optional */\r\n            \"email\": \"email\", /* Optional */\r\n            \"url\": \"url page\" /* Optional */\r\n        },\r\n        {\r\n            \"fullName\": \"Contact Name\",\r\n            \"wuid\": \"559911111111\",\r\n            \"phoneNumber\": \"+55 99 9 1111-1111\",\r\n            \"organization\": \"Company Name\", /* Optional */\r\n            \"email\": \"email\", /* Optional */\r\n            \"url\": \"url page\" /* Optional */\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendContact/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendContact",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Reaction",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    // key of the message or key.id only for get message in database\r\n    \"key\": {\r\n        \"remoteJid\": \"{{remoteJid}}@s.whatsapp.net\", // or {{groupJid}}@g.us\"\r\n        \"fromMe\": true,\r\n        \"id\": \"BAE5A75CB0F39712\"\r\n    },\r\n    \"reaction\": \"🚀\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendReaction/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendReaction",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Poll",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"name\": \"Main text of the poll\",\r\n    \"selectableCount\": 1,\r\n    \"values\": [\r\n        \"Question 1\",\r\n        \"Question 2\",\r\n        \"Question 3\"\r\n    ]\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendPoll/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendPoll",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send List",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number\": \"{{remoteJid}}\",\n    \"title\": \"List Title\",\n    \"description\": \"List description\",\n    \"buttonText\": \"Click Here\",\n    \"footerText\": \"footer list\\nhttps://examplelink.com.br\",\n    \"sections\": [\n        {\n            \"title\": \"Row tilte 01\",\n            \"rows\": [\n                {\n                    \"title\": \"Title row 01\",\n                    \"description\": \"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,\",\n                    \"rowId\": \"rowId 001\"\n                },\n                {\n                    \"title\": \"Title row 02\",\n                    \"description\": \"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,\",\n                    \"rowId\": \"rowId 002\"\n                }\n            ]\n        },\n        {\n            \"title\": \"Row tilte 02\",\n            \"rows\": [\n                {\n                    \"title\": \"Title row 01\",\n                    \"description\": \"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,\",\n                    \"rowId\": \"rowId 001\"\n                },\n                {\n                    \"title\": \"Title row 02\",\n                    \"description\": \"Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,\",\n                    \"rowId\": \"rowId 002\"\n                }\n            ]\n        }\n    ]\n    // options\n    // \"delay\": 1200,\n    // \"quoted\": {\n    //     // payload message or key.id only for get message in database\n    //     \"key\": {\n    //         \"id\": \" MESSAGE_ID\"\n    //     },\n    //     \"message\": {\n    //         \"conversation\": \"CONTENT_MESSAGE\"\n    //     }\n    // },\n    // \"mentionsEveryOne\": false,\n    // \"mentioned\": [\n    //     \"{{remoteJid}}\"\n    // ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendList/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendList",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Button",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"title\": \"Title Button\",\r\n    \"description\": \"Description Button\",\r\n    \"footer\": \"Footer Button\",\r\n    \"buttons\": [\r\n        {\r\n            \"type\": \"reply\",\r\n            \"displayText\": \"Resposta\",\r\n            \"id\": \"123\"\r\n        }\r\n        // {\r\n        //     \"type\": \"copy\",\r\n        //     \"displayText\": \"Copia Código\",\r\n        //     \"copyCode\": \"ZXN0ZSDDqSB1bSBjw7NkaWdvIGRlIHRleHRvIGNvcGnDoXZlbC4=\"\r\n        // },\r\n        // {\r\n        //     \"type\": \"url\",\r\n        //     \"displayText\": \"Evolution API\",\r\n        //     \"url\": \"http://evolution-api.com\"\r\n        // },\r\n        // {\r\n        //     \"type\": \"call\",\r\n        //     \"displayText\": \"Me ligue\",\r\n        //     \"phoneNumber\": \"557499879409\"\r\n        // }\r\n        // {\r\n        //     \"type\": \"pix\",\r\n        //     \"currency\": \"BRL\",\r\n        //     \"name\": \"Davidson Gomes\",\r\n        //     \"keyType\": \"random\", /* phone, email, cpf, cnpj, random  */\r\n        //     \"key\": \"0ea59ac5-f001-4f0e-9785-c772200f1b1e\"\r\n        // }\r\n    ]\r\n    // options\r\n    // \"delay\": 1200,\r\n    // \"quoted\": {\r\n    //     // payload message or key.id only for get message in database\r\n    //     \"key\": {\r\n    //         \"id\": \" MESSAGE_ID\"\r\n    //     },\r\n    //     \"message\": {\r\n    //         \"conversation\": \"CONTENT_MESSAGE\"\r\n    //     }\r\n    // },\r\n    // \"mentionsEveryOne\": false,\r\n    // \"mentioned\": [\r\n    //     \"{{remoteJid}}\"\r\n    // ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/sendButtons/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"sendButtons",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Chat",
+			"item": [
+				{
+					"name": "Check is WhatsApp Number",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"numbers\": [\r\n    \"55911111111\",\r\n    \"55922222222\",\r\n    \"55933333333\",\r\n    \"55944444444\",\r\n    \"55955555555\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/whatsappNumbers/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"whatsappNumbers",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Read Messages",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"readMessages\": [\r\n    {\r\n      \"remoteJid\": \"123@s.whatsapp.net\",\r\n      \"fromMe\": false,\r\n      \"id\": \"80C4CE9B72F797DBC6ECD8D19B247FC9\"\r\n    }\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/markMessageAsRead/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"markMessageAsRead",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Archive Chat",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"lastMessage\": {\r\n        \"key\": {\r\n            \"remoteJid\": \"123@s.whatsapp.net\",\r\n            \"fromMe\": false,\r\n            \"id\": \"80C4CE9B72F797DBC6ECD8D19B247FC9\"\r\n        }\r\n    },\r\n    \"chat\": \"123@s.whatsapp.net\",\r\n    // false: to unarchive\r\n    // true: to archive\r\n    \"archive\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/archiveChat/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"archiveChat",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Chat Unread",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"lastMessage\": {\r\n        \"key\": {\r\n            \"remoteJid\": \"123@s.whatsapp.net\",\r\n            \"fromMe\": false,\r\n            \"id\": \"80C4CE9B72F797DBC6ECD8D19B247FC9\"\r\n        }\r\n    },\r\n    \"chat\": \"123@s.whatsapp.net\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/markChatUnread/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"markChatUnread",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Message",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"id\": \"id\",\r\n  \"remoteJid\": \"remoteJid\",\r\n  \"fromMe\": true,\r\n  // optional\r\n  \"paticipant\": \"paticipant\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/deleteMessageForEveryone/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"deleteMessageForEveryone",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Profile Picture",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"number\": \"{{remoteJid}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/fetchProfilePictureUrl/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"fetchProfilePictureUrl",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Base64 From Media Message",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\n  In this endpoint it is possible to extract the Base64 of the media \r\n  received in the messages, passing the message ID as a parameter.\r\n  Make sure that the received message is stored in MongoDB or in a file,\r\n  otherwise the error 400 - Bad Request will be displayed.\r\n  If the media type is audio, the mimetype audio/ogg is returned by default. \r\n  If you need an MP4 file, check the \"convertToMp4\" option as \"true\"\r\n*/\r\n{\r\n    // payload message or key.id only for get message in database\r\n    \"message\": {\r\n        \"key\": {\r\n            \"id\": \"3EB0F4A1F841F02958FB74\"\r\n        }\r\n    },\r\n    \"convertToMp4\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/getBase64FromMediaMessage/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"getBase64FromMediaMessage",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Message",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"key\":  {\r\n        \"remoteJid\": \"123@s.whatsapp.net\",\r\n        \"fromMe\": true,\r\n        \"id\": \"3EB04DC69D97835D7CC6F12776D25766FBC224E2\"\r\n    },\r\n    \"text\": \"new message\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/updateMessage/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"updateMessage",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Presence",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"delay\": 1200,\r\n    \"presence\": \"composing\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/sendPresence/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"sendPresence",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Block Status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"status\": \"block\" /* block, unblock */\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/message/updateBlockStatus/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"message",
+								"updateBlockStatus",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Contacts",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\n  Here it is possible to list all contacts or just one,\r\n  using the 'where' option.\r\n*/\r\n{\r\n  \"where\": {\r\n//    \"id\": \"{{remoteJid}}\" /* Optional */\r\n  }\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/findContacts/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"findContacts",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Messages",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\n  Each of these properties are optional.\r\n  With mongodb disabled, only the \"key.id\" property is available.\r\n  Remove all comments before submitting the request.\r\n*/\r\n{\r\n    \"where\": {\r\n        \"key\": {\r\n            \"remoteJid\": \"{{remoteJid}}\"\r\n        }\r\n    },\r\n    // optional\r\n    \"page\": 1,\r\n    \"offset\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/findMessages/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"findMessages",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Status Message",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "/*\r\n  Each of these properties are optional.\r\n  With mongodb disabled, only the \"id\" property is available.\r\n  Remove all comments before submitting the request.\r\n*/\r\n{\r\n  \"where\": {\r\n    \"remoteJid\": \"123@s.whatsapp.net\",\r\n    \"id\": \"BAE5959535174C7E\"\r\n  },\r\n  // optional\r\n  \"page\": 1,\r\n  \"offset\": 10\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/findStatusMessage/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"findStatusMessage",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Chats",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/findChats/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"findChats",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Label",
+			"item": [
+				{
+					"name": "Find Labels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/label/findLabels/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"label",
+								"findLabels",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Handle Labels",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"number\": \"{{remoteJid}}\",\n    \"labelId\": \"labelId\",\n    \"action\": \"add\" /* add or remove */\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/label/handleLabel/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"label",
+								"handleLabel",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Profile Settings",
+			"item": [
+				{
+					"name": "Fetch Business Profile",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"number\": \"{{remoteJid}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/fetchBusinessProfile/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"fetchBusinessProfile",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Profile",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"number\": \"{{remoteJid}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/fetchProfile/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"fetchProfile",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile Name",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Evolution-API\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/updateProfileName/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"updateProfileName",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile Status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"status\": \"Unavailable for calls\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/updateProfileStatus/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"updateProfileStatus",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile Picture",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"picture\": \"https://avatars.githubusercontent.com/u/136080052?s=200&v=4\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/updateProfilePicture/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"updateProfilePicture",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Profile Picture",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/removeProfilePicture/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"removeProfilePicture",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Privacy Settings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/fetchPrivacySettings/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"fetchPrivacySettings",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Privacy Settings",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"readreceipts\": \"all\", /*'all', 'none'*/\n    \"profile\": \"all\", /*'all', 'contacts', 'contact_blacklist', 'none'*/\n    \"status\": \"contacts\", /*'all', 'contacts', 'contact_blacklist', 'none'*/\n    \"online\": \"all\", /*'all', 'match_last_seen'*/\n    \"last\": \"contacts\", /*'all', 'contacts', 'contact_blacklist', 'none'*/\n    \"groupadd\": \"none\" /*'all', 'contacts', 'contact_blacklist'*/\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/updatePrivacySettings/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"updatePrivacySettings",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Group",
+			"item": [
+				{
+					"name": "Create Group",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"subject\": \"Test 02\",  \r\n  \"description\": \"optional\",\r\n  \"participants\": [\r\n    \"5531900000000\",\r\n    \"5531900000000\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/create/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"create",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Group Picture",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"image\": \"https://evolution-api.com/files/sticker.png\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/updateGroupPicture/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"updateGroupPicture",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Group Subject",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"subject\": \"Group Name or Subject\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/updateGroupSubject/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"updateGroupSubject",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Group Description",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"description\": \"Group Description or Rules\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/updateGroupDescription/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"updateGroupDescription",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch Invite Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/inviteCode/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"inviteCode",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revoke Invite Code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/revokeInviteCode/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"revokeInviteCode",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Invite Url",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"groupJid\": \"{{groupJid}}\",\r\n  \"description\": \"Access this link to join my WhatsApp group:\",\r\n  \"numbers\": [\r\n    \"{{remoteJid}}\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/sendInvite/{{instance}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"sendInvite",
+								"{{instance}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Group by Invite Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/inviteInfo/{{instance}}?inviteCode={{inviteCode}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"inviteInfo",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "inviteCode",
+									"value": "{{inviteCode}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Group by Jid",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/findGroupInfos/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"findGroupInfos",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch All Groups",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/fetchAllGroups/{{instance}}?getParticipants=false",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"fetchAllGroups",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "getParticipants",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Find Participants",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/participants/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"participants",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Participant",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"action\": \"add\", // add = Add new member on group\r\n                   // remove = Remove existing member on group\r\n                   // promote = Promote to group admin\r\n                   // demote = Demote to group user\r\n  \"participants\": [\r\n    \"5531900000000\",\r\n    \"5531911111111\",\r\n    \"5531922222222\"\r\n  ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/updateParticipant/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"updateParticipant",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Setting",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"action\": \"not_announcement\" // announcement = Only Admins send messages\r\n                               // not_announcement = All Members send messages\r\n                               // locked = Only Admins edit group settings\r\n                               // unlocked = All Members edit group settings\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/updateSetting/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"updateSetting",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Ephemeral",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"expiration\": 0 // 0 = Off \r\n                  // 86400 = 24 Hours \r\n                  // 604800 = 7 Days \r\n                  // 7776000 = 90 Days\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/group/toggleEphemeral/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"toggleEphemeral",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Leave Group",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/group/leaveGroup/{{instance}}?groupJid={{groupJid}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"group",
+								"leaveGroup",
+								"{{instance}}"
+							],
+							"query": [
+								{
+									"key": "groupJid",
+									"value": "{{groupJid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Integrations",
+			"item": [
+				{
+					"name": "Events",
+					"item": [
+						{
+							"name": "Websocket",
+							"item": [
+								{
+									"name": "Set Websocket",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"websocket\": {\r\n        \"enabled\": true,\r\n        \"events\": [\r\n            \"APPLICATION_STARTUP\",\r\n            \"QRCODE_UPDATED\",\r\n            \"MESSAGES_SET\",\r\n            \"MESSAGES_UPSERT\",\r\n            \"MESSAGES_UPDATE\",\r\n            \"MESSAGES_DELETE\",\r\n            \"SEND_MESSAGE\",\r\n            \"CONTACTS_SET\",\r\n            \"CONTACTS_UPSERT\",\r\n            \"CONTACTS_UPDATE\",\r\n            \"PRESENCE_UPDATE\",\r\n            \"CHATS_SET\",\r\n            \"CHATS_UPSERT\",\r\n            \"CHATS_UPDATE\",\r\n            \"CHATS_DELETE\",\r\n            \"GROUPS_UPSERT\",\r\n            \"GROUP_UPDATE\",\r\n            \"GROUP_PARTICIPANTS_UPDATE\",\r\n            \"CONNECTION_UPDATE\",\r\n            \"LABELS_EDIT\",\r\n            \"LABELS_ASSOCIATION\",\r\n            \"CALL\",\r\n            \"TYPEBOT_START\",\r\n            \"TYPEBOT_CHANGE_STATUS\"\r\n        ]\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/websocket/set/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"websocket",
+												"set",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Websocket",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/websocket/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"websocket",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Rabbitmq",
+							"item": [
+								{
+									"name": "Set Rabbitmq",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"rabbitmq\": {\r\n        \"enabled\": true,\r\n        \"events\": [\r\n            \"APPLICATION_STARTUP\",\r\n            \"QRCODE_UPDATED\",\r\n            \"MESSAGES_SET\",\r\n            \"MESSAGES_UPSERT\",\r\n            \"MESSAGES_UPDATE\",\r\n            \"MESSAGES_DELETE\",\r\n            \"SEND_MESSAGE\",\r\n            \"CONTACTS_SET\",\r\n            \"CONTACTS_UPSERT\",\r\n            \"CONTACTS_UPDATE\",\r\n            \"PRESENCE_UPDATE\",\r\n            \"CHATS_SET\",\r\n            \"CHATS_UPSERT\",\r\n            \"CHATS_UPDATE\",\r\n            \"CHATS_DELETE\",\r\n            \"GROUPS_UPSERT\",\r\n            \"GROUP_UPDATE\",\r\n            \"GROUP_PARTICIPANTS_UPDATE\",\r\n            \"CONNECTION_UPDATE\",\r\n            \"LABELS_EDIT\",\r\n            \"LABELS_ASSOCIATION\",\r\n            \"CALL\",\r\n            \"TYPEBOT_START\",\r\n            \"TYPEBOT_CHANGE_STATUS\"\r\n        ]\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/rabbitmq/set/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"rabbitmq",
+												"set",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Rabbitmq",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/rabbitmq/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"rabbitmq",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Sqs",
+							"item": [
+								{
+									"name": "Set Sqs",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"sqs\": {\r\n        \"enabled\": true,\r\n        \"events\": [\r\n            \"APPLICATION_STARTUP\",\r\n            \"QRCODE_UPDATED\",\r\n            \"MESSAGES_SET\",\r\n            \"MESSAGES_UPSERT\",\r\n            \"MESSAGES_UPDATE\",\r\n            \"MESSAGES_DELETE\",\r\n            \"SEND_MESSAGE\",\r\n            \"CONTACTS_SET\",\r\n            \"CONTACTS_UPSERT\",\r\n            \"CONTACTS_UPDATE\",\r\n            \"PRESENCE_UPDATE\",\r\n            \"CHATS_SET\",\r\n            \"CHATS_UPSERT\",\r\n            \"CHATS_UPDATE\",\r\n            \"CHATS_DELETE\",\r\n            \"GROUPS_UPSERT\",\r\n            \"GROUP_UPDATE\",\r\n            \"GROUP_PARTICIPANTS_UPDATE\",\r\n            \"CONNECTION_UPDATE\",\r\n            \"LABELS_EDIT\",\r\n            \"LABELS_ASSOCIATION\",\r\n            \"CALL\",\r\n            \"TYPEBOT_START\",\r\n            \"TYPEBOT_CHANGE_STATUS\"\r\n        ]\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/sqs/set/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sqs",
+												"set",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Sqs",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/sqs/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"sqs",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Webhook",
+							"item": [
+								{
+									"name": "Set Webhook",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"webhook\": {\r\n        \"enabled\": true,\r\n        \"url\": \"https://webhook.site\",\r\n        \"headers\": {\r\n            \"autorization\": \"Bearer TOKEN\",\r\n            \"Content-Type\": \"application/json\"\r\n        },\r\n        \"byEvents\": false,\r\n        \"base64\": false,\r\n        \"events\": [\r\n            \"APPLICATION_STARTUP\",\r\n            \"QRCODE_UPDATED\",\r\n            \"MESSAGES_SET\",\r\n            \"MESSAGES_UPSERT\",\r\n            \"MESSAGES_UPDATE\",\r\n            \"MESSAGES_DELETE\",\r\n            \"SEND_MESSAGE\",\r\n            \"CONTACTS_SET\",\r\n            \"CONTACTS_UPSERT\",\r\n            \"CONTACTS_UPDATE\",\r\n            \"PRESENCE_UPDATE\",\r\n            \"CHATS_SET\",\r\n            \"CHATS_UPSERT\",\r\n            \"CHATS_UPDATE\",\r\n            \"CHATS_DELETE\",\r\n            \"GROUPS_UPSERT\",\r\n            \"GROUP_UPDATE\",\r\n            \"GROUP_PARTICIPANTS_UPDATE\",\r\n            \"CONNECTION_UPDATE\",\r\n            \"LABELS_EDIT\",\r\n            \"LABELS_ASSOCIATION\",\r\n            \"CALL\",\r\n            \"TYPEBOT_START\",\r\n            \"TYPEBOT_CHANGE_STATUS\"\r\n        ]\r\n    }\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/webhook/set/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"webhook",
+												"set",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Webhook",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/webhook/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"webhook",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Chatbot",
+					"item": [
+						{
+							"name": "Chatwoot",
+							"item": [
+								{
+									"name": "Set Chatwoot",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"enabled\": true,\r\n\t\"accountId\": \"1\",\r\n    \"token\": \"TOKEN\",\r\n    \"url\": \"https://chatwoot.com\",\r\n    \"signMsg\": true,\r\n    \"reopenConversation\": true,\r\n    \"conversationPending\": false,\r\n    \"nameInbox\": \"evolution\",\r\n    \"mergeBrazilContacts\": true,\r\n    \"importContacts\": true,\r\n    \"importMessages\": true,\r\n    \"daysLimitImportMessages\": 2,\r\n    \"signDelimiter\": \"\\n\",\r\n    \"autoCreate\": true,\r\n    \"organization\": \"BOT\",\r\n    \"logo\": \"link da sua\",\r\n    \"ignoreJids\": [\r\n        \"@g.us\"\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/chatwoot/set/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"chatwoot",
+												"set",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Chatwoot",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/chatwoot/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"chatwoot",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Typebot",
+							"item": [
+								{
+									"name": "Typebot Session",
+									"item": [
+										{
+											"name": "Change Session Status",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"remoteJid\": \"5511912345678@s.whatsapp.net\",\r\n    \"status\": \"closed\" /* opened, paused, closed */\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/typebot/changeStatus/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"typebot",
+														"changeStatus",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Sessions",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/typebot/fetchSessions/:typebotId/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"typebot",
+														"fetchSessions",
+														":typebotId",
+														"{{instance}}"
+													],
+													"variable": [
+														{
+															"key": "typebotId",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Default Settings",
+									"item": [
+										{
+											"name": "Set Default Settings",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 10,\r\n    \"ignoreJids\": [],\r\n    \"typebotIdFallback\": \"clyja4oys0a3uqpy7k3bd7swe\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/typebot/settings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"typebot",
+														"settings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Default Settings",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/typebot/fetchSettings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"typebot",
+														"fetchSettings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Create Typebot",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"url\": \"https://bot.dgcode.com.br\",\r\n    \"typebot\": \"my-typebot-uoz1rg9\",\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"regex\", /* contains, equals, startsWith, endsWith, regex */\r\n    \"triggerValue\": \"^atend.*\",\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 10\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/typebot/create/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"typebot",
+												"create",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Typebots",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/typebot/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"typebot",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Fetch Typebot",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/typebot/fetch/:typebotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"typebot",
+												"fetch",
+												":typebotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "typebotId",
+													"value": "clx6niurm0001lzrhhqqe72yq"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Typebot",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"enabled\": true,\r\n    \"url\": \"https://bot.dgcode.com.br\",\r\n    \"typebot\":  \"my-typebot-uoz1rg9\",\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 10,\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"contains\", /* contains, equals, startsWith, endsWith */\r\n    \"triggerValue\": \"evolution\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/typebot/update/:typebotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"typebot",
+												"update",
+												":typebotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "typebotId",
+													"value": "clx6niurm0001lzrhhqqe72yq"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Typebot",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/typebot/delete/:typebotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"typebot",
+												"delete",
+												":typebotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "typebotId",
+													"value": "clx6niurm0001lzrhhqqe72yq"
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Start Typebot",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"url\": \"https://bot.dgcode.com.br\",\r\n    \"typebot\": \"fluxo-unico-3uuso28\",\r\n    \"remoteJid\": \"557499879409@s.whatsapp.net\",\r\n    \"startSession\": false,\r\n    \"variables\": [\r\n        {\r\n            \"name\": \"pushName\",\r\n            \"value\": \"Davidson Gomes\"\r\n        }\r\n    ]\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/typebot/start/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"typebot",
+												"start",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Evolution Bot",
+							"item": [
+								{
+									"name": "Session",
+									"item": [
+										{
+											"name": "Change Session Status",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"remoteJid\": \"5511912345678@s.whatsapp.net\",\r\n    \"status\": \"closed\" /* opened, paused, closed */\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/evolutionBot/changeStatus/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"evolutionBot",
+														"changeStatus",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Sessions",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/evolutionBot/fetchSessions/:evolutionBotId/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"evolutionBot",
+														"fetchSessions",
+														":evolutionBotId",
+														"{{instance}}"
+													],
+													"variable": [
+														{
+															"key": "evolutionBotId",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Default Settings",
+									"item": [
+										{
+											"name": "Set Default Settings",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": [],\r\n    \"botIdFallback\": \"clyja4oys0a3uqpy7k3bd7swe\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/evolutionBot/settings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"evolutionBot",
+														"settings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Default Settings",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/evolutionBot/fetchSettings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"evolutionBot",
+														"fetchSettings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Create Bots",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"apiUrl\": \"http://api.site.com/v1\",\r\n    \"apiKey\": \"app-123456\", // optional\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 0,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/evolutionBot/create/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"evolutionBot",
+												"create",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Bots",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/evolutionBot/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"evolutionBot",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Fetch Bot",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/evolutionBot/fetch/:evolutionBotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"evolutionBot",
+												"fetch",
+												":evolutionBotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "evolutionBotId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Bot",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"apiUrl\": \"http://api.site.com/v1\",\r\n    \"apiKey\": \"app-123456\", // optional\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 0,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/evolutionBot/update/:evolutionBotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"evolutionBot",
+												"update",
+												":evolutionBotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "evolutionBotId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Bot",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/evolutionBot/delete/:evolutionBotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"evolutionBot",
+												"delete",
+												":evolutionBotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "evolutionBotId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Openai",
+							"item": [
+								{
+									"name": "Openai Session",
+									"item": [
+										{
+											"name": "Change Session Status",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"remoteJid\": \"5511912345678@s.whatsapp.net\",\r\n    \"status\": \"closed\" /* opened, paused, closed */\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/openai/changeStatus/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"changeStatus",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Sessions",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/openai/fetchSessions/:openaiBotId/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"fetchSessions",
+														":openaiBotId",
+														"{{instance}}"
+													],
+													"variable": [
+														{
+															"key": "openaiBotId",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Default Settings",
+									"item": [
+										{
+											"name": "Set Default Settings",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"openaiCredsId\": \"clyja4oys0a3uqpy7k3bd7swe\",\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": [],\r\n    \"openaiIdFallback\": \"clyja4oys0a3uqpy7k3bd7swe\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/openai/settings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"settings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Default Settings",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/openai/fetchSettings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"fetchSettings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Openai Creds",
+									"item": [
+										{
+											"name": "Set Openai Creds",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"name\": \"apikey\",\r\n    \"apiKey\": \"sk-proj-...\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/openai/creds/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"creds",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Get Openai Creds",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/openai/creds/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"creds",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Delete Openai Creds",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/openai/creds/:openaiCredsId/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"openai",
+														"creds",
+														":openaiCredsId",
+														"{{instance}}"
+													],
+													"variable": [
+														{
+															"key": "openaiCredsId",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Create Openai Bots",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"openaiCredsId\": \"clyrx36wj0001119ucjjzxik1\",\r\n    \"botType\": \"assistant\", /* assistant or chatCompletion */\r\n    // for assistants\r\n    \"assistantId\": \"asst_LRNyh6qC4qq8NTyPjHbcJjSp\",\r\n    \"functionUrl\": \"https://n8n.site.com\",\r\n    // for chat completion\r\n    \"model\": \"gpt-4o\",\r\n    \"systemMessages\": [\r\n        \"You are a helpful assistant.\"\r\n    ],\r\n    \"assistantMessages\": [\r\n        \"\\n\\nHello there, how may I assist you today?\"\r\n    ],\r\n    \"userMessages\": [\r\n        \"Hello!\"\r\n    ],\r\n    \"maxTokens\": 300,\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 10,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/openai/create/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"openai",
+												"create",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Openai Bots",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/openai/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"openai",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Fetch Openai Bot",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/openai/fetch/:openaiBotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"openai",
+												"fetch",
+												":openaiBotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "openaiBotId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Openai Bot",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n\t\"enabled\": true,\r\n\t\"openaiCredsId\": \"clyrx36wj0001119ucjjzxik1\",\r\n\t\"botType\": \"assistant\", /* assistant or chatCompletion */\r\n\t// for assistants\r\n\t\"assistantId\": \"asst_LRNyh6qC4qq8NTyPjHbcJjSp\",\r\n    \"functionUrl\": \"https://webhook.com\",\r\n\t// for chat completion\r\n\t\"model\": \"gpt-4o\",\r\n\t\"systemMessages\": [\r\n\t\t\"You are a helpful assistant.\"\r\n\t],\r\n\t\"assistantMessages\": [\r\n\t\t\"\\n\\nHello there, how may I assist you today?\"\r\n\t],\r\n\t\"userMessages\": [\r\n\t\t\"Hello!\"\r\n\t],\r\n\t\"maxTokens\": 300,\r\n\t// options\r\n\t\"triggerType\": \"keyword\", /* all or keyword */\r\n\t\"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n\t\"triggerValue\": \"teste\",\r\n\t\"expire\": 20,\r\n\t\"keywordFinish\": \"#SAIR\",\r\n\t\"delayMessage\": 1000,\r\n\t\"unknownMessage\": \"Mensagem não reconhecida\",\r\n\t\"listeningFromMe\": false,\r\n\t\"stopBotFromMe\": false,\r\n\t\"keepOpen\": false,\r\n\t\"debounceTime\": 10,\r\n\t\"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/openai/update/:openaiBotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"openai",
+												"update",
+												":openaiBotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "openaiBotId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Openai Bot",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/openai/delete/:openaiBotId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"openai",
+												"delete",
+												":openaiBotId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "openaiBotId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Dify",
+							"item": [
+								{
+									"name": "Dify Session",
+									"item": [
+										{
+											"name": "Change Session Status",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"remoteJid\": \"5511912345678@s.whatsapp.net\",\r\n    \"status\": \"closed\" /* opened, paused, closed */\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/dify/changeStatus/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"dify",
+														"changeStatus",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Sessions",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/dify/fetchSessions/:difyId/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"dify",
+														"fetchSessions",
+														":difyId",
+														"{{instance}}"
+													],
+													"variable": [
+														{
+															"key": "difyId",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Default Settings",
+									"item": [
+										{
+											"name": "Set Default Settings",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": [],\r\n    \"difyIdFallback\": \"clyja4oys0a3uqpy7k3bd7swe\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/dify/settings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"dify",
+														"settings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Default Settings",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/dify/fetchSettings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"dify",
+														"fetchSettings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Create Dify Bots",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"botType\": \"chatBot\", /* chatBot, textGenerator, agent, workflow */\r\n    \"apiUrl\": \"http://dify.site.com/v1\",\r\n    \"apiKey\": \"app-123456\",\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 0,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/dify/create/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"dify",
+												"create",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Dify Bots",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/dify/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"dify",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Fetch Dify Bot",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/dify/fetch/:difyId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"dify",
+												"fetch",
+												":difyId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "difyId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Dify Bot",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"botType\": \"chatBot\", /* chatBot, textGenerator, agent, workflow */\r\n    \"apiUrl\": \"http://dify.site.com/v1\",\r\n    \"apiKey\": \"app-123456\",\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 0,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/dify/update/:difyId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"dify",
+												"update",
+												":difyId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "difyId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Dify Bot",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/dify/delete/:difyId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"dify",
+												"delete",
+												":difyId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "difyId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						},
+						{
+							"name": "Flowise",
+							"item": [
+								{
+									"name": "Flowise Session",
+									"item": [
+										{
+											"name": "Change Session Status",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"remoteJid\": \"5511912345678@s.whatsapp.net\",\r\n    \"status\": \"closed\" /* opened, paused, closed */\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/flowise/changeStatus/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"flowise",
+														"changeStatus",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Sessions",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/flowise/fetchSessions/:difyId/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"flowise",
+														"fetchSessions",
+														":difyId",
+														"{{instance}}"
+													],
+													"variable": [
+														{
+															"key": "difyId",
+															"value": ""
+														}
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Default Settings",
+									"item": [
+										{
+											"name": "Set Default Settings",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"expire\": 20,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": [],\r\n    \"flowiseIdFallback\": \"clyja4oys0a3uqpy7k3bd7swe\"\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/flowise/settings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"flowise",
+														"settings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Fetch Default Settings",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/flowise/fetchSettings/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"flowise",
+														"fetchSettings",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Create Flowise Bots",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"apiUrl\": \"http://flowise.site.com/v1\",\r\n    \"apiKey\": \"app-123456\", // optional\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 0,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/flowise/create/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"flowise",
+												"create",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Find Flowise Bots",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/flowise/find/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"flowise",
+												"find",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Fetch Flowise Bot",
+									"request": {
+										"method": "GET",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/flowise/fetch/:flowiseId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"flowise",
+												"fetch",
+												":flowiseId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "flowiseId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update Flowise Bot",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"enabled\": true,\r\n    \"apiUrl\": \"http://dify.site.com/v1\",\r\n    \"apiKey\": \"app-123456\", // optional\r\n    // options\r\n    \"triggerType\": \"keyword\", /* all or keyword */\r\n    \"triggerOperator\": \"equals\", /* contains, equals, startsWith, endsWith, regex, none */\r\n    \"triggerValue\": \"teste\",\r\n    \"expire\": 0,\r\n    \"keywordFinish\": \"#SAIR\",\r\n    \"delayMessage\": 1000,\r\n    \"unknownMessage\": \"Mensagem não reconhecida\",\r\n    \"listeningFromMe\": false,\r\n    \"stopBotFromMe\": false,\r\n    \"keepOpen\": false,\r\n    \"debounceTime\": 0,\r\n    \"ignoreJids\": []\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/flowise/update/:flowiseId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"flowise",
+												"update",
+												":flowiseId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "flowiseId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Flowise Bot",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"url": {
+											"raw": "{{baseUrl}}/flowise/delete/:flowiseId/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"flowise",
+												"delete",
+												":flowiseId",
+												"{{instance}}"
+											],
+											"variable": [
+												{
+													"key": "flowiseId",
+													"value": ""
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Channel",
+					"item": [
+						{
+							"name": "Cloud API Oficial",
+							"item": [
+								{
+									"name": "Send Message",
+									"item": [
+										{
+											"name": "Send Template",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"number\": \"{{remoteJid}}\",\r\n    \"name\": \"hello_world\",\r\n    \"language\": \"en_US\",\r\n    // \"webhookUrl\": \"\", (optional)\r\n    \"components\": [\r\n        {\r\n            \"type\": \"body\",\r\n            \"parameters\": [\r\n                {\r\n                    \"type\": \"text\",\r\n                    \"text\": \"Name\"\r\n                },\r\n                {\r\n                    \"type\": \"text\",\r\n                    \"text\": \"email@email.com\"\r\n                }\r\n            ]\r\n        },\r\n        {\r\n            \"type\": \"button\",\r\n            \"sub_type\": \"URL\",\r\n            \"index\": \"1\",\r\n            \"parameters\": [\r\n                {\r\n                    \"type\": \"text\",\r\n                    \"text\": \"/reset-password/1234\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/message/sendTemplate/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"message",
+														"sendTemplate",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								},
+								{
+									"name": "Template",
+									"item": [
+										{
+											"name": "Create Template",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\r\n    \"name\": \"teste_evolution\",\r\n    \"category\": \"MARKETING\", /* AUTHENTICATION, MARKETING, UTILITY */\r\n    \"allowCategoryChange\": false,\r\n    \"language\": \"en_US\",\r\n    // \"webhookUrl\": \"\", (optional)\r\n    \"components\": [\r\n        {\r\n            \"type\": \"BODY\",\r\n            \"text\": \"Thank you for your order, {{1}}! Your confirmation number is {{2}}. If you have any questions, please use the buttons below to contact support. Thank you for being a customer!\",\r\n            \"example\": {\r\n                \"body_text\": [\r\n                    [\r\n                        \"Pablo\",\r\n                        \"860198-230332\"\r\n                    ]\r\n                ]\r\n            }\r\n        },\r\n        {\r\n            \"type\": \"BUTTONS\",\r\n            \"buttons\": [\r\n                {\r\n                    \"type\": \"QUICK_REPLY\",\r\n                    \"text\": \"Unsubscribe from Promos\"\r\n                },\r\n                {\r\n                    \"type\": \"URL\",\r\n                    \"text\": \"Contact Support\",\r\n                    \"url\": \"https://atendai.com\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "{{baseUrl}}/template/create/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"template",
+														"create",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										},
+										{
+											"name": "Find Templates",
+											"request": {
+												"method": "GET",
+												"header": [],
+												"url": {
+													"raw": "{{baseUrl}}/template/find/{{instance}}",
+													"host": [
+														"{{baseUrl}}"
+													],
+													"path": [
+														"template",
+														"find",
+														"{{instance}}"
+													]
+												}
+											},
+											"response": []
+										}
+									]
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Storage",
+					"item": [
+						{
+							"name": "S3",
+							"item": [
+								{
+									"name": "Get Media",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    // \"id\": \"\",\r\n    // \"type\": \"\",\r\n    // \"messageId\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/s3/getMedia/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"s3",
+												"getMedia",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Get Media Url",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"id\": \"clykhoqq70003pmm88bb6eejd\"\r\n    // \"type\": \"\",\r\n    // \"messageId\": \"\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "{{baseUrl}}/s3/getMediaUrl/{{instance}}",
+											"host": [
+												"{{baseUrl}}"
+											],
+											"path": [
+												"s3",
+												"getMediaUrl",
+												"{{instance}}"
+											]
+										}
+									},
+									"response": []
+								}
+							]
+						}
+					]
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "apikey",
+		"apikey": [
+			{
+				"key": "value",
+				"value": "{{globalApikey}}",
+				"type": "string"
+			},
+			{
+				"key": "key",
+				"value": "apikey",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "https://api.evoapicloud.com",
+			"type": "string"
+		},
+		{
+			"key": "instance",
+			"value": "INSTANCE_ID",
+			"type": "string"
+		},
+		{
+			"key": "globalApikey",
+			"value": "ADMIN TOKEN",
+			"type": "string"
+		},
+		{
+			"key": "apikey",
+			"value": "INSTANCE TOKEN",
+			"type": "string"
+		},
+		{
+			"key": "webhookUrl",
+			"value": "https://sub.domain.com/webhook-test/exclusive-webhook-code (Optional)",
+			"type": "string"
+		},
+		{
+			"key": "groupJid",
+			"value": "999999999999999999@g.us (Group Number)",
+			"type": "string"
+		},
+		{
+			"key": "remoteJid",
+			"value": "559999999999 (Recipient number with Country Code)",
+			"type": "string"
+		},
+		{
+			"key": "number",
+			"value": "559999999999 (Recipient number with Country Code)",
+			"type": "string"
+		},
+		{
+			"key": "url",
+			"value": "sub.domain.com (Optional)",
+			"type": "string"
+		},
+		{
+			"key": "inviteCode",
+			"value": "inviteCode (Group Invite Code)",
+			"type": "string"
+		},
+		{
+			"key": "instanceId",
+			"value": "INSTANCE_ID",
+			"type": "string"
+		}
+	]
+}
