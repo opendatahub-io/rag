@@ -19,9 +19,9 @@ uv pip install -r requirements.txt
 
 Prepare your environment by running:
 ``` bash
-# The run.yaml file is based on starter template https://github.com/meta-llama/llama-stack/tree/main/llama_stack/templates/starter
-# We run a build here to install all of the dependencies for the starter template
-llama stack build --template starter --image-type venv
+# The run.yaml file is based on starter distro https://github.com/llamastack/llama-stack/tree/v0.2.23/llama_stack/distributions/starter
+# We run a build here to install all of the dependencies for the starter distro
+llama stack build --distro starter --image-type venv
 ```
 
 ## Running Instructions
@@ -30,8 +30,14 @@ llama stack build --template starter --image-type venv
 To run the script with default settings:
 
 ```bash
-# Update OLLAMA_INFERENCE_MODEL to your preferred model or similar for other inference providers
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py
+# This will run the script with the provided run.yaml using LlamaStackAsLibraryClient
+MILVUS_URL=milvus uv run python beir_benchmarks.py
+```
+
+To run the script with a custom Llama Stack server:
+
+```bash
+LLAMA_STACK_URL="http://localhost:8321" MILVUS_URL=milvus uv run python beir_benchmarks.py
 ```
 
 ## Supported Embedding Models
@@ -46,7 +52,7 @@ It is possible to add more embedding models using the [Llama Stack Python Client
 Below is an example of how you can add more embedding models to the models list.
 ``` bash
 # First run the llama stack server via the run file
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run llama stack run run.yaml
+MILVUS_URL=milvus uv run llama stack run run.yaml
 ```
 ``` bash
 # Adding the all-MiniLM-L6-v2 model via the llama-stack-client
@@ -56,6 +62,18 @@ llama-stack-client models register all-MiniLM-L6-v2 --provider-id sentence-trans
 > Shut down the Llama Stack server before running the benchmark
 
 ### Command-Line Options
+
+#### `--vector-db-provider-id`
+**Description:** Specifies which vector db provider to use for benchmarking
+
+- **Type:** String
+- **Default:** `"milvus"`
+
+**Example:**
+```bash
+# Set the provider to remote Milvus
+--vector-db-provider-id "remote-milvus"
+```
 
 #### `--dataset-names`
 **Description:** Specifies which BEIR datasets to use for benchmarking.

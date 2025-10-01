@@ -11,10 +11,6 @@ Currently there is only one benchmark available:
 ## Prerequisites
 * [Python](https://www.python.org/downloads/) > v3.12
 * [uv](https://github.com/astral-sh/uv?tab=readme-ov-file#installation) installed
-* [ollama](https://ollama.com/) set up on your system and running the `meta-llama/Llama-3.2-3B-Instruct` model
-
-> [!NOTE]
-> Ollama can be replaced with an [inference provider](https://llama-stack.readthedocs.io/en/latest/providers/inference/index.html) of your choice
 
 ## Installation
 
@@ -32,9 +28,9 @@ uv pip install -r requirements.txt
 
 Prepare your environment by running:
 ``` bash
-# The run.yaml file is based on starter template https://github.com/meta-llama/llama-stack/tree/main/llama_stack/templates/starter
-# We run a build here to install all of the dependencies for the starter template
-llama stack build --template starter --image-type venv
+# The run.yaml file is based on starter distro https://github.com/llamastack/llama-stack/tree/v0.2.23/llama_stack/distributions/starter
+# We run a build here to install all of the dependencies for the starter distro
+llama stack build --distro starter --image-type venv
 ```
 
 ## Quick Start
@@ -42,7 +38,7 @@ llama stack build --template starter --image-type venv
 1. **Run a basic benchmark**:
 ```bash
 # Runs the embedding models benchmark by default
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
+MILVUS_URL=milvus uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
 ```
 
 2. **View results**: Results will be saved in the `results/` directory with detailed evaluation metrics.
@@ -63,13 +59,13 @@ beir-benchmarks/
 ### Basic Usage
 ```bash
 # Run benchmark with default settings
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py
+MILVUS_URL=milvus uv run python beir_benchmarks.py
 
 # Specify custom dataset and model
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
+MILVUS_URL=milvus uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
 
 # Run with custom batch size
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py --batch-size 100
+MILVUS_URL=milvus uv run python beir_benchmarks.py --batch-size 100
 ```
 
 ### Advanced Configuration
