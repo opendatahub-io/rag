@@ -19,9 +19,10 @@ import pathlib
 from beir import util, LoggingHandler
 from beir.datasets.data_loader import GenericDataLoader
 
-from llama_stack.distribution.library_client import LlamaStackAsLibraryClient
+from llama_stack.core.library_client import LlamaStackAsLibraryClient
 from llama_stack.apis.tools import RAGQueryConfig
 from llama_stack_client.types import Document
+from llama_stack_client import LlamaStackClient
 
 import numpy as np
 import pytrec_eval
@@ -34,6 +35,7 @@ DEFAULT_DATASET_NAMES = ["scifact"]
 DEFAULT_CUSTOM_DATASETS_URLS = []
 DEFAULT_EMBEDDING_MODELS = ["granite-embedding-30m", "granite-embedding-125m"]
 DEFAULT_BATCH_SIZE = 150
+DEFAULT_VECTOR_DB_PROVIDER_ID = "milvus"
 
 """
 TODO: Add an arg for specifying the benchmark type when new benchmarks are added.
@@ -74,6 +76,13 @@ def parse_args():
         type=int,
         default=150,
         help=f"Batch size for injecting documents (default: {DEFAULT_BATCH_SIZE})",
+    )
+
+    parser.add_argument(
+        "--vector-db-provider-id",
+        type=str,
+        default="milvus",
+        help=f"Vector DB provider ID (default: {DEFAULT_VECTOR_DB_PROVIDER_ID})",
     )
 
     return parser.parse_args()
@@ -156,9 +165,19 @@ def inject_documents(
 ) -> str:
     vector_db_id = f"beir-rag-eval-{embedding_model}-{uuid.uuid4().hex}"
 
-    llama_stack_client.vector_dbs.register(
-        vector_db_id=vector_db_id,
+    embedding_dimension = llama_stack_client.models.retrieve(
+        model_id=embedding_model
+    ).metadata["embedding_dimension"]
+
+    if embedding_dimension is None:
+        raise ValueError(
+            f"Embedding dimension not found in model metadata for {embedding_model}"
+        )
+
+    vector_store = llama_stack_client.vector_stores.create(
+        name=vector_db_id,
         embedding_model=embedding_model,
+        embedding_dimension=embedding_dimension,
         provider_id=vector_db_provider_id,
     )
 
@@ -186,13 +205,13 @@ def inject_documents(
 
         llama_stack_client.tool_runtime.rag_tool.insert(
             documents=documents_batch,
-            vector_db_id=vector_db_id,
+            vector_db_id=vector_store.id,
             chunk_size_in_tokens=512,
             timeout=3600,
         )
 
     print(f"Successfully inserted all {total_docs} documents")
-    return vector_db_id
+    return vector_store
 
 
 # Adapted from https://github.com/opendatahub-io/llama-stack-demos/blob/main/demos/rag_eval/Agentic_RAG_with_reference_eval.ipynb
@@ -330,7 +349,7 @@ class BenchmarkEmbeddingModels:
                     f"\n====================== {dataset_name}, {embedding_model} ======================"
                 )
                 print(f"Ingesting {dataset_name}, {embedding_model}")
-                vector_db_id = inject_documents(
+                vector_store = inject_documents(
                     self.llama_stack_client,
                     corpus,
                     self.batch_size,
@@ -340,7 +359,7 @@ class BenchmarkEmbeddingModels:
 
                 query_config = RAGQueryConfig(max_chunks=10, mode="vector").model_dump()
                 retriever = LlamaStackRAGRetriever(
-                    llama_stack_client, vector_db_id, query_config, top_k=10
+                    llama_stack_client, vector_store.id, query_config, top_k=10
                 )
 
                 print("Retrieving")
@@ -369,7 +388,7 @@ class BenchmarkEmbeddingModels:
                 util.save_runfile(
                     os.path.join(
                         results_dir,
-                        f"{dataset_name}-{vector_db_id}-{embedding_model}.run.trec",
+                        f"{dataset_name}-{vector_store.id}-{embedding_model}.run.trec",
                     ),
                     results,
                 )
@@ -392,8 +411,12 @@ if __name__ == "__main__":
         )
 
     # Run LlamaStack Client
-    llama_stack_client = LlamaStackAsLibraryClient("./run.yaml")
-    llama_stack_client.initialize()
+    llama_stack_url = os.environ.get("LLAMA_STACK_URL")
+    if llama_stack_url:
+        llama_stack_client = LlamaStackClient(base_url=llama_stack_url)
+    else:
+        llama_stack_client = LlamaStackAsLibraryClient("./run.yaml")
+        llama_stack_client.initialize()
 
     """
     TODO: When adding a new benchmark add a check to see which of the available benchmarks to use and set a generic variable to the benchmark class.
@@ -418,7 +441,7 @@ if __name__ == "__main__":
         args.dataset_names,
         args.custom_datasets_urls,
         args.batch_size,
-        "milvus",
+        args.vector_db_provider_id,
         args.embedding_models,
     )
     all_scores = embedding_models_benchmark.evaluate_retrieval()
