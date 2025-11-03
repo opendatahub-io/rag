@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: whisper-cpp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: whisper-cpp
+  template:
+    metadata:
+      labels:
+        app: whisper-cpp
+    spec:
+      containers:
+      - name: whisper-cpp
+        image: quay.io/rh_ee_czaccari/whisper:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: "1"
+            memory: 4Gi
+          limits:
+            cpu: "4"
+            memory: 8Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: whisper-cpp
+spec:
+  selector:
+    app: whisper-cpp
+  ports:
+  - port: 80
+    targetPort: 8080

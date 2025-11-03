@@ -1,0 +1,4 @@
+kfp[kubernetes] >= 2.13.0
+llama-stack >= 0.3.0
+rapidocr-onnxruntime >= 1.4.4
+sqlalchemy >= 2.0.0
