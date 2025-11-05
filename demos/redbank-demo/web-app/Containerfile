@@ -1,0 +1,24 @@
+
+# OpenShift-friendly base (runs as non-root, supports random UID)
+FROM registry.access.redhat.com/ubi9/python-311:latest
+
+# Install system deps (ffmpeg for audio) and build tools for faster-whisper
+USER 0
+RUN microdnf install -y fftw-libs ffmpeg git gcc gcc-c++ make &&     microdnf clean all
+
+# Create app dir with group 0 write so random UID can write
+WORKDIR /opt/app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY app ./app
+
+# OpenShift runs containers with a random UID; ensure group 0 has write
+RUN chgrp -R 0 /opt/app && chmod -R g+rwX /opt/app
+
+# Drop to non-root
+USER 1001
+
+EXPOSE 8080
+ENV HOST=0.0.0.0 PORT=8080
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -1,0 +1,15 @@
+
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: voice-agent-server
+  labels:
+    app: voice-agent-server
+spec:
+  to:
+    kind: Service
+    name: voice-agent-server
+  port:
+    targetPort: http
+  tls:
+    termination: edge

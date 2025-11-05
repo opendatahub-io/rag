@@ -1,0 +1,24 @@
+[project]
+name = "vibe-ui"
+version = "0.1.0"
+description = "Audio Recording & API Communication App"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "audio-recorder-streamlit>=0.0.10",
+    "streamlit>=1.49.1",
+    "requests>=2.25.0",
+    "flask>=2.0.0",
+    "flask-cors>=3.0.0",
+    "pydub>=0.25.0",
+    "httpx",
+    "openai",
+]
+
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["audio_app", "flask_api", "main"]
+

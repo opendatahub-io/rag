@@ -1,0 +1,80 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voice-agent-server
+  labels:
+    app: voice-agent-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voice-agent-server
+  template:
+    metadata:
+      labels:
+        app: voice-agent-server
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: app
+        image: image-registry.openshift-image-registry.svc:5000/your-namespace/voice-agent-server:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 8080
+        env:
+          - name: WHISPER_MODEL
+            value: "medium"
+          - name: WHISPER_DEVICE
+            value: "auto" # set to "cuda" if GPU is available
+          - name: LLAMASTACK_URL
+            valueFrom:
+              secretKeyRef:
+                name: llamastack-secret
+                key: base_url
+          - name: LLAMASTACK_AGENT_ROUTE
+            value: "/v1/agent/invoke"
+          - name: AGENT_NAME
+            value: "default-agent"
+          - name: LLAMASTACK_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: llamastack-secret
+                key: api_key
+          - name: AUDIO_HIGGS_URL
+            valueFrom:
+              secretKeyRef:
+                name: audiohiggs-secret
+                key: base_url
+          - name: AUDIO_HIGGS_ROUTE
+            value: "/v1/tts"
+          - name: AUDIO_HIGGS_VOICE
+            value: "alloy"
+          - name: VDB_URL
+            value: "http://vdb:8080"
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health/live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 20
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+      # Uncomment for GPU Whisper (requires NodeFeatureDiscovery & NVIDIA GPU Operator)
+      #  resources:
+      #    limits:
+      #      nvidia.com/gpu: 1
+      #  env:
+      #    - name: WHISPER_DEVICE
+      #      value: "cuda"

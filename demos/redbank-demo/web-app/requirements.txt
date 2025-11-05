@@ -1,0 +1,22 @@
+# Core FastAPI dependencies
+fastapi>=0.100.0
+uvicorn[standard]>=0.20.0
+python-multipart>=0.0.6
+
+# AI/ML dependencies
+openai-whisper>=20231117
+llama-stack-client>=0.0.40
+
+# Audio processing
+pydub>=0.25.1
+
+# HTTP client
+httpx>=0.24.0
+requests>=2.31.0
+
+# Logging and utilities
+python-dotenv>=1.0.0
+
+# For Flask UI (if running separately)
+flask>=2.3.0
+flask-cors>=4.0.0

@@ -1,0 +1,23 @@
+
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: voice-agent-server
+---
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: voice-agent-server
+spec:
+  source:
+    type: Git
+    git:
+      uri: https://your.git/repo.git
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Containerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: voice-agent-server:latest
