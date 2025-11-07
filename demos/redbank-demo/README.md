@@ -42,6 +42,7 @@ This guide assumes RHOAI 3.0+ is installed on an OpenShift 4.19.9+ cluster.
 2. Under `<your-cluster>` → Machine pools, click "Add machine pool".
 3. Add a name, and in "Compute node instance type" scroll all way down and search for `g5.2xlarge`.
 4. Click on Add machine pool.
+5. Repeat the steps above to provision 2 `g4dn.xlarge` GPUs. These will be used for the STT Whisper model and TTS Kokoro model during this demo.
 
 ---
 
@@ -183,20 +184,14 @@ To create a Data Science Pipeline, we need to set up an AWS S3 bucket to store p
 
 ## Deploy STT, TTS, and Qwen-2.5:7b AI models + MCP Server and PostgreSQL
 
-> **Note:** The Qwen-2.5:7b model runs on 1 GPU. We are using a `g5.2xlarge` node (A10g NVIDIA GPU)
+> **Note:** The Qwen-2.5:7b model runs on 1 GPU. We are using a `g5.2xlarge` node (A10g NVIDIA GPU), and the Whisper (STT) model
+and Kokoro (TTS) model each run on 1 `g4dn.xlarge` node (NVIDIA T4 GPU)
 
 **Steps:**
 
-<!-- TODO: put everything into the one make target -->
 1. Run in your terminal:
 ```bash
-  oc project redbank-demo
-  make deploy
-  oc apply -f deployment-yamls/whisper-deployment.yaml
-  oc apply -f deployment-yamls/deploy-kokoro.yaml
-  oc apply -f deployment-yamls/qwen-2-5-deployment.yaml
-  oc apply -f deployment-yamls/llamastackdistribution.yaml
-  oc wait --for=condition=available --timeout=600s deployment --all -n redbank-demo
+  make deploy-all
 ```
 **Verification:**
 Wait until all pods are fully running in the `redbank-demo` namespace.

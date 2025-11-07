@@ -7,43 +7,50 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1Gi
+      storage: 2Gi
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kokoro-fastapi
+  name: kokoro-fastapi-gpu
   labels:
-    app: kokoro-fastapi
+    app: kokoro-fastapi-gpu
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kokoro-fastapi
+      app: kokoro-fastapi-gpu
   template:
     metadata:
       labels:
-        app: kokoro-fastapi
+        app: kokoro-fastapi-gpu
     spec:
+      serviceAccountName: kokoro-sa
       securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
       containers:
-      - name: kokoro-fastapi
-        image: ghcr.io/remsky/kokoro-fastapi-cpu:latest
+      - name: kokoro-fastapi-gpu
+        image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.4
         ports:
         - containerPort: 8880
         env:
         - name: XDG_CACHE_HOME
           value: /cache
-        securityContext:
-          allowPrivilegeEscalation: false
-          runAsNonRoot: true
-          capabilities:
-            drop: ["ALL"]
-          seccompProfile:
-            type: RuntimeDefault
+        - name: DOWNLOAD_MODEL
+          value: "false"
+        - name: DEVICE
+          value: "gpu"
+        resources:
+          limits:
+            cpu: "4"
+            memory: 16Gi
+            nvidia.com/gpu: "1"
+          requests:
+            cpu: "1"
+            memory: 8Gi
+            nvidia.com/gpu: "1"
         volumeMounts:
         - name: cache-volume
           mountPath: /cache
@@ -55,10 +62,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kokoro-fastapi
+  name: kokoro-fastapi-gpu
 spec:
   selector:
-    app: kokoro-fastapi
+    app: kokoro-fastapi-gpu
   ports:
     - protocol: TCP
       port: 8880
