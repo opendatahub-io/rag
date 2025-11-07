@@ -34,7 +34,7 @@ This guide assumes RHOAI 3.0+ is installed on an OpenShift 4.19.9+ cluster.
 
 ## Instructions to get GPUs on OpenShift
 
-### Get a GPU Worker Node
+### Get GPU Worker Nodes
 
 **Steps:**
 

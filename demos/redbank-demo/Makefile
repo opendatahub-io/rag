@@ -2,7 +2,7 @@
 deploy-all delete-all deploy-whisper delete-whisper deploy-kokoro delete-kokoro \
 deploy-qwen-2-5 delete-qwen-2-5 deploy-lsd-server delete-lsd-server
 
-NAMESPACE := redbank-demo
+NAMESPACE := chris-ai
 KUBECTL := kubectl
 
 ifneq ($(shell which oc),)

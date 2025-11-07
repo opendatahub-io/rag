@@ -59,6 +59,8 @@ metadata:
   name: whisper-large-v3-turbo-quantized
 spec:
   predictor:
+    nodeSelector:
+      node.kubernetes.io/instance-type: g4dn.xlarge
     automountServiceAccountToken: false
     maxReplicas: 1
     minReplicas: 1

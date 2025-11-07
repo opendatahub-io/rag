@@ -58,6 +58,8 @@ metadata:
     opendatahub.io/genai-asset: "true"
 spec:
   predictor:
+    nodeSelector:
+      node.kubernetes.io/instance-type: g5.2xlarge
     automountServiceAccountToken: false
     maxReplicas: 1
     minReplicas: 1

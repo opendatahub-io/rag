@@ -25,6 +25,8 @@ spec:
       labels:
         app: kokoro-fastapi-gpu
     spec:
+      nodeSelector:
+        node.kubernetes.io/instance-type: g4dn.xlarge
       serviceAccountName: kokoro-sa
       securityContext:
         runAsUser: 1001
