@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voice-api
+  labels:
+    app: voice-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voice-api
+  template:
+    metadata:
+      labels:
+        app: voice-api
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: app
+        image: image-registry.openshift-image-registry.svc:5000/redbank-demo/redbank-voice-api-server:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+        env:
+          - name: LLAMASTACK_URL
+            value: http://redbank-lsd-service.redbank-demo.svc.cluster.local:8321
+          - name: VECTOR_STORE_NAME
+            value: redbank-kb-vector-store
+          - name: INFERENCE_MODEL
+            value: vllm-inference/qwen2-5
+          - name: WHISPER_URL
+            value: http://whisper-large-v3-turbo-quantized-predictor.redbank-demo.svc.cluster.local:80/v1
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: voice-api-service
+  labels:
+    app: voice-api-service
+spec:
+  selector:
+    app: voice-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080

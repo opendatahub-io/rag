@@ -348,13 +348,13 @@
 
                 <div class="form-group">
                     <label for="apiEndpoint">Step 1 - Audio Processing API:</label>
-                    <input type="text" id="apiEndpoint" placeholder="http://localhost:5000/transcribe" value="">
+                    <input type="text" id="apiEndpoint" placeholder="/voice/complete" value="">
                     <small style="color: #6c757d; display: block; margin-top: 5px;">This API should accept audio and return raw text</small>
                 </div>
 
                 <div class="form-group">
                     <label style="color: #6c757d;">Step 2 - Text-to-Speech API (Disabled):</label>
-                    <input type="text" id="ttsEndpoint" placeholder="http://localhost:5000/text-to-speech" value="" disabled style="background-color: #f8f9fa; color: #6c757d;">
+                    <input type="text" id="ttsEndpoint" placeholder="/text-to-speech" value="" disabled style="background-color: #f8f9fa; color: #6c757d;">
                     <small style="color: #6c757d; display: block; margin-top: 5px;">TTS functionality disabled in text-only mode</small>
                 </div>
 
@@ -491,12 +491,12 @@
         let messageCounter = 0;
 
         function setLocalFlaskEndpoints() {
-            document.getElementById('apiEndpoint').value = 'http://localhost:5000/transcribe';
+            document.getElementById('apiEndpoint').value = '/transcribe';
             document.getElementById('ttsEndpoint').value = '';
         }
 
         function setVoiceAPIEndpoints() {
-            document.getElementById('apiEndpoint').value = 'http://localhost:3000/voice/complete';
+            document.getElementById('apiEndpoint').value = '/voice/complete';
             document.getElementById('ttsEndpoint').value = '';
             showAlert('Voice Processing API endpoints configured! Use the voice controls below.', 'success');
         }

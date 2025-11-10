@@ -16,13 +16,13 @@ _tts = None
 def _get_whisper():
     global _whisper
     if _whisper is None:
-        _whisper = WhisperService(settings.whisper_model, settings.whisper_device, settings.whisper_compute_type)
+        _whisper = WhisperService(settings.whisper_model, settings.whisper_url)
     return _whisper
 
 def _get_agent():
     global _agent
     if _agent is None:
-        _agent = AgentService(settings.llamastack_url, settings.agent_route, settings.agent_name, settings.agent_api_key, settings.inference_model)
+        _agent = AgentService(settings.llamastack_url, settings.agent_route, settings.agent_name, settings.agent_api_key, settings.inference_model, settings.vector_store_name)
     return _agent
 
 def _get_tts():
@@ -35,10 +35,12 @@ def _get_tts():
 async def transcribe(file: UploadFile = File(...), logger = Depends(get_logger)):
     try:
         audio = await file.read()
+        logger.info(f"Received audio file: {file.filename}, size: {len(audio)} bytes")
         text, dur = _get_whisper().transcribe(audio)
         logger.info(f"Transcribed {len(audio)} bytes to {len(text)} chars (dur≈{dur}s)")
         return {"text": text, "duration": dur}
     except Exception as e:
+        logger.error(f"Transcription error: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.post("/complete")

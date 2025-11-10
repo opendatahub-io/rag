@@ -3,12 +3,15 @@ fastapi>=0.100.0
 uvicorn[standard]>=0.20.0
 python-multipart>=0.0.6
 
-# AI/ML dependencies
-openai-whisper>=20231117
-llama-stack-client>=0.0.40
+openai>=1.0.0
 
-# Audio processing
-pydub>=0.25.1
+# AI/ML dependencies
+llama-stack-client>=0.3.0
+
+# Audio processing (pure Python, no ffmpeg required)
+soundfile>=0.12.1
+numpy>=1.24.0
+scipy>=1.10.0
 
 # HTTP client
 httpx>=0.24.0

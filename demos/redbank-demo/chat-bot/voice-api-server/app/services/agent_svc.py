@@ -1,10 +1,10 @@
 import requests
 import json
 from typing import Dict, Any, Optional
-from llama_stack_client import LlamaStackClient, Agent
+from llama_stack_client import LlamaStackClient, Agent, AgentEventLogger
 
 class AgentService:
-    def __init__(self, url, route, name, api_key, model):
+    def __init__(self, url, route, name, api_key, model, vector_store_name: str):
         self.base_url = url
         self.agent_route = route
         self.agent_id = name
@@ -19,13 +19,14 @@ class AgentService:
             model=model,
             instructions = """You are a banking assistant; Use the knowledge tool to answer questions anduse the MCP tools to fetch user banking information by phone number. Make multiple tool calls to get complete account details including statements and transactions. Do not retrive info not asked by the user. Always use the phone +353 85 148 0072. If no answer is found, say so directly""",
 
-            # tools=[
-            #     "mcp::redbank-financials", 
-            #     {
-            #         "name": "builtin::rag/knowledge_search",
-            #         "args": {"vector_db_ids": ['vs_1f1dd1b7-49ad-4ceb-8e8d-f0bf9afe2179']},
-            #     }
-            # ],
+            tools=[
+                "mcp::redbank-financials", 
+                {
+                    # "name": "builtin::rag/knowledge_search",
+                    "type": "file_search",
+                    "vector_store_ids": [self.get_vector_store(vector_store_name)],
+                }
+            ],
         )
     
     def create_session(self) -> str:
@@ -62,37 +63,50 @@ class AgentService:
                 session_id=self.session_id,
                 stream=True
             )
+
             
             # Process the streaming response to get the final answer
             final_response = None
+            
             for chunk in response_stream:
+                # Method 1: Check for TurnCompleted event with final_text
                 if hasattr(chunk, 'event') and chunk.event:
-                    if hasattr(chunk.event, 'payload') and chunk.event.payload:
-                        payload = chunk.event.payload
-                        
-                        # Check if this is the turn_complete event with the final response
-                        if (hasattr(payload, 'event_type') and 
-                            payload.event_type == 'turn_complete' and
-                            hasattr(payload, 'turn') and payload.turn):
-                            
-                            # Extract the content from the turn
-                            turn = payload.turn
-                            
-                            # Try different ways to extract content
-                            if hasattr(turn, 'output_message') and turn.output_message:
-                                output_message = turn.output_message
-                                
-                                if hasattr(output_message, 'content') and output_message.content:
-                                    final_response = output_message.content
+                    event = chunk.event
+                    event_type = type(event).__name__
+                    
+                    # TurnCompleted event has final_text attribute
+                    if event_type == 'TurnCompleted' and hasattr(event, 'final_text') and event.final_text:
+                        final_response = event.final_text
+                        break
+                
+                # Method 2: Check chunk.response for ResponseObject
+                if hasattr(chunk, 'response') and chunk.response:
+                    response = chunk.response
+                    
+                    # ResponseObject has output which is a list of messages
+                    if hasattr(response, 'output') and response.output:
+                        for output_item in response.output:
+                            # Check if it's a message with content
+                            if hasattr(output_item, 'content') and output_item.content:
+                                # content is a list of content items
+                                for content_item in output_item.content:
+                                    if hasattr(content_item, 'text') and content_item.text:
+                                        final_response = content_item.text
+                                        break
+                                if final_response:
                                     break
-                                elif hasattr(output_message, 'text') and output_message.text:
-                                    final_response = output_message.text
-                                    break
-                            
-                            # # Try direct content access
-                            # if hasattr(turn, 'content') and turn.content:
-                            #     final_response = turn.content
-                            #     break
+                    
+                    # Also check for text attribute directly on response
+                    if not final_response and hasattr(response, 'text') and response.text:
+                        # text might be an object with format, check if it has a value
+                        text_obj = response.text
+                        if hasattr(text_obj, 'text') and text_obj.text:
+                            final_response = text_obj.text
+                        elif isinstance(text_obj, str):
+                            final_response = text_obj
+                    
+                    if final_response:
+                        break
             
             if final_response:
                 # Add assistant response to conversation history
@@ -100,7 +114,6 @@ class AgentService:
                 return {"output": final_response, "model": "vllm-inference/llama-4-scout-17b-16e-w4a16"}
             
             return {"output": "No response from agent"}
-            print(final_response)
         except Exception as e:
             print(f"Agent error: {e}")
             return {"output": f"Agent invocation failed: {str(e)}", "error": "invocation_failed"}
@@ -108,3 +121,12 @@ class AgentService:
     def clear_conversation(self):
         """Clear the conversation history"""
         self.conversation_history = []
+
+    def get_vector_store(self, vector_store_name: str) -> str:
+        """Get the vector store ID"""
+        vector_stores = self.client.vector_stores.list()
+        vector_store = next(
+            (s for s in vector_stores.data if s.name == vector_store_name), None
+        )
+        print(f"Vector store ID: {vector_store.id}")
+        return vector_store.id
