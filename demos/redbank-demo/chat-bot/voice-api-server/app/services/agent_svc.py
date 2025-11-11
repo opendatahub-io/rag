@@ -20,7 +20,12 @@ class AgentService:
             instructions = """You are a banking assistant; Use the knowledge tool to answer questions anduse the MCP tools to fetch user banking information by phone number. Make multiple tool calls to get complete account details including statements and transactions. Do not retrive info not asked by the user. Always use the phone +353 85 148 0072. If no answer is found, say so directly""",
 
             tools=[
-                "mcp::redbank-financials", 
+                {
+                    "type": "mcp",
+                    "server_label": "dmcp",
+                    "server_description": "MCP Server.",
+                    "server_url": "http://redbank-mcp-server:8000/mcp"
+                },
                 {
                     # "name": "builtin::rag/knowledge_search",
                     "type": "file_search",

@@ -12,6 +12,7 @@ llama-stack-client>=0.3.0
 soundfile>=0.12.1
 numpy>=1.24.0
 scipy>=1.10.0
+pydub>=0.25.1
 
 # HTTP client
 httpx>=0.24.0

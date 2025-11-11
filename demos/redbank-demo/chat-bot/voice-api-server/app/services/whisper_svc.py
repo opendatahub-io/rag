@@ -13,6 +13,7 @@ import soundfile as sf
 from scipy import signal
 from openai import OpenAI
 from typing import Tuple
+from pydub import AudioSegment
 
 class WhisperService:
     """
@@ -81,15 +82,15 @@ class WhisperService:
         """
         Transcribe audio data to text using the Whisper model.
         
-        Processes raw audio bytes by writing them to a temporary WAV file,
-        sending the file to the Whisper API endpoint, and returning the
-        transcribed text along with processing duration. Automatically
-        cleans up temporary files after transcription.
+        Processes raw audio bytes by converting them to WAV format and sending
+        to the Whisper API endpoint. Supports multiple input formats: mp3, mp4,
+        mpeg, mpga, m4a, wav, webm, flac, ogg.
         
         Args:
-            audio_data: Raw audio file bytes in any format supported by soundfile
-                (WAV, FLAC, OGG, etc.). The audio will be automatically converted
-                to Whisper-compatible format (16-bit PCM, mono, 16kHz).
+            audio_data: Raw audio file bytes in any supported format.
+                Supported formats: mp3, mp4, mpeg, mpga, m4a, wav, webm, flac, ogg.
+                The audio will be automatically converted to Whisper-compatible
+                format (16-bit PCM, mono, 16kHz).
                 
         Returns:
             A tuple containing:
@@ -116,52 +117,12 @@ class WhisperService:
         start_time = time.time()
         temp_filename = None
         
-        # Convert audio data to Whisper-compatible WAV format
-        # Whisper expects: 16-bit PCM, mono channel, 16kHz sample rate
         try:
-            # Load audio from bytes using soundfile (supports WAV, FLAC, OGG, etc.)
-            audio_data_io = io.BytesIO(audio_data)
-            audio_data_io.seek(0)
-            
-            # Read audio file (soundfile auto-detects format)
-            audio_array, sample_rate = sf.read(audio_data_io)
-            
-            # Convert to mono if stereo/multi-channel
-            if len(audio_array.shape) > 1:
-                audio_array = np.mean(audio_array, axis=1)
-            
-            # Resample to 16kHz if needed
-            if sample_rate != 16000:
-                num_samples = int(len(audio_array) * 16000 / sample_rate)
-                audio_array = signal.resample(audio_array, num_samples)
-                sample_rate = 16000
-            
-            # Normalize to int16 range (-32768 to 32767)
-            if audio_array.dtype != np.int16:
-                # Normalize to [-1, 1] range first
-                if audio_array.dtype == np.float32 or audio_array.dtype == np.float64:
-                    # Already in float format, just ensure it's in [-1, 1]
-                    audio_array = np.clip(audio_array, -1.0, 1.0)
-                else:
-                    # Convert to float and normalize
-                    max_val = np.max(np.abs(audio_array))
-                    if max_val > 0:
-                        audio_array = audio_array.astype(np.float32) / max_val
-                
-                # Convert to int16
-                audio_array = (audio_array * 32767).astype(np.int16)
-            
-            # Create temporary file for audio data
+            # Create a temporary file and write audio data to it
             with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_file:
                 temp_filename = temp_file.name
+                temp_file.write(audio_data)
             
-            # Write as WAV file (16-bit PCM, mono, 16kHz)
-            sf.write(temp_filename, audio_array, sample_rate, subtype='PCM_16')
-            
-        except Exception as e:
-            raise Exception(f"Failed to convert audio to WAV format: {str(e)}")
-
-        try:
             # Open the file in read mode for the API
             with open(temp_filename, 'rb') as audio_file:
                 transcript = self.client.audio.transcriptions.create(

@@ -490,6 +490,77 @@
         let conversationHistory = [];
         let messageCounter = 0;
 
+        // Convert WebM/Opus audio to WAV format using Web Audio API
+        async function convertToWav(audioBlob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const arrayBuffer = e.target.result;
+                        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+                        
+                        // Convert to 16kHz mono WAV
+                        const sampleRate = 16000;
+                        const numChannels = 1;
+                        const length = Math.floor(audioBuffer.duration * sampleRate);
+                        const samples = new Float32Array(length);
+                        
+                        // Resample and convert to mono
+                        const sourceData = audioBuffer.getChannelData(0);
+                        const ratio = audioBuffer.sampleRate / sampleRate;
+                        for (let i = 0; i < length; i++) {
+                            const srcIndex = Math.floor(i * ratio);
+                            samples[i] = sourceData[srcIndex];
+                        }
+                        
+                        // Convert to 16-bit PCM
+                        const pcmData = new Int16Array(length);
+                        for (let i = 0; i < length; i++) {
+                            const s = Math.max(-1, Math.min(1, samples[i]));
+                            pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                        }
+                        
+                        // Create WAV file
+                        const wavBuffer = new ArrayBuffer(44 + pcmData.length * 2);
+                        const view = new DataView(wavBuffer);
+                        
+                        // WAV header
+                        const writeString = (offset, string) => {
+                            for (let i = 0; i < string.length; i++) {
+                                view.setUint8(offset + i, string.charCodeAt(i));
+                            }
+                        };
+                        
+                        writeString(0, 'RIFF');
+                        view.setUint32(4, 36 + pcmData.length * 2, true);
+                        writeString(8, 'WAVE');
+                        writeString(12, 'fmt ');
+                        view.setUint32(16, 16, true); // fmt chunk size
+                        view.setUint16(20, 1, true); // audio format (PCM)
+                        view.setUint16(22, numChannels, true);
+                        view.setUint32(24, sampleRate, true);
+                        view.setUint32(28, sampleRate * numChannels * 2, true); // byte rate
+                        view.setUint16(32, numChannels * 2, true); // block align
+                        view.setUint16(34, 16, true); // bits per sample
+                        writeString(36, 'data');
+                        view.setUint32(40, pcmData.length * 2, true);
+                        
+                        // Write PCM data
+                        const pcmView = new Int16Array(wavBuffer, 44);
+                        pcmView.set(pcmData);
+                        
+                        const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                        resolve(wavBlob);
+                    } catch (error) {
+                        reject(new Error('Failed to convert audio to WAV: ' + error.message));
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(audioBlob);
+            });
+        }
+
         function setLocalFlaskEndpoints() {
             document.getElementById('apiEndpoint').value = '/transcribe';
             document.getElementById('ttsEndpoint').value = '';
@@ -546,8 +617,10 @@
                         audioChunks.push(event.data);
                     };
 
-                    mediaRecorder.onstop = () => {
-                        recordedBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    mediaRecorder.onstop = async () => {
+                        // Convert WebM/Opus to WAV format using Web Audio API
+                        const webmBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                        recordedBlob = await convertToWav(webmBlob);
                         const audioUrl = URL.createObjectURL(recordedBlob);
 
                         const audioElement = document.getElementById('recordedAudio');
