@@ -35,7 +35,7 @@ function setup() {
   oc start-build build-redbank-voice-api-server --from-dir=. --follow
 
   _out Deploying voice API server
-  oc apply -f ./voice-api-server.yaml
+  oc apply -f ../deployment-yamls/voice-api-server.yaml
 
   _out Done deploying redbank-voice-api-server
 }

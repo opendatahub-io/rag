@@ -35,7 +35,7 @@ function setup() {
   oc start-build build-redbank-chat-ui --from-dir=. --follow
 
   _out Deploying Chat UI
-  oc apply -f ./chat-ui.yaml
+  oc apply -f ../deployment-yamls/chat-ui.yaml
 
   _out Done deploying redbank-chat-ui
 }
