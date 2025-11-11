@@ -12,7 +12,7 @@ endif
 
 ############ Deploy/Delete All ############
 deploy-all: deploy-qwen-2-5 deploy-whisper deploy-kokoro deploy-postgres-mcp deploy-voice-api deploy-chat-ui
-	$(KUBECTL) wait --for=condition=available --timeout=900s deployment --all -n $(NAMESPACE)
+	$(KUBECTL) wait --for=condition=available --timeout=1200s deployment --all -n $(NAMESPACE)
 	$(MAKE) deploy-lsd-server
 	$(KUBECTL) wait --for=condition=available --timeout=300s deployment/lsd-server -n $(NAMESPACE)
 delete-all: delete-qwen-2-5 delete-whisper delete-kokoro delete-postgres-mcp delete-lsd-server delete-voice-api delete-chat-ui

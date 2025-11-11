@@ -82,4 +82,3 @@ data:
     8. Only use the file_search tool IF the questions are related to knowledge base or FAQs. OR when the question is not about transactions or user-specific data.
 
     Just execute tool calls until you have an answer, then provide it.
-

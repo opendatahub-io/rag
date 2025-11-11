@@ -1,7 +1,19 @@
-import requests
-import json
-from typing import Dict, Any, Optional
-from llama_stack_client import LlamaStackClient, Agent, AgentEventLogger
+# Copyright 2025 IBM, Red Hat
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+from typing import Dict, Any
+from llama_stack_client import LlamaStackClient
 
 MODEL_INSTRUCTIONS = """
     You are a helpful assistant with access to financial data through MCP tools.
@@ -22,6 +34,7 @@ MODEL_INSTRUCTIONS = """
     Just execute tool calls until you have an answer, then provide it.
 """
 
+
 class ResponseService:
     def __init__(self, url, model, vector_store_name: str, mcp_url: str):
         self.base_url = url
@@ -31,17 +44,19 @@ class ResponseService:
         self.client = LlamaStackClient(base_url=url)
         self.vector_store_name = vector_store_name
         self.mcp_url = mcp_url
-    
+
     def create_session(self) -> str:
         """Create a new agent session using LlamaStack client"""
         try:
-            session = self.agent.create_session(session_name=f"voice_session_{self.agent_id[:8]}")
-            self.session_id = session.id if hasattr(session, 'id') else str(session)
+            session = self.agent.create_session(
+                session_name=f"voice_session_{self.agent_id[:8]}"
+            )
+            self.session_id = session.id if hasattr(session, "id") else str(session)
             return self.session_id
         except Exception as e:
             print(f"Failed to create session: {e}")
             return None
-    
+
     def clear_conversation(self):
         """Clear the conversation history"""
         self.conversation_history = []
@@ -61,7 +76,7 @@ class ResponseService:
         print(model_instructions)
         # Add user message to conversation history
         self.conversation_history.append({"role": "user", "content": prompt})
-        try: 
+        try:
             resp_stream = self.client.responses.create(
                 model=self.model,
                 instructions=model_instructions,
@@ -73,58 +88,77 @@ class ResponseService:
                         "server_url": f"{self.mcp_url}",
                         "require_approval": "never",
                     },
-                    {"type": "file_search", "vector_store_ids": [self.get_vector_store(self.vector_store_name)]},
+                    {
+                        "type": "file_search",
+                        "vector_store_ids": [
+                            self.get_vector_store(self.vector_store_name)
+                        ],
+                    },
                 ],
                 input=prompt,
                 stream=True,
             )
-            
+
             # Process the streaming response to extract the full text
             final_text = None
             completed_response = None
-            
+
             for chunk in resp_stream:
                 # Check for completed response event - this has the full response object
-                if hasattr(chunk, 'type') and chunk.type == 'response.completed':
-                    if hasattr(chunk, 'response') and chunk.response:
+                if hasattr(chunk, "type") and chunk.type == "response.completed":
+                    if hasattr(chunk, "response") and chunk.response:
                         completed_response = chunk.response
-                
+
                 # Check for content_part.done events which contain the full text for each part
-                if hasattr(chunk, 'type') and chunk.type == 'response.content_part.done':
-                    if hasattr(chunk, 'part') and chunk.part:
+                if (
+                    hasattr(chunk, "type")
+                    and chunk.type == "response.content_part.done"
+                ):
+                    if hasattr(chunk, "part") and chunk.part:
                         part = chunk.part
                         # The part has a text attribute that is the full text string
-                        if hasattr(part, 'text') and part.text:
+                        if hasattr(part, "text") and part.text:
                             if isinstance(part.text, str):
                                 final_text = part.text
-                            elif hasattr(part.text, 'text') and part.text.text:
+                            elif hasattr(part.text, "text") and part.text.text:
                                 final_text = part.text.text
-            
+
             # Extract text from completed response if we haven't found it yet
             if not final_text and completed_response:
-                if hasattr(completed_response, 'output') and completed_response.output:
+                if hasattr(completed_response, "output") and completed_response.output:
                     for output_item in completed_response.output:
                         # Look for message type output items with content
-                        if hasattr(output_item, 'content') and output_item.content:
+                        if hasattr(output_item, "content") and output_item.content:
                             for content_item in output_item.content:
                                 # Check if it's an output_text type with text attribute
-                                if hasattr(content_item, 'type') and content_item.type == 'output_text':
-                                    if hasattr(content_item, 'text') and content_item.text:
+                                if (
+                                    hasattr(content_item, "type")
+                                    and content_item.type == "output_text"
+                                ):
+                                    if (
+                                        hasattr(content_item, "text")
+                                        and content_item.text
+                                    ):
                                         if isinstance(content_item.text, str):
                                             final_text = content_item.text
                                             break
-                                        elif hasattr(content_item.text, 'text'):
+                                        elif hasattr(content_item.text, "text"):
                                             final_text = content_item.text.text
                                             break
                             if final_text:
                                 break
-            
+
             if final_text:
-                self.conversation_history.append({"role": "assistant", "content": final_text})
+                self.conversation_history.append(
+                    {"role": "assistant", "content": final_text}
+                )
                 return {"output": final_text}
             else:
                 return {"output": "No response text found in stream"}
-                
+
         except Exception as e:
             print(f"Response error: {e}")
-            return {"output": f"Response invocation failed: {str(e)}", "error": "invocation_failed"}
+            return {
+                "output": f"Response invocation failed: {str(e)}",
+                "error": "invocation_failed",
+            }

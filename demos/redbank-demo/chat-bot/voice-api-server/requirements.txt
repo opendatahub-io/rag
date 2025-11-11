@@ -1,26 +1,26 @@
 # Core FastAPI dependencies
 fastapi>=0.100.0
-uvicorn[standard]>=0.20.0
-python-multipart>=0.0.6
-
-openai>=1.0.0
-
-# AI/ML dependencies
-llama-stack-client>=0.3.0
-
-# Audio processing (pure Python, no ffmpeg required)
-soundfile>=0.12.1
-numpy>=1.24.0
-scipy>=1.10.0
-pydub>=0.25.1
-
-# HTTP client
-httpx>=0.24.0
-requests>=2.31.0
-
-# Logging and utilities
-python-dotenv>=1.0.0
 
 # For Flask UI (if running separately)
 flask>=2.3.0
 flask-cors>=4.0.0
+
+# HTTP client
+httpx>=0.24.0
+
+# AI/ML dependencies
+llama-stack-client>=0.3.0
+numpy>=1.24.0
+
+openai>=1.0.0
+pydub>=0.25.1
+
+# Logging and utilities
+python-dotenv>=1.0.0
+python-multipart>=0.0.6
+requests>=2.31.0
+scipy>=1.10.0
+
+# Audio processing (pure Python, no ffmpeg required)
+soundfile>=0.12.1
+uvicorn[standard]>=0.20.0

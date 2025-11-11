@@ -499,13 +499,13 @@
                         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
                         const arrayBuffer = e.target.result;
                         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-                        
+
                         // Convert to 16kHz mono WAV
                         const sampleRate = 16000;
                         const numChannels = 1;
                         const length = Math.floor(audioBuffer.duration * sampleRate);
                         const samples = new Float32Array(length);
-                        
+
                         // Resample and convert to mono
                         const sourceData = audioBuffer.getChannelData(0);
                         const ratio = audioBuffer.sampleRate / sampleRate;
@@ -513,25 +513,25 @@
                             const srcIndex = Math.floor(i * ratio);
                             samples[i] = sourceData[srcIndex];
                         }
-                        
+
                         // Convert to 16-bit PCM
                         const pcmData = new Int16Array(length);
                         for (let i = 0; i < length; i++) {
                             const s = Math.max(-1, Math.min(1, samples[i]));
                             pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
                         }
-                        
+
                         // Create WAV file
                         const wavBuffer = new ArrayBuffer(44 + pcmData.length * 2);
                         const view = new DataView(wavBuffer);
-                        
+
                         // WAV header
                         const writeString = (offset, string) => {
                             for (let i = 0; i < string.length; i++) {
                                 view.setUint8(offset + i, string.charCodeAt(i));
                             }
                         };
-                        
+
                         writeString(0, 'RIFF');
                         view.setUint32(4, 36 + pcmData.length * 2, true);
                         writeString(8, 'WAVE');
@@ -545,11 +545,11 @@
                         view.setUint16(34, 16, true); // bits per sample
                         writeString(36, 'data');
                         view.setUint32(40, pcmData.length * 2, true);
-                        
+
                         // Write PCM data
                         const pcmView = new Int16Array(wavBuffer, 44);
                         pcmView.set(pcmData);
-                        
+
                         const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
                         resolve(wavBlob);
                     } catch (error) {
@@ -667,7 +667,7 @@
             // Auto-configure voice processing API if not already configured
             let apiEndpoint = document.getElementById('apiEndpoint').value;
             let isVoiceAPI = apiEndpoint.includes('/voice/complete');
-            
+
             if (!isMockMode && !isVoiceAPI) {
                 // Auto-configure voice processing API
                 setVoiceAPIEndpoints();
@@ -699,9 +699,9 @@
                         method: 'POST',
                         body: formData
                     });
-                    
+
                     const result = await response.json();
-                    
+
                     document.getElementById('loading').style.display = 'none';
 
                     if (response.ok) {
@@ -913,17 +913,17 @@
                         const audioDiv = document.createElement('div');
                         audioDiv.style.marginTop = '8px';
                         audioDiv.style.textAlign = 'center';
-                        
+
                         const audioElement = document.createElement('audio');
                         audioElement.controls = true;
                         audioElement.style.width = '100%';
                         audioElement.style.maxWidth = '300px';
                         audioElement.src = `data:audio/wav;base64,${content.audio}`;
                         audioElement.id = `audio-${messageCounter}`;
-                        
+
                         audioDiv.appendChild(audioElement);
                         messageContent.appendChild(audioDiv);
-                        
+
                         // Auto-play the audio
                         setTimeout(() => {
                             audioElement.play().catch(e => console.log('Auto-play failed:', e));
@@ -949,23 +949,23 @@
                     pre.className = 'message-text';
                     pre.textContent = content.data;
                     messageContent.appendChild(pre);
-                    
+
                     // Add audio playback if available
                     if (content.audio) {
                         const audioDiv = document.createElement('div');
                         audioDiv.style.marginTop = '8px';
                         audioDiv.style.textAlign = 'center';
-                        
+
                         const audioElement = document.createElement('audio');
                         audioElement.controls = true;
                         audioElement.style.width = '100%';
                         audioElement.style.maxWidth = '300px';
                         audioElement.src = `data:audio/wav;base64,${content.audio}`;
                         audioElement.id = `audio-${messageCounter}`;
-                        
+
                         audioDiv.appendChild(audioElement);
                         messageContent.appendChild(audioDiv);
-                        
+
                         // Auto-play the audio
                         setTimeout(() => {
                             audioElement.play().catch(e => console.log('Auto-play failed:', e));
@@ -1073,7 +1073,7 @@
             try {
                 const response = await fetch('/voice/session/start', { method: 'POST' });
                 const result = await response.json();
-                
+
                 if (result.success) {
                     updateVoiceStatus(`Session started: ${result.session_id}`);
                     showAlert('Voice session started successfully!', 'success');
@@ -1089,7 +1089,7 @@
             try {
                 const response = await fetch('/voice/conversation/clear', { method: 'POST' });
                 const result = await response.json();
-                
+
                 if (result.success) {
                     updateVoiceStatus('Conversation cleared');
                     showAlert('Conversation cleared successfully!', 'success');
@@ -1117,9 +1117,9 @@
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     // Add the complete voice response to conversation with audio
                     addMessageToConversation('assistant', {
@@ -1129,7 +1129,7 @@
                         audio: result.audio,
                         message: 'Voice complete test successful with TTS'
                     }, new Date());
-                    
+
                     updateVoiceStatus('Voice complete test successful');
                     showAlert('Voice complete test successful!', 'success');
                 } else {
@@ -1152,9 +1152,9 @@
                     method: 'POST',
                     body: formData
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     // Add the chat response to conversation
                     addMessageToConversation('user', testText, new Date());
@@ -1164,7 +1164,7 @@
                         audio: result.audio,
                         message: `Chat response (conversation length: ${result.conversation_length})`
                     }, new Date());
-                    
+
                     updateVoiceStatus(`Chat test successful (${result.conversation_length} messages)`);
                     showAlert('Voice chat test successful!', 'success');
                 } else {
@@ -1178,7 +1178,7 @@
         function updateVoiceStatus(status) {
             const statusDiv = document.getElementById('voiceStatus');
             const statusText = document.getElementById('voiceStatusText');
-            
+
             statusDiv.style.display = 'block';
             statusText.textContent = status;
         }
