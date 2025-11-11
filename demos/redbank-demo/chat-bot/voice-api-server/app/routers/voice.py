@@ -2,7 +2,7 @@ from fastapi import APIRouter, File, UploadFile, Depends, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 import base64
 from ..services.whisper_svc import WhisperService
-from ..services.agent_svc import AgentService
+from ..services.agent_svc import ResponseService
 from ..services.tts_svc import TTSService
 from ..deps import get_logger
 from ..config import settings
@@ -10,7 +10,7 @@ from ..config import settings
 router = APIRouter(prefix="/api/voice", tags=["voice"])
 
 _whisper = None
-_agent = None
+_response = None
 _tts = None
 
 def _get_whisper():
@@ -19,11 +19,11 @@ def _get_whisper():
         _whisper = WhisperService(settings.whisper_model, settings.whisper_url)
     return _whisper
 
-def _get_agent():
-    global _agent
-    if _agent is None:
-        _agent = AgentService(settings.llamastack_url, settings.agent_route, settings.agent_name, settings.agent_api_key, settings.inference_model, settings.vector_store_name)
-    return _agent
+def _get_response():
+    global _response
+    if _response is None:
+        _response = ResponseService(settings.llamastack_url, settings.inference_model, settings.vector_store_name, settings.mcp_url)
+    return _response
 
 def _get_tts():
     global _tts
@@ -49,14 +49,14 @@ async def complete(file: UploadFile = File(...), logger = Depends(get_logger)):
     text, _ = _get_whisper().transcribe(audio)
 
     tools_ctx = {"vdb_url": settings.vdb_url}
-    agent_resp = _get_agent().invoke(text, tools_ctx)
-    agent_text = agent_resp.get("output") or agent_resp.get("text") or str(agent_resp)
+    agent_resp = _get_response().invoke(text, settings.model_instructions)
+    response_text = agent_resp.get("output") or agent_resp.get("text") or str(agent_resp)
 
-    wav = _get_tts().synthesize(agent_text)
+    wav = _get_tts().synthesize(response_text)
 
     return JSONResponse({
         "transcript": text,
-        "agent_text": agent_text,
+        "agent_text": response_text,
         "wav_base64": base64.b64encode(wav).decode("ascii")
     })
 
@@ -69,7 +69,7 @@ async def speak(text: str):
 async def start_session(logger = Depends(get_logger)):
     """Start a new agent session"""
     try:
-        session_id = _get_agent().create_session()
+        session_id = _get_response().create_session()
         if session_id:
             logger.info(f"Created new agent session: {session_id}")
             return {"session_id": session_id, "status": "created"}
@@ -84,7 +84,7 @@ async def chat_with_agent(text: str, logger = Depends(get_logger)):
     """Chat with the agent using text input (for testing conversation continuity)"""
     try:
         tools_ctx = {"vdb_url": settings.vdb_url}
-        agent_resp = _get_agent().invoke(text, tools_ctx)
+        agent_resp = _get_response().invoke(text, tools_ctx)
         agent_text = agent_resp.get("output") or agent_resp.get("text") or str(agent_resp)
         
         logger.info(f"User: {text}")
@@ -93,7 +93,7 @@ async def chat_with_agent(text: str, logger = Depends(get_logger)):
         return {
             "user_input": text,
             "agent_response": agent_text,
-            "conversation_length": len(_get_agent().conversation_history)
+            "conversation_length": len(_get_response().conversation_history)
         }
     except Exception as e:
         logger.error(f"Chat error: {e}")
@@ -103,7 +103,7 @@ async def chat_with_agent(text: str, logger = Depends(get_logger)):
 async def clear_conversation(logger = Depends(get_logger)):
     """Clear the conversation history"""
     try:
-        _get_agent().clear_conversation()
+        _get_response().clear_conversation()
         logger.info("Conversation history cleared")
         return {"status": "cleared", "message": "Conversation history has been cleared"}
     except Exception as e:

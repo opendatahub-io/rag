@@ -13,5 +13,7 @@ class Settings:
     inference_model = os.getenv('INFERENCE_MODEL', 'vllm-inference/qwen2-5')
     vector_store_name = os.getenv('VECTOR_STORE_NAME', 'redbank-kb-vector-store')
     whisper_url = os.getenv("WHISPER_URL", "http://localhost:80/v1")
+    mcp_url = os.getenv("MCP_URL", "http://redbank-mcp-server:8000/mcp")
+    model_instructions = os.getenv("MODEL_INSTRUCTIONS", "")
 
 settings = Settings()
