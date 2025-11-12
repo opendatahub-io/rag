@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kokoro-cache-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kokoro-fastapi-gpu
+  labels:
+    app: kokoro-fastapi-gpu
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kokoro-fastapi-gpu
+  template:
+    metadata:
+      labels:
+        app: kokoro-fastapi-gpu
+    spec:
+      serviceAccountName: kokoro-sa
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+      - name: kokoro-fastapi-gpu
+        imagePullPolicy: IfNotPresent
+        image: ghcr.io/remsky/kokoro-fastapi-gpu:v0.2.4
+        ports:
+        - containerPort: 8880
+        env:
+        - name: XDG_CACHE_HOME
+          value: /cache
+        - name: DOWNLOAD_MODEL
+          value: "false"
+        - name: DEVICE
+          value: "gpu"
+        resources:
+          limits:
+            cpu: "4"
+            memory: 16Gi
+            nvidia.com/gpu: "1"
+          requests:
+            cpu: "1"
+            memory: 8Gi
+            nvidia.com/gpu: "1"
+        volumeMounts:
+        - name: cache-volume
+          mountPath: /cache
+      volumes:
+      - name: cache-volume
+        persistentVolumeClaim:
+          claimName: kokoro-cache-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kokoro-fastapi-gpu
+spec:
+  selector:
+    app: kokoro-fastapi-gpu
+  ports:
+    - protocol: TCP
+      port: 8880
+      targetPort: 8880
+  type: ClusterIP

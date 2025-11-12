@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redbank-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redbank-mcp-server
+  template:
+    metadata:
+      labels:
+        app: redbank-mcp-server
+    spec:
+      containers:
+      - name: mcp-server
+        image: image-registry.openshift-image-registry.svc:5000/redbank-demo/redbank-mcp-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        env:
+        - name: POSTGRES_HOST
+          value: "postgresql"
+        - name: POSTGRES_DATABASE
+          value: "db"
+        - name: POSTGRES_USER
+          value: "user"
+        - name: POSTGRES_PASSWORD
+          value: "pass"
+        - name: POSTGRES_PORT
+          value: "5432"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redbank-mcp-server
+spec:
+  selector:
+    app: redbank-mcp-server
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
+    protocol: TCP
+  type: ClusterIP

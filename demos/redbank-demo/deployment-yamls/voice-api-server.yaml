@@ -1,0 +1,84 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: voice-api
+  labels:
+    app: voice-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voice-api
+  template:
+    metadata:
+      labels:
+        app: voice-api
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: app
+        image: image-registry.openshift-image-registry.svc:5000/redbank-demo/redbank-voice-api-server:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8080
+        env:
+          - name: LLAMASTACK_URL
+            value: http://redbank-lsd-service.redbank-demo.svc.cluster.local:8321
+          - name: VECTOR_STORE_NAME
+            value: redbank-kb-vector-store
+          - name: INFERENCE_MODEL
+            value: vllm-inference/qwen3-14b-awq
+          - name: WHISPER_URL
+            value: http://whisper-large-v3-turbo-quantized-predictor.redbank-demo.svc.cluster.local:80/v1
+          - name: MODEL_INSTRUCTIONS
+            valueFrom:
+              configMapKeyRef:
+                name: model-instructions-config
+                key: MODEL_INSTRUCTIONS
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: voice-api-service
+  labels:
+    app: voice-api-service
+spec:
+  selector:
+    app: voice-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: model-instructions-config
+  labels:
+    app: voice-api
+data:
+  MODEL_INSTRUCTIONS: |
+    /no_think
+    You are a helpful assistant with access to financial data through MCP tools.
+
+    IMPORTANT: Transaction all data is from 2025.
+
+    When asked questions, use available tools to find the answer. Follow these rules:
+
+    1. Decide on the tool to use immediately without asking for confirmation
+    2. If you need additional information, search for it using whatever details are provided
+    3. Chain tool calls as needed - use results from one call as inputs to the next
+    4. If one approach doesn't work, try alternative methods silently
+    5. Do not narrate your process, explain failures, or describe what you're trying - just do it
+    6. Only provide output when you have the final answer
+    7. If you truly cannot find the information after multiple attempts, simply state what you were unable to find
+
+    Just execute tool calls until you have an answer, then provide it.

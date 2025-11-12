@@ -1,0 +1,460 @@
+# PIPELINE DEFINITION
+# Name: vector-store-files-pipeline
+# Description: Creates a vector store with embeddings from PDF files from a GitHub source.
+# Inputs:
+#    base_url: str [Default: 'https://raw.githubusercontent.com/opendatahub-io/rag/redbank/demos/redbank-demo/pdf']
+#    chunk_overlap_tokens: int [Default: 64.0]
+#    embedding_model_id: str [Default: 'ibm-granite/granite-embedding-125m']
+#    max_tokens: int [Default: 512.0]
+#    pdf_filenames: str [Default: 'redbankfinancial_about.pdf, redbankfinancial_faq.pdf']
+#    service_url: str [Default: 'http://redbank-lsd-service:8321']
+#    use_gpu: bool [Default: False]
+#    vector_store_name: str [Default: 'redbank-kb-vector-store']
+components:
+  comp-condition-2:
+    dag:
+      tasks:
+        register-vector-store-and-files:
+          cachingOptions: {}
+          componentRef:
+            name: comp-register-vector-store-and-files
+          inputs:
+            parameters:
+              base_url:
+                componentInputParameter: pipelinechannel--base_url
+              chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pdf_filenames:
+                componentInputParameter: pipelinechannel--pdf_filenames
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: register-vector-store-and-files
+    inputDefinitions:
+      parameters:
+        pipelinechannel--base_url:
+          parameterType: STRING
+        pipelinechannel--chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--embedding_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--pdf_filenames:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_store_name:
+          parameterType: STRING
+  comp-condition-3:
+    dag:
+      tasks:
+        register-vector-store-and-files-2:
+          cachingOptions: {}
+          componentRef:
+            name: comp-register-vector-store-and-files-2
+          inputs:
+            parameters:
+              base_url:
+                componentInputParameter: pipelinechannel--base_url
+              chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pdf_filenames:
+                componentInputParameter: pipelinechannel--pdf_filenames
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: register-vector-store-and-files-2
+    inputDefinitions:
+      parameters:
+        pipelinechannel--base_url:
+          parameterType: STRING
+        pipelinechannel--chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--embedding_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--pdf_filenames:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_store_name:
+          parameterType: STRING
+  comp-condition-branches-1:
+    dag:
+      tasks:
+        condition-2:
+          componentRef:
+            name: comp-condition-2
+          inputs:
+            parameters:
+              pipelinechannel--base_url:
+                componentInputParameter: pipelinechannel--base_url
+              pipelinechannel--chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              pipelinechannel--embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--pdf_filenames:
+                componentInputParameter: pipelinechannel--pdf_filenames
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: condition-2
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--use_gpu'] == true
+        condition-3:
+          componentRef:
+            name: comp-condition-3
+          inputs:
+            parameters:
+              pipelinechannel--base_url:
+                componentInputParameter: pipelinechannel--base_url
+              pipelinechannel--chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              pipelinechannel--embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--pdf_filenames:
+                componentInputParameter: pipelinechannel--pdf_filenames
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: condition-3
+          triggerPolicy:
+            condition: '!(inputs.parameter_values[''pipelinechannel--use_gpu''] ==
+              true)'
+    inputDefinitions:
+      parameters:
+        pipelinechannel--base_url:
+          parameterType: STRING
+        pipelinechannel--chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--embedding_model_id:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--pdf_filenames:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_store_name:
+          parameterType: STRING
+  comp-register-vector-store-and-files:
+    executorLabel: exec-register-vector-store-and-files
+    inputDefinitions:
+      parameters:
+        base_url:
+          parameterType: STRING
+        chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        embedding_model_id:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        pdf_filenames:
+          parameterType: STRING
+        service_url:
+          parameterType: STRING
+        vector_store_name:
+          parameterType: STRING
+  comp-register-vector-store-and-files-2:
+    executorLabel: exec-register-vector-store-and-files-2
+    inputDefinitions:
+      parameters:
+        base_url:
+          parameterType: STRING
+        chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        embedding_model_id:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        pdf_filenames:
+          parameterType: STRING
+        service_url:
+          parameterType: STRING
+        vector_store_name:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-register-vector-store-and-files:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_vector_store_and_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client'\
+          \ 'fire' 'requests'  &&  python3 -m pip install --quiet --no-warn-script-location\
+          \ 'kfp==2.14.3' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"\
+          3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef register_vector_store_and_files(\n    service_url: str,\n   \
+          \ vector_store_name: str,\n    embedding_model_id: str,\n    max_tokens:\
+          \ int,\n    chunk_overlap_tokens: int,\n    base_url: str,\n    pdf_filenames:\
+          \ str,\n):\n    import io\n    import requests\n    from llama_stack_client\
+          \ import LlamaStackClient\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    # Upload all files first and collect file_ids\n    file_ids = []\n\
+          \    for filename in pdf_filenames.split(\",\"):\n        source = f\"{base_url}/{filename.strip()}\"\
+          \n        print(\"Downloading and uploading document:\", source)\n\n   \
+          \     try:\n            # Download the docs from URL\n            response\
+          \ = requests.get(source)\n            response.raise_for_status()  # Raise\
+          \ an exception for bad status codes\n\n            file_content = io.BytesIO(response.content)\n\
+          \            file_basename = source.split(\"/\")[-1]\n\n            # Upload\
+          \ file to storage\n            file = client.files.create(\n           \
+          \     file=(file_basename, file_content, \"application/pdf\"),\n       \
+          \         purpose=\"assistants\",\n            )\n            file_ids.append(file.id)\n\
+          \            print(f\"Successfully uploaded {file_basename} (file_id: {file.id})\"\
+          )\n\n        except Exception as e:\n            print(f\"ERROR: Failed\
+          \ to upload {filename.strip()}: {str(e)}\")\n            raise\n\n    print(f\"\
+          Successfully uploaded {len(file_ids)} files: {file_ids}\")\n\n    models\
+          \ = client.models.list()\n    matching_model = next(\n        (m for m in\
+          \ models if m.provider_resource_id == embedding_model_id), None\n    )\n\
+          \n    if not matching_model:\n        raise ValueError(\n            f\"\
+          Model with ID '{embedding_model_id}' not found on LlamaStack server.\"\n\
+          \        )\n\n    if matching_model.api_model_type != \"embedding\":\n \
+          \       raise ValueError(f\"Model '{embedding_model_id}' is not an embedding\
+          \ model\")\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
+          ]\n\n    # Warm up the embedding model\n    response = client.embeddings.create(\n\
+          \        model=embedding_model_id,\n        input=\"warmup\",\n    )\n\n\
+          \    # Create vector store from uploaded files\n    try:\n        vector_store\
+          \ = client.vector_stores.create(\n            name=vector_store_name,\n\
+          \            file_ids=file_ids,\n            chunking_strategy={\n     \
+          \           \"type\": \"static\",\n                \"static\": {\n     \
+          \               \"max_chunk_size_tokens\": max_tokens,\n               \
+          \     \"chunk_overlap_tokens\": chunk_overlap_tokens,\n                },\n\
+          \            },\n            extra_body={\n                \"embedding_model\"\
+          : embedding_model_id,\n                \"embedding_dimension\": embedding_dimension,\n\
+          \                \"provider_id\": \"milvus\",\n            },\n        )\n\
+          \        print(\n            f\"Successfully created vector store '{vector_store_name}'\
+          \ with ID: {vector_store.id}\"\n        )\n        print(f\"Vector store\
+          \ details: {vector_store}\")\n    except Exception as e:\n        print(f\"\
+          ERROR: Failed to create vector store '{vector_store_name}': {str(e)}\")\n\
+          \        raise\n\n"
+        image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py312-ubi9@sha256:72ff2381e5cb24d6f549534cb74309ed30e92c1ca80214669adb78ad30c5ae12
+        resources:
+          accelerator:
+            count: '1'
+            resourceCount: '1'
+            resourceType: nvidia.com/gpu
+            type: nvidia.com/gpu
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+    exec-register-vector-store-and-files-2:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_vector_store_and_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client'\
+          \ 'fire' 'requests'  &&  python3 -m pip install --quiet --no-warn-script-location\
+          \ 'kfp==2.14.3' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"\
+          3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef register_vector_store_and_files(\n    service_url: str,\n   \
+          \ vector_store_name: str,\n    embedding_model_id: str,\n    max_tokens:\
+          \ int,\n    chunk_overlap_tokens: int,\n    base_url: str,\n    pdf_filenames:\
+          \ str,\n):\n    import io\n    import requests\n    from llama_stack_client\
+          \ import LlamaStackClient\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    # Upload all files first and collect file_ids\n    file_ids = []\n\
+          \    for filename in pdf_filenames.split(\",\"):\n        source = f\"{base_url}/{filename.strip()}\"\
+          \n        print(\"Downloading and uploading document:\", source)\n\n   \
+          \     try:\n            # Download the docs from URL\n            response\
+          \ = requests.get(source)\n            response.raise_for_status()  # Raise\
+          \ an exception for bad status codes\n\n            file_content = io.BytesIO(response.content)\n\
+          \            file_basename = source.split(\"/\")[-1]\n\n            # Upload\
+          \ file to storage\n            file = client.files.create(\n           \
+          \     file=(file_basename, file_content, \"application/pdf\"),\n       \
+          \         purpose=\"assistants\",\n            )\n            file_ids.append(file.id)\n\
+          \            print(f\"Successfully uploaded {file_basename} (file_id: {file.id})\"\
+          )\n\n        except Exception as e:\n            print(f\"ERROR: Failed\
+          \ to upload {filename.strip()}: {str(e)}\")\n            raise\n\n    print(f\"\
+          Successfully uploaded {len(file_ids)} files: {file_ids}\")\n\n    models\
+          \ = client.models.list()\n    matching_model = next(\n        (m for m in\
+          \ models if m.provider_resource_id == embedding_model_id), None\n    )\n\
+          \n    if not matching_model:\n        raise ValueError(\n            f\"\
+          Model with ID '{embedding_model_id}' not found on LlamaStack server.\"\n\
+          \        )\n\n    if matching_model.api_model_type != \"embedding\":\n \
+          \       raise ValueError(f\"Model '{embedding_model_id}' is not an embedding\
+          \ model\")\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
+          ]\n\n    # Warm up the embedding model\n    response = client.embeddings.create(\n\
+          \        model=embedding_model_id,\n        input=\"warmup\",\n    )\n\n\
+          \    # Create vector store from uploaded files\n    try:\n        vector_store\
+          \ = client.vector_stores.create(\n            name=vector_store_name,\n\
+          \            file_ids=file_ids,\n            chunking_strategy={\n     \
+          \           \"type\": \"static\",\n                \"static\": {\n     \
+          \               \"max_chunk_size_tokens\": max_tokens,\n               \
+          \     \"chunk_overlap_tokens\": chunk_overlap_tokens,\n                },\n\
+          \            },\n            extra_body={\n                \"embedding_model\"\
+          : embedding_model_id,\n                \"embedding_dimension\": embedding_dimension,\n\
+          \                \"provider_id\": \"milvus\",\n            },\n        )\n\
+          \        print(\n            f\"Successfully created vector store '{vector_store_name}'\
+          \ with ID: {vector_store.id}\"\n        )\n        print(f\"Vector store\
+          \ details: {vector_store}\")\n    except Exception as e:\n        print(f\"\
+          ERROR: Failed to create vector store '{vector_store_name}': {str(e)}\")\n\
+          \        raise\n\n"
+        image: quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py312-ubi9@sha256:72ff2381e5cb24d6f549534cb74309ed30e92c1ca80214669adb78ad30c5ae12
+        resources:
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+pipelineInfo:
+  description: Creates a vector store with embeddings from PDF files from a GitHub
+    source.
+  name: vector-store-files-pipeline
+root:
+  dag:
+    tasks:
+      condition-branches-1:
+        componentRef:
+          name: comp-condition-branches-1
+        inputs:
+          parameters:
+            pipelinechannel--base_url:
+              componentInputParameter: base_url
+            pipelinechannel--chunk_overlap_tokens:
+              componentInputParameter: chunk_overlap_tokens
+            pipelinechannel--embedding_model_id:
+              componentInputParameter: embedding_model_id
+            pipelinechannel--max_tokens:
+              componentInputParameter: max_tokens
+            pipelinechannel--pdf_filenames:
+              componentInputParameter: pdf_filenames
+            pipelinechannel--service_url:
+              componentInputParameter: service_url
+            pipelinechannel--use_gpu:
+              componentInputParameter: use_gpu
+            pipelinechannel--vector_store_name:
+              componentInputParameter: vector_store_name
+        taskInfo:
+          name: condition-branches-1
+  inputDefinitions:
+    parameters:
+      base_url:
+        defaultValue: https://raw.githubusercontent.com/opendatahub-io/rag/redbank/demos/redbank-demo/pdf
+        description: Base URL to fetch PDF files from
+        isOptional: true
+        parameterType: STRING
+      chunk_overlap_tokens:
+        defaultValue: 64.0
+        description: Number of overlapping tokens between chunks
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      embedding_model_id:
+        defaultValue: ibm-granite/granite-embedding-125m
+        description: Model ID for embedding generation
+        isOptional: true
+        parameterType: STRING
+      max_tokens:
+        defaultValue: 512.0
+        description: Maximum number of tokens per chunk
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      pdf_filenames:
+        defaultValue: redbankfinancial_about.pdf, redbankfinancial_faq.pdf
+        description: Comma-separated list of PDF filenames to download and convert
+        isOptional: true
+        parameterType: STRING
+      service_url:
+        defaultValue: http://redbank-lsd-service:8321
+        description: URL of the Milvus service
+        isOptional: true
+        parameterType: STRING
+      use_gpu:
+        defaultValue: false
+        description: Enable GPU usage for embedding generation
+        isOptional: true
+        parameterType: BOOLEAN
+      vector_store_name:
+        defaultValue: redbank-kb-vector-store
+        description: Name of the vector store to store embeddings
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.14.3
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-register-vector-store-and-files:
+          nodeSelector:
+            nodeSelectorJson:
+              runtimeValue:
+                constant: {}
+          tolerations:
+          - effect: NoSchedule
+            key: nvidia.com/gpu
+            operator: Exists

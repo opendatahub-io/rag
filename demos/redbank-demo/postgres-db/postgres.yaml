@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+      - name: postgresql
+        image: registry.redhat.io/rhel10/postgresql-16
+        imagePullPolicy: Always
+        env:
+        - name: POSTGRESQL_USER
+          value: user
+        - name: POSTGRESQL_PASSWORD
+          value: pass
+        - name: POSTGRESQL_DATABASE
+          value: db
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - name: init-sql
+          mountPath: /opt/app-root/src/postgresql-start
+          readOnly: true
+      volumes:
+      - name: init-sql
+        configMap:
+          name: postgres-init
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+  selector:
+    app: postgresql

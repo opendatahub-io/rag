@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Recording & API Communication</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            width: 350px;
+            flex-shrink: 0;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .config-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .chat-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: calc(100vh - 100px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .config-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .record-btn {
+            background-color: #28a745;
+            font-size: 18px;
+            padding: 15px 30px;
+        }
+
+        .record-btn:hover {
+            background-color: #218838;
+        }
+
+        .record-btn.recording {
+            background-color: #dc3545;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .send-btn {
+            background-color: #17a2b8;
+        }
+
+        .send-btn:hover {
+            background-color: #138496;
+        }
+
+        .audio-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .response-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .status {
+            font-weight: 600;
+            margin: 10px 0;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid #e9ecef;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #007bff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .quick-config {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quick-config button {
+            background-color: #6c757d;
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        .quick-config button:hover {
+            background-color: #545b62;
+        }
+
+        .conversation {
+            flex: 1;
+            overflow-y: auto;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .message {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f1f3f4;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .message:last-child {
+            border-bottom: none;
+        }
+
+        .message.user {
+            background-color: #f8f9fa;
+        }
+
+        .message.assistant {
+            background-color: #e3f2fd;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .message.assistant .message-avatar {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .message-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .message-timestamp {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+
+        .message-audio {
+            width: 100%;
+            margin: 8px 0;
+        }
+
+        .message-text {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 8px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .conversation-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .clear-btn {
+            background-color: #dc3545;
+            font-size: 14px;
+            padding: 6px 12px;
+        }
+
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            flex-shrink: 0;
+        }
+
+        .input-section.recording {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .record-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .auto-play-indicator {
+            color: #28a745;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="config-panel">
+                <h3 style="margin-top: 0;">🔧 API Configuration</h3>
+
+                <div class="form-group">
+                    <label for="apiEndpoint">Step 1 - Audio Processing API:</label>
+                    <input type="text" id="apiEndpoint" placeholder="/voice/complete" value="">
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">This API should accept audio and return raw text</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #6c757d;">Step 2 - Text-to-Speech API (Disabled):</label>
+                    <input type="text" id="ttsEndpoint" placeholder="/text-to-speech" value="" disabled style="background-color: #f8f9fa; color: #6c757d;">
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">TTS functionality disabled in text-only mode</small>
+                </div>
+
+                <div class="form-group">
+                    <label style="color: #6c757d;">
+                        🔇 Text-to-speech disabled (text-only mode)
+                    </label>
+                    <small style="color: #6c757d; display: block; margin-top: 5px;">Only text responses will be shown</small>
+                </div>
+
+                <div class="quick-config">
+                    <button onclick="setVoiceAPIEndpoints()" style="background-color: #28a745;">🎤 Use Voice Processing API</button>
+                    <button onclick="setLocalFlaskEndpoints()" style="background-color: #6c757d;">Use Local Flask Endpoints</button>
+                    <button onclick="testEndpoints()" style="background-color: #17a2b8;">🔍 Test Endpoints</button>
+                </div>
+            </div>
+
+            {% if mock_enabled %}
+            <div class="config-panel">
+                <h4 style="margin-top: 0; color: #856404;">🧪 Mock Response (Testing)</h4>
+                <div style="margin-bottom: 10px;">
+                    <label for="mockText" style="display: block; margin-bottom: 5px; font-weight: 600;">Enter mock response text:</label>
+                    <textarea id="mockText" placeholder="{{ default_mock_text }}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; resize: vertical; min-height: 60px; box-sizing: border-box;">{{ default_mock_text }}</textarea>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; gap: 5px; font-size: 14px; margin: 0; color: #6c757d;">
+                        🔇 Text-to-speech disabled (text-only mode)
+                    </label>
+                </div>
+                <button onclick="sendMockResponse()" style="background-color: #ffc107; color: #212529; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; width: 100%;">
+                    🎭 Send Mock Response
+                </button>
+            </div>
+            {% endif %}
+
+            <div class="config-panel">
+                <h4 style="margin-top: 0; color: #28a745;">🎤 Voice Processing API</h4>
+                <div class="button-group">
+                    <button onclick="startVoiceSession()" style="background-color: #28a745;">🚀 Start Session</button>
+                    <button onclick="clearVoiceConversation()" style="background-color: #dc3545;">🗑️ Clear Chat</button>
+                </div>
+                <div class="button-group">
+                    <button onclick="testVoiceComplete()" style="background-color: #17a2b8;">🎯 Test Voice Complete</button>
+                    <button onclick="testVoiceChat()" style="background-color: #6f42c1;">💬 Test Voice Chat</button>
+                </div>
+                <div id="voiceStatus" style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 6px; font-size: 14px; display: none;">
+                    <strong>Voice API Status:</strong> <span id="voiceStatusText">Not connected</span>
+                </div>
+            </div>
+
+            <div class="config-panel">
+                <h4 style="margin-top: 0;">📋 Instructions</h4>
+                <ol style="font-size: 14px; line-height: 1.5;">
+                    <li>Click "Start Recording" to begin recording audio</li>
+                    <li>Click "Stop Recording" when finished</li>
+                    <li>Click "Send Message" to process your audio (auto-configures Voice API)</li>
+                    <li>The response will appear in the conversation</li>
+                    <li><em>Optional:</em> Use "Use Voice Processing API" for manual configuration</li>
+                </ol>
+
+                <div class="alert alert-info" style="font-size: 12px; padding: 10px;">
+                    <strong>🎤 Voice Processing API:</strong><br>
+                    • Complete voice-to-text pipeline<br>
+                    • Handles transcription and agent processing<br>
+                    • Maintains conversation memory<br>
+                    • Auto-configures when you click "Send Message"<br>
+                    • <strong>Text-only mode:</strong> No audio output<br><br>
+                    <strong>🧪 Mock Mode (Testing):</strong><br>
+                    <code>MOCK_RESPONSE_ENABLED=true python main.py</code><br>
+                    This enables the mock response panel and local test endpoints.<br><br>
+                    <strong>📡 Custom API Formats:</strong><br>
+                    • Step 1: <code>POST audio file</code> → <code>returns text</code><br>
+                    • Step 2: <code>POST text</code> → <code>returns audio</code> (disabled)<br>
+                    • Only text responses are shown<br><br>
+                    <strong>🔧 Local Test Endpoints:</strong><br>
+                    • <code>/transcribe</code> - Mock audio processing<br>
+                    • <code>/text-to-speech</code> - Mock TTS generation (disabled)
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="chat-panel">
+                <div class="conversation">
+                    <div class="conversation-header">
+                        <span>🗨️ Conversation</span>
+                        <button class="clear-btn" onclick="clearConversation()">
+                            🗑️ Clear
+                        </button>
+                    </div>
+                    <div id="conversationHistory">
+                        <div class="message assistant">
+                            <div class="message-avatar">🤖</div>
+                            <div class="message-content">
+                                <div class="message-timestamp">Ready to chat</div>
+                                <div>Start recording to begin the conversation!</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-section" id="inputSection">
+                    <div class="record-controls">
+                        <button id="recordBtn" class="record-btn" onclick="toggleRecording()">
+                            🎤 Start Recording
+                        </button>
+                        <div id="recordingStatus" class="status" style="display: none;"></div>
+                    </div>
+
+                    <div id="audioPlayback" style="display: none; margin: 15px 0; text-align: center;">
+                        <audio id="recordedAudio" controls class="message-audio"></audio>
+                        <div style="margin: 10px 0;">
+                            <button id="sendBtn" class="send-btn" onclick="sendAudio()" disabled>
+                                📤 Send Message
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Processing message...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mediaRecorder;
+        let audioChunks = [];
+        let isRecording = false;
+        let recordedBlob = null;
+        let conversationHistory = [];
+        let messageCounter = 0;
+
+        // Convert WebM/Opus audio to WAV format using Web Audio API
+        async function convertToWav(audioBlob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const arrayBuffer = e.target.result;
+                        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+                        // Convert to 16kHz mono WAV
+                        const sampleRate = 16000;
+                        const numChannels = 1;
+                        const length = Math.floor(audioBuffer.duration * sampleRate);
+                        const samples = new Float32Array(length);
+
+                        // Resample and convert to mono
+                        const sourceData = audioBuffer.getChannelData(0);
+                        const ratio = audioBuffer.sampleRate / sampleRate;
+                        for (let i = 0; i < length; i++) {
+                            const srcIndex = Math.floor(i * ratio);
+                            samples[i] = sourceData[srcIndex];
+                        }
+
+                        // Convert to 16-bit PCM
+                        const pcmData = new Int16Array(length);
+                        for (let i = 0; i < length; i++) {
+                            const s = Math.max(-1, Math.min(1, samples[i]));
+                            pcmData[i] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                        }
+
+                        // Create WAV file
+                        const wavBuffer = new ArrayBuffer(44 + pcmData.length * 2);
+                        const view = new DataView(wavBuffer);
+
+                        // WAV header
+                        const writeString = (offset, string) => {
+                            for (let i = 0; i < string.length; i++) {
+                                view.setUint8(offset + i, string.charCodeAt(i));
+                            }
+                        };
+
+                        writeString(0, 'RIFF');
+                        view.setUint32(4, 36 + pcmData.length * 2, true);
+                        writeString(8, 'WAVE');
+                        writeString(12, 'fmt ');
+                        view.setUint32(16, 16, true); // fmt chunk size
+                        view.setUint16(20, 1, true); // audio format (PCM)
+                        view.setUint16(22, numChannels, true);
+                        view.setUint32(24, sampleRate, true);
+                        view.setUint32(28, sampleRate * numChannels * 2, true); // byte rate
+                        view.setUint16(32, numChannels * 2, true); // block align
+                        view.setUint16(34, 16, true); // bits per sample
+                        writeString(36, 'data');
+                        view.setUint32(40, pcmData.length * 2, true);
+
+                        // Write PCM data
+                        const pcmView = new Int16Array(wavBuffer, 44);
+                        pcmView.set(pcmData);
+
+                        const wavBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                        resolve(wavBlob);
+                    } catch (error) {
+                        reject(new Error('Failed to convert audio to WAV: ' + error.message));
+                    }
+                };
+                reader.onerror = reject;
+                reader.readAsArrayBuffer(audioBlob);
+            });
+        }
+
+        function setLocalFlaskEndpoints() {
+            document.getElementById('apiEndpoint').value = '/transcribe';
+            document.getElementById('ttsEndpoint').value = '';
+        }
+
+        function setVoiceAPIEndpoints() {
+            document.getElementById('apiEndpoint').value = '/voice/complete';
+            document.getElementById('ttsEndpoint').value = '';
+            showAlert('Voice Processing API endpoints configured! Use the voice controls below.', 'success');
+        }
+
+        async function testEndpoints() {
+            const apiEndpoint = document.getElementById('apiEndpoint').value;
+
+            if (!apiEndpoint) {
+                showAlert('Please configure Step 1 API endpoint first', 'error');
+                return;
+            }
+
+            let results = [];
+
+            // Test Step 1 endpoint
+            try {
+                console.log('Testing Step 1 endpoint:', apiEndpoint);
+                const testResponse = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    body: new FormData() // Empty form to test connection
+                });
+                results.push(`✅ Step 1 (${apiEndpoint}): ${testResponse.status} ${testResponse.statusText}`);
+            } catch (error) {
+                results.push(`❌ Step 1 (${apiEndpoint}): ${error.message}`);
+            }
+
+            // TTS endpoint disabled
+            results.push(`⚠️ Step 2: TTS disabled (text-only mode)`);
+
+            // Show results
+            const resultText = results.join('\n');
+            alert('Endpoint Test Results:\n\n' + resultText);
+            console.log('Endpoint test results:', results);
+        }
+
+        async function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const statusDiv = document.getElementById('recordingStatus');
+
+            if (!isRecording) {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+
+                    mediaRecorder.ondataavailable = (event) => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = async () => {
+                        // Convert WebM/Opus to WAV format using Web Audio API
+                        const webmBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                        recordedBlob = await convertToWav(webmBlob);
+                        const audioUrl = URL.createObjectURL(recordedBlob);
+
+                        const audioElement = document.getElementById('recordedAudio');
+                        audioElement.src = audioUrl;
+                        document.getElementById('audioPlayback').style.display = 'block';
+                        document.getElementById('sendBtn').disabled = false;
+
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+
+                    mediaRecorder.start();
+                    isRecording = true;
+
+                    recordBtn.textContent = '🛑 Stop Recording';
+                    recordBtn.classList.add('recording');
+                    statusDiv.textContent = 'Recording... Click stop when finished';
+                    statusDiv.style.display = 'block';
+                    document.getElementById('inputSection').classList.add('recording');
+
+                } catch (error) {
+                    showAlert('Error accessing microphone: ' + error.message, 'error');
+                }
+            } else {
+                mediaRecorder.stop();
+                isRecording = false;
+
+                recordBtn.textContent = '🎤 Start Recording';
+                recordBtn.classList.remove('recording');
+                statusDiv.style.display = 'none';
+                document.getElementById('inputSection').classList.remove('recording');
+            }
+        }
+
+        async function sendAudio() {
+            if (!recordedBlob) {
+                showAlert('Please record audio first', 'error');
+                return;
+            }
+
+            // Check if we're in mock mode (mock section exists)
+            const mockSection = document.querySelector('.mock-section') || document.getElementById('mockText');
+            const isMockMode = mockSection !== null;
+
+            // Auto-configure voice processing API if not already configured
+            let apiEndpoint = document.getElementById('apiEndpoint').value;
+            let isVoiceAPI = apiEndpoint.includes('/voice/complete');
+
+            if (!isMockMode && !isVoiceAPI) {
+                // Auto-configure voice processing API
+                setVoiceAPIEndpoints();
+                showAlert('Auto-configured Voice Processing API for this session', 'success');
+                // Re-evaluate after auto-configuration
+                apiEndpoint = document.getElementById('apiEndpoint').value;
+                isVoiceAPI = apiEndpoint.includes('/voice/complete');
+            }
+
+            // Add user message to conversation
+            addMessageToConversation('user', recordedBlob, new Date());
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('audioPlayback').style.display = 'none';
+            document.getElementById('sendBtn').disabled = true;
+
+            // Store reference before resetting
+            const audioToSend = recordedBlob;
+            recordedBlob = null;
+
+            // Handle voice API mode differently
+            if (isVoiceAPI) {
+                try {
+                    console.log('Using Voice Processing API');
+                    const formData = new FormData();
+                    formData.append('audio', audioToSend, 'recording.wav');
+
+                    const response = await fetch(apiEndpoint, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    document.getElementById('loading').style.display = 'none';
+
+                    if (response.ok) {
+                        // Add the complete voice response to conversation with audio
+                        addMessageToConversation('assistant', {
+                            type: 'complete',
+                            transcript: result.transcript,
+                            agent_text: result.agent_text,
+                            audio: result.audio,
+                            message: 'Voice processing complete with TTS'
+                        }, new Date());
+                    } else {
+                        addMessageToConversation('assistant', {
+                            type: 'text',
+                            data: `Error: ${result.error}`,
+                            message: 'Voice processing failed'
+                        }, new Date());
+                    }
+                } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
+                    showAlert('Voice API error: ' + error.message, 'error');
+                    addMessageToConversation('assistant', {
+                        type: 'text',
+                        data: `Error: ${error.message}`,
+                        message: 'Voice processing failed'
+                    }, new Date());
+                }
+                return;
+            }
+
+            // Handle mock mode differently
+            if (isMockMode) {
+                try {
+                    // Simulate processing delay
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+
+                    // Get mock text from the textarea
+                    const mockTextElement = document.getElementById('mockText');
+                    const mockText = mockTextElement ?
+                        (mockTextElement.value.trim() || mockTextElement.placeholder) :
+                        "This is a mock AI response";
+
+                    document.getElementById('loading').style.display = 'none';
+
+                    // Show text only (TTS disabled)
+                    addMessageToConversation('assistant', {
+                        type: 'text',
+                        data: mockText,
+                        message: 'Mock transcription (text-only mode)'
+                    }, new Date());
+
+                } catch (error) {
+                    document.getElementById('loading').style.display = 'none';
+                    showAlert('Mock processing error: ' + error.message, 'error');
+                }
+                return;
+            }
+
+            try {
+                // Step 1: Send audio to processing API
+                console.log('Step 1: Sending audio to:', apiEndpoint);
+                const formData = new FormData();
+                formData.append('audio', audioToSend, 'recording.wav');
+
+                const step1Response = await fetch(apiEndpoint, {
+                    method: 'POST',
+                    body: formData
+                }).catch(fetchError => {
+                    console.error('Step 1 fetch error:', fetchError);
+                    throw new Error(`Step 1 network error: ${fetchError.message}. Check if the endpoint is running and accessible.`);
+                });
+
+                console.log('Step 1 response status:', step1Response.status);
+                console.log('Step 1 response headers:', [...step1Response.headers.entries()]);
+
+                if (!step1Response.ok) {
+                    const errorText = await step1Response.text().catch(() => 'Unable to read error response');
+                    throw new Error(`Step 1 API failed with status ${step1Response.status}: ${errorText}`);
+                }
+
+                // Extract text from Step 1 response
+                let responseText = null;
+                const contentType = step1Response.headers.get('content-type') || '';
+
+                if (contentType.includes('application/json')) {
+                    try {
+                        const responseData = await step1Response.json();
+                        // Try common JSON keys for text responses
+                        responseText = responseData.text ||
+                                     responseData.transcript ||
+                                     responseData.response ||
+                                     responseData.message ||
+                                     JSON.stringify(responseData);
+                    } catch (e) {
+                        responseText = await step1Response.text();
+                    }
+                } else {
+                    responseText = await step1Response.text();
+                }
+
+                if (!responseText) {
+                    throw new Error('No text received from Step 1 API');
+                }
+
+                // Show text only (TTS disabled)
+                document.getElementById('loading').style.display = 'none';
+                addMessageToConversation('assistant', {
+                    type: 'text',
+                    data: responseText,
+                    message: 'Text response (text-only mode)'
+                }, new Date());
+
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                showAlert('Error: ' + error.message, 'error');
+                addMessageToConversation('assistant', {
+                    type: 'text',
+                    data: `Error: ${error.message}`,
+                    message: 'Processing failed'
+                }, new Date());
+            }
+        }
+
+        function addMessageToConversation(sender, content, timestamp) {
+            messageCounter++;
+            const conversation = document.getElementById('conversationHistory');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.id = `message-${messageCounter}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.textContent = sender === 'user' ? '👤' : '🤖';
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+
+            const timestampDiv = document.createElement('div');
+            timestampDiv.className = 'message-timestamp';
+            timestampDiv.textContent = timestamp.toLocaleTimeString();
+
+            messageContent.appendChild(timestampDiv);
+
+            if (sender === 'user' && content instanceof Blob) {
+                // User audio message
+                const audioElement = document.createElement('audio');
+                audioElement.controls = true;
+                audioElement.className = 'message-audio';
+                audioElement.src = URL.createObjectURL(content);
+                messageContent.appendChild(audioElement);
+            } else if (sender === 'assistant') {
+                // Assistant response
+                if (content.type === 'audio') {
+                    // Show the original text if available (audio disabled)
+                    if (content.text) {
+                        const textDiv = document.createElement('div');
+                        textDiv.style.marginBottom = '8px';
+                        textDiv.style.padding = '8px';
+                        textDiv.style.backgroundColor = '#f8f9fa';
+                        textDiv.style.borderRadius = '4px';
+                        textDiv.style.fontStyle = 'italic';
+                        textDiv.textContent = content.text;
+                        messageContent.appendChild(textDiv);
+                    }
+
+                    // Show message that audio is disabled
+                    const audioDisabledDiv = document.createElement('div');
+                    audioDisabledDiv.style.color = '#6c757d';
+                    audioDisabledDiv.style.fontSize = '12px';
+                    audioDisabledDiv.style.marginTop = '4px';
+                    audioDisabledDiv.style.fontStyle = 'italic';
+                    audioDisabledDiv.textContent = '🔇 Audio playback disabled (text-only mode)';
+                    messageContent.appendChild(audioDisabledDiv);
+
+                    if (content.message) {
+                        const messageText = document.createElement('div');
+                        messageText.style.fontSize = '12px';
+                        messageText.style.color = '#6c757d';
+                        messageText.style.marginTop = '4px';
+                        messageText.textContent = content.message;
+                        messageContent.appendChild(messageText);
+                    }
+                } else if (content.type === 'complete') {
+                    // Voice-to-voice complete response (text only)
+                    if (content.transcript) {
+                        const transcriptDiv = document.createElement('div');
+                        transcriptDiv.style.marginBottom = '8px';
+                        transcriptDiv.style.padding = '8px';
+                        transcriptDiv.style.backgroundColor = '#fff3cd';
+                        transcriptDiv.style.borderRadius = '4px';
+                        transcriptDiv.style.fontSize = '14px';
+                        transcriptDiv.innerHTML = `<strong>Transcript:</strong> ${content.transcript}`;
+                        messageContent.appendChild(transcriptDiv);
+                    }
+
+                    if (content.agent_text) {
+                        const agentTextDiv = document.createElement('div');
+                        agentTextDiv.style.marginBottom = '8px';
+                        agentTextDiv.style.padding = '8px';
+                        agentTextDiv.style.backgroundColor = '#d1ecf1';
+                        agentTextDiv.style.borderRadius = '4px';
+                        agentTextDiv.style.fontSize = '14px';
+                        agentTextDiv.innerHTML = `<strong>Agent Response:</strong> ${content.agent_text}`;
+                        messageContent.appendChild(agentTextDiv);
+                    }
+
+                    // Add audio playback if available
+                    if (content.audio) {
+                        const audioDiv = document.createElement('div');
+                        audioDiv.style.marginTop = '8px';
+                        audioDiv.style.textAlign = 'center';
+
+                        const audioElement = document.createElement('audio');
+                        audioElement.controls = true;
+                        audioElement.style.width = '100%';
+                        audioElement.style.maxWidth = '300px';
+                        audioElement.src = `data:audio/wav;base64,${content.audio}`;
+                        audioElement.id = `audio-${messageCounter}`;
+
+                        audioDiv.appendChild(audioElement);
+                        messageContent.appendChild(audioDiv);
+
+                        // Auto-play the audio
+                        setTimeout(() => {
+                            audioElement.play().catch(e => console.log('Auto-play failed:', e));
+                        }, 500);
+                    }
+
+                    if (content.message) {
+                        const messageText = document.createElement('div');
+                        messageText.style.fontSize = '12px';
+                        messageText.style.color = '#6c757d';
+                        messageText.style.marginTop = '4px';
+                        messageText.textContent = content.message;
+                        messageContent.appendChild(messageText);
+                    }
+                } else if (content.type === 'json') {
+                    const pre = document.createElement('pre');
+                    pre.className = 'message-text';
+                    pre.textContent = JSON.stringify(content.data, null, 2);
+                    messageContent.appendChild(pre);
+                } else if (content.type === 'chat') {
+                    // Chat response with optional audio
+                    const pre = document.createElement('pre');
+                    pre.className = 'message-text';
+                    pre.textContent = content.data;
+                    messageContent.appendChild(pre);
+
+                    // Add audio playback if available
+                    if (content.audio) {
+                        const audioDiv = document.createElement('div');
+                        audioDiv.style.marginTop = '8px';
+                        audioDiv.style.textAlign = 'center';
+
+                        const audioElement = document.createElement('audio');
+                        audioElement.controls = true;
+                        audioElement.style.width = '100%';
+                        audioElement.style.maxWidth = '300px';
+                        audioElement.src = `data:audio/wav;base64,${content.audio}`;
+                        audioElement.id = `audio-${messageCounter}`;
+
+                        audioDiv.appendChild(audioElement);
+                        messageContent.appendChild(audioDiv);
+
+                        // Auto-play the audio
+                        setTimeout(() => {
+                            audioElement.play().catch(e => console.log('Auto-play failed:', e));
+                        }, 500);
+                    }
+                } else {
+                    const pre = document.createElement('pre');
+                    pre.className = 'message-text';
+                    pre.textContent = content.data;
+                    messageContent.appendChild(pre);
+                }
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            conversation.appendChild(messageDiv);
+
+            // Scroll to bottom
+            conversation.scrollTop = conversation.scrollHeight;
+
+            // Store in history
+            conversationHistory.push({
+                id: messageCounter,
+                sender: sender,
+                content: content,
+                timestamp: timestamp
+            });
+        }
+
+        // Audio auto-play function removed - using text-only mode
+
+        function clearConversation() {
+            if (confirm('Clear conversation history?')) {
+                const conversation = document.getElementById('conversationHistory');
+                conversation.innerHTML = `
+                    <div class="message assistant">
+                        <div class="message-avatar">🤖</div>
+                        <div class="message-content">
+                            <div class="message-timestamp">Ready to chat</div>
+                            <div>Start recording to begin the conversation!</div>
+                        </div>
+                    </div>
+                `;
+                conversationHistory = [];
+                messageCounter = 0;
+            }
+        }
+
+        async function sendMockResponse() {
+            const mockTextElement = document.getElementById('mockText');
+
+            if (!mockTextElement) return;
+
+            const mockText = mockTextElement.value.trim() || mockTextElement.placeholder;
+
+            try {
+                const formData = new FormData();
+                formData.append('mock_text', mockText);
+
+                const response = await fetch('/mock_response', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Add mock response to conversation (text only)
+                    addMessageToConversation('assistant', {
+                        type: 'text',
+                        data: mockText,
+                        message: 'Mock response (text-only mode)'
+                    }, new Date());
+
+                    showAlert('Mock response sent!', 'success');
+                } else {
+                    showAlert(`Error: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Error sending mock response: ' + error.message, 'error');
+            }
+        }
+
+        // TTS function removed - using text-only mode
+
+        function showAlert(message, type) {
+            const existingAlert = document.querySelector('.alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+
+            document.querySelector('.container').insertBefore(alert, document.querySelector('.audio-section'));
+
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Voice Processing API Functions
+        async function startVoiceSession() {
+            try {
+                const response = await fetch('/voice/session/start', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.success) {
+                    updateVoiceStatus(`Session started: ${result.session_id}`);
+                    showAlert('Voice session started successfully!', 'success');
+                } else {
+                    showAlert(`Failed to start session: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error starting session: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearVoiceConversation() {
+            try {
+                const response = await fetch('/voice/conversation/clear', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.success) {
+                    updateVoiceStatus('Conversation cleared');
+                    showAlert('Conversation cleared successfully!', 'success');
+                    // Also clear the UI conversation
+                    clearConversation();
+                } else {
+                    showAlert(`Failed to clear conversation: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error clearing conversation: ${error.message}`, 'error');
+            }
+        }
+
+        async function testVoiceComplete() {
+            if (!recordedBlob) {
+                showAlert('Please record audio first before testing voice complete', 'error');
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                formData.append('audio', recordedBlob, 'recording.wav');
+
+                const response = await fetch('/voice/complete', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Add the complete voice response to conversation with audio
+                    addMessageToConversation('assistant', {
+                        type: 'complete',
+                        transcript: result.transcript,
+                        agent_text: result.agent_text,
+                        audio: result.audio,
+                        message: 'Voice complete test successful with TTS'
+                    }, new Date());
+
+                    updateVoiceStatus('Voice complete test successful');
+                    showAlert('Voice complete test successful!', 'success');
+                } else {
+                    showAlert(`Voice complete test failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error testing voice complete: ${error.message}`, 'error');
+            }
+        }
+
+        async function testVoiceChat() {
+            const testText = prompt('Enter text to test voice chat:', 'Hello, how are you?');
+            if (!testText) return;
+
+            try {
+                const formData = new FormData();
+                formData.append('text', testText);
+
+                const response = await fetch('/voice/chat', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Add the chat response to conversation
+                    addMessageToConversation('user', testText, new Date());
+                    addMessageToConversation('assistant', {
+                        type: 'chat',
+                        data: result.agent_response,
+                        audio: result.audio,
+                        message: `Chat response (conversation length: ${result.conversation_length})`
+                    }, new Date());
+
+                    updateVoiceStatus(`Chat test successful (${result.conversation_length} messages)`);
+                    showAlert('Voice chat test successful!', 'success');
+                } else {
+                    showAlert(`Voice chat test failed: ${result.error}`, 'error');
+                }
+            } catch (error) {
+                showAlert(`Error testing voice chat: ${error.message}`, 'error');
+            }
+        }
+
+        function updateVoiceStatus(status) {
+            const statusDiv = document.getElementById('voiceStatus');
+            const statusText = document.getElementById('voiceStatusText');
+
+            statusDiv.style.display = 'block';
+            statusText.textContent = status;
+        }
+
+        // Check if getUserMedia is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            showAlert('Audio recording is not supported in this browser', 'error');
+        }
+    </script>
+</body>
+</html>

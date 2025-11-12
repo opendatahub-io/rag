@@ -1,0 +1,26 @@
+apiVersion: llamastack.io/v1alpha1
+kind: LlamaStackDistribution
+metadata:
+  name: redbank-lsd
+spec:
+  replicas: 1
+  server:
+    containerSpec:
+      env:
+        - name: INFERENCE_MODEL
+          value: qwen3-14b-awq
+        - name: VLLM_URL
+          value: 'http://qwen3-14b-awq-predictor:80/v1'
+        - name: MILVUS_DB_PATH
+          value: /.llama/distributions/remote-vllm/milvus.db
+      name: llama-stack
+      port: 8321
+    distribution:
+      name: 'rh-dev'
+    podOverrides:
+      volumeMounts:
+        - mountPath: /root/.llama
+          name: llama-storage
+      volumes:
+        - emptyDir: {}
+          name: llama-storage

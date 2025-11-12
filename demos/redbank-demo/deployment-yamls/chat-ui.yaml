@@ -1,0 +1,65 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-ui
+  labels:
+    app: chat-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-ui
+  template:
+    metadata:
+      labels:
+        app: chat-ui
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: app
+        image: image-registry.openshift-image-registry.svc:5000/redbank-demo/redbank-chat-ui:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 3000
+        env:
+          - name: KOKORO_URL
+            value: http://kokoro-fastapi-gpu.redbank-demo.svc.cluster.local:8880/v1
+          - name: VOICE_API_BASE_URL
+            value: http://voice-api-service.redbank-demo.svc.cluster.local:80
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "1Gi"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chat-ui-service
+  labels:
+    app: chat-ui-service
+spec:
+  selector:
+    app: chat-ui
+  ports:
+  - name: http
+    port: 80
+    targetPort: 3000
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: chat-ui-route
+  labels:
+    app: chat-ui
+spec:
+  to:
+    kind: Service
+    name: chat-ui-service
+  port:
+    targetPort: http
+  tls:
+    termination: edge
