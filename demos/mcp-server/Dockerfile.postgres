@@ -1,0 +1,12 @@
+FROM postgres:15
+
+# Set environment variables
+ENV POSTGRES_DB=postgres
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=postgres
+
+# Copy the complete database initialization script
+COPY init-bank-db.sql /docker-entrypoint-initdb.d/01-init-bank-db.sql
+
+# Expose PostgreSQL port
+EXPOSE 5432

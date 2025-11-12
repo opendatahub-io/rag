@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llamastack-redbank-mcp-config
+  namespace: ragathon-team-1
+  labels:
+    app: llamastack
+    component: mcp-integration
+data:
+  redbank-mcp-tools.yaml: |
+    tool_groups:
+    - toolgroup_id: mcp::redbank-financials
+      provider_id: model-context-protocol
+      mcp_endpoint:
+        uri: http://redbank-mcp-service.ragathon-team-1.svc.cluster.local:8000/sse
+        description: "RedBank Financials MCP Server - Banking tools for user lookup, statements, and transactions"
+        tools:
+          - get_user_by_phone
+          - get_statements  
+          - get_transactions
+        metadata:
+          version: "1.0.0"
+          namespace: "ragathon-team-1"
+          service: "redbank-mcp-service"
+          port: 8000
+          transport: "sse"
+          database: "PostgreSQL bank_statements"
+  
+  # Alternative configuration for external access
+  redbank-mcp-external.yaml: |
+    tool_groups:
+    - toolgroup_id: mcp::redbank-financials-external
+      provider_id: model-context-protocol
+      mcp_endpoint:
+        uri: https://redbank-mcp-route-ragathon-team-1.apps.llama-rag-pool-b84hp.aws.rh-ods.com/sse
+        description: "RedBank Financials MCP Server - External HTTPS endpoint"
+        ssl_verify: false
+        tools:
+          - get_user_by_phone
+          - get_statements
+          - get_transactions
+        metadata:
+          version: "1.0.0"
+          access: "external"
+          route: "redbank-mcp-route"
+          transport: "sse"
+          
+  # Tool descriptions for LlamaStack integration
+  tool-descriptions.yaml: |
+    tools:
+      get_user_by_phone:
+        name: "Get User by Phone"
+        description: "Retrieve bank customer information using their phone number"
+        parameters:
+          phone_number:
+            type: "string"
+            description: "Customer's phone number (e.g., +1-555-123-4567)"
+            required: true
+        returns: "User details including ID, name, address, and date of birth"
+        
+      get_statements:
+        name: "Get Bank Statements"
+        description: "Retrieve bank statements for a specific user"
+        parameters:
+          user_id:
+            type: "integer"
+            description: "User ID from get_user_by_phone result"
+            required: true
+        returns: "List of bank statements with dates and totals"
+        
+      get_transactions:
+        name: "Get Statement Transactions"
+        description: "Retrieve detailed transactions for a specific bank statement"
+        parameters:
+          statement_id:
+            type: "integer"
+            description: "Statement ID from get_statements result"
+            required: true
+        returns: "List of transactions with descriptions, amounts, and dates"

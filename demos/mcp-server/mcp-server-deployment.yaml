@@ -1,13 +1,9 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: redbank-financials
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redbank-mcp-server
-  namespace: redbank-financials
+  namespace: ragathon-team-1
   labels:
     app: redbank-mcp-server
 spec:
@@ -22,52 +18,71 @@ spec:
     spec:
       containers:
       - name: mcp-server
-        image: redbank-mcp-server:latest
+        image: image-registry.openshift-image-registry.svc:5000/ragathon-team-1/redbank-mcp-server:latest
         ports:
         - containerPort: 8000
           protocol: TCP
         env:
         - name: PYTHONUNBUFFERED
           value: "1"
+        - name: MCP_TRANSPORT
+          value: "sse"
+        - name: MCP_HOST
+          value: "0.0.0.0"
+        - name: MCP_PORT
+          value: "8000"
+        - name: DB_HOST
+          value: "postgres-service"
+        - name: DB_NAME
+          value: "bank_statements"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-credentials
+              key: POSTGRES_PASSWORD
+        - name: DB_PORT
+          value: "5432"
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          seccompProfile:
+            type: RuntimeDefault
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "250m"
+            memory: "256Mi"
+            cpu: "100m"
           limits:
-            memory: "1Gi"
+            memory: "512Mi"
             cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /mcp
-            port: 8000
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          timeoutSeconds: 5
-          failureThreshold: 3
         readinessProbe:
-          httpGet:
-            path: /mcp
+          tcpSocket:
             port: 8000
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 3
           failureThreshold: 3
-        volumeMounts:
-        - name: pgdata-volume
-          mountPath: /opt/app-root/pgdata
-      volumes:
-      - name: pgdata-volume
-        emptyDir: {}
+        livenessProbe:
+          tcpSocket:
+            port: 8000
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
       securityContext:
         runAsNonRoot: true
-        runAsUser: 1001
-        fsGroup: 0
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: redbank-mcp-service
-  namespace: redbank-financials
+  namespace: ragathon-team-1
   labels:
     app: redbank-mcp-server
 spec:
@@ -84,7 +99,7 @@ apiVersion: route.openshift.io/v1
 kind: Route
 metadata:
   name: redbank-mcp-route
-  namespace: redbank-financials
+  namespace: ragathon-team-1
   labels:
     app: redbank-mcp-server
 spec:

@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  whatsapp-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.whatsapp
+    container_name: redbank-whatsapp-bot
+    ports:
+      - "8000:8000"
+    environment:
+      - EVOLUTION_API_URL=${EVOLUTION_API_URL:-https://api.evoapicloud.com}
+      - EVOLUTION_API_ID=${EVOLUTION_API_ID}
+      - EVOLUTION_API_TOKEN=${EVOLUTION_API_TOKEN}
+      - HOST=0.0.0.0
+      - PORT=8000
+      - REDBANK_GROUP_NAME=${REDBANK_GROUP_NAME:-RedBank}
+      - WELCOME_MESSAGE=${WELCOME_MESSAGE:-Welcome to RedBank}
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - whatsapp-network
+
+networks:
+  whatsapp-network:
+    driver: bridge
+
+volumes:
+  logs:

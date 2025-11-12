@@ -12,11 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 from fastmcp import FastMCP
 from logger import setup_logger
 from database_manager import DatabaseManager
 import sys
+import os
 import psycopg
 
 
@@ -28,18 +29,19 @@ logger.info("MCP Server initialized: RedBank Financials")
 
 
 @mcp.tool()
-def get_user_by_phone(phone_number: str) -> Dict[str, Any]:
+def get_user_by_phone(phone_number: str, session_id: Optional[str] = None) -> Dict[str, Any]:
     """Get a specific bank user by their phone number
 
     Args:
         phone_number: The phone number of the user to retrieve
+        session_id: Optional session identifier for tracking requests
 
     Returns:
         Dictionary containing user details (user_id, name, date_of_birth, address, phone_number)
         Returns empty dict if user not found
     """
 
-    logger.info(f"Attempting to retrieve user with phone number: {phone_number}")
+    logger.info(f"Attempting to retrieve user with phone number: {phone_number} (session: {session_id})")
 
     try:
         db.cursor.execute(
@@ -71,17 +73,18 @@ def get_user_by_phone(phone_number: str) -> Dict[str, Any]:
 
 
 @mcp.tool()
-def get_statements(user_id: int) -> List[Dict[str, Any]]:
+def get_statements(user_id: int, session_id: Optional[str] = None) -> List[Dict[str, Any]]:
     """Get bank statements for a specific user
 
     Args:
         user_id: Required user ID to retrieve statements for
+        session_id: Optional session identifier for tracking requests
 
     Returns:
         List of dictionaries containing statement details (id, user_id, user_name, date, total)
     """
 
-    logger.info(f"Attempting to retrieve statements for user_id: {user_id}")
+    logger.info(f"Attempting to retrieve statements for user_id: {user_id} (session: {session_id})")
     try:
         query = """
             SELECT s.id, s.user_id, u.name, s.date, s.total 
@@ -121,11 +124,12 @@ def get_statements(user_id: int) -> List[Dict[str, Any]]:
 
 
 @mcp.tool()
-def get_transactions(statement_id: int) -> List[Dict[str, Any]]:
+def get_transactions(statement_id: int, session_id: Optional[str] = None) -> List[Dict[str, Any]]:
     """Get transactions for a specific statement
 
     Args:
         statement_id: Required statement ID to retrieve transactions for
+        session_id: Optional session identifier for tracking requests
 
     Returns:
         List of dictionaries containing transaction details
@@ -133,7 +137,7 @@ def get_transactions(statement_id: int) -> List[Dict[str, Any]]:
     Raises:
         RuntimeError: If database operation fails
     """
-    logger.info(f"Attempting to retrieve transactions for statement_id: {statement_id}")
+    logger.info(f"Attempting to retrieve transactions for statement_id: {statement_id} (session: {session_id})")
 
     try:
         query = """
@@ -182,11 +186,25 @@ def get_transactions(statement_id: int) -> List[Dict[str, Any]]:
 
 
 if __name__ == "__main__":
-    logger.info("Starting RedBank Financials MCP server on http://127.0.0.1:8000/mcp")
+    logger.info("Starting RedBank Financials MCP server")
     try:
-        # this is will be used for Llama Stack
-        mcp.run(transport="http", host="127.0.0.1", port=8000, path="/mcp")
-        # asyncio.run(mcp.run()) # this is will be used for Cursor testing
+        # Check transport mode
+        transport_mode = os.getenv("MCP_TRANSPORT", "stdio")
+        
+        if transport_mode == "sse":
+            host = os.getenv("MCP_HOST", "0.0.0.0")
+            port = int(os.getenv("MCP_PORT", "8000"))
+            logger.info(f"Starting SSE server on {host}:{port}")
+            mcp.run(transport="sse", host=host, port=port)
+        elif transport_mode == "http":
+            host = os.getenv("MCP_HOST", "0.0.0.0")
+            port = int(os.getenv("MCP_PORT", "8000"))
+            logger.info(f"Starting HTTP server on {host}:{port}")
+            mcp.run(transport="http", host=host, port=port)
+        else:
+            # Use stdio transport for Cursor compatibility
+            logger.info("Starting stdio transport")
+            mcp.run()
     except KeyboardInterrupt:
         logger.info("Server stopped by user")
         db.close()

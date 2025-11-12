@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Set PostgreSQL connection parameters for Docker
-export PGHOST=postgres
+# Set PostgreSQL connection parameters for local/container
+export PGHOST=localhost
 export PGUSER=postgres
 export PGPASSWORD=postgres
 

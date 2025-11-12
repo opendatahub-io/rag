@@ -1,8 +1,9 @@
-apiVersion: v1
+---
+apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
   name: redbank-mcp-server
-  namespace: redbank-financials
+  namespace: ragathon-team-1
   labels:
     app: redbank-mcp-server
 spec:
@@ -13,7 +14,7 @@ apiVersion: build.openshift.io/v1
 kind: BuildConfig
 metadata:
   name: redbank-mcp-server-build
-  namespace: redbank-financials
+  namespace: ragathon-team-1
   labels:
     app: redbank-mcp-server
 spec:
@@ -24,19 +25,13 @@ spec:
   source:
     type: Git
     git:
-      uri: https://github.com/your-username/your-repo.git  # Update with your repo
-      ref: main
-    contextDir: .
+      uri: https://github.com/Schimuneck/rag.git
+      ref: feature/redbank-mcp-server-demo
+    contextDir: demos/mcp-server
   strategy:
     type: Docker
     dockerStrategy:
-      dockerfilePath: Dockerfile.openshift
+      dockerfilePath: Dockerfile.mcp
   triggers:
   - type: ConfigChange
-  - type: GitHub
-    github:
-      secret: webhook-secret
-  - type: Generic
-    generic:
-      secret: webhook-secret
   runPolicy: Serial

@@ -16,6 +16,7 @@ import psycopg
 import threading
 from typing import Optional
 import logging
+import os
 
 logger = logging.getLogger("redbank_financials_db")
 
@@ -43,11 +44,20 @@ class DatabaseManager:
             return
 
         try:
+            # Use environment variables for Docker compatibility
+            db_host = os.getenv("DB_HOST", "localhost")
+            db_name = os.getenv("DB_NAME", "bank_statements")
+            db_user = os.getenv("DB_USER", "postgres")
+            db_password = os.getenv("DB_PASSWORD", "postgres")
+            db_port = os.getenv("DB_PORT", "5432")
+            
+            logger.info(f"Connecting to database at {db_host}:{db_port}")
             self.conn = psycopg.connect(
-                host="postgres",
-                database="bank_statements",
-                user="postgres",
-                password="postgres",
+                host=db_host,
+                port=db_port,
+                dbname=db_name,
+                user=db_user,
+                password=db_password,
             )
             self.cursor = self.conn.cursor()
             self._initialized = True

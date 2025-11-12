@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "redbank-financials-mcp-server": {
+      "command": "/Users/schimuneck/projects/redhat/opendatahub-io/rag/demos/mcp-server/venv/bin/python",
+      "args": [
+        "/Users/schimuneck/projects/redhat/opendatahub-io/rag/demos/mcp-server/mcp_server/mcp_server.py"
+      ],
+      "description": "RedBank Financials MCP Server - Banking tools for user lookup, statements, and transactions"
+    }
+  }
+}
