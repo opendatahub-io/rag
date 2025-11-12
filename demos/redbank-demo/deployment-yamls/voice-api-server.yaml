@@ -28,7 +28,7 @@ spec:
           - name: VECTOR_STORE_NAME
             value: redbank-kb-vector-store
           - name: INFERENCE_MODEL
-            value: vllm-inference/qwen2-5
+            value: vllm-inference/qwen3-14b-awq
           - name: WHISPER_URL
             value: http://whisper-large-v3-turbo-quantized-predictor.redbank-demo.svc.cluster.local:80/v1
           - name: MODEL_INSTRUCTIONS
@@ -66,6 +66,7 @@ metadata:
     app: voice-api
 data:
   MODEL_INSTRUCTIONS: |
+    /no_think
     You are a helpful assistant with access to financial data through MCP tools.
 
     IMPORTANT: Transaction all data is from 2025.

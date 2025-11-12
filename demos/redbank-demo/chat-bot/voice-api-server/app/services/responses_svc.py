@@ -16,6 +16,7 @@ from typing import Dict, Any
 from llama_stack_client import LlamaStackClient
 
 MODEL_INSTRUCTIONS = """
+    /no_think
     You are a helpful assistant with access to financial data through MCP tools.
 
     IMPORTANT: Transaction all data is from 2025.

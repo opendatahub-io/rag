@@ -1,6 +1,7 @@
 .PHONY: deploy-postgres-mcp deploy-postgres delete-postgres-mcp delete-postgres deploy-mcp delete-mcp \
 deploy-all delete-all deploy-whisper delete-whisper deploy-kokoro delete-kokoro \
-deploy-qwen-2-5 delete-qwen-2-5 deploy-lsd-server delete-lsd-server \
+deploy-qwen3-14b-awq delete-qwen3-14b-awq \
+deploy-lsd-server delete-lsd-server \
 deploy-voice-api delete-voice-api deploy-chat-ui delete-chat-ui
 
 NAMESPACE := redbank-demo
@@ -13,11 +14,11 @@ endif
 ############ Deploy/Delete All ############
 deploy-all:
 	$(KUBECTL) create namespace $(NAMESPACE) || true
-	$(MAKE) -j deploy-qwen-2-5 deploy-whisper deploy-kokoro deploy-postgres-mcp deploy-voice-api deploy-chat-ui
+	$(MAKE) -j deploy-qwen3-14b-awq deploy-whisper deploy-kokoro deploy-postgres-mcp deploy-voice-api deploy-chat-ui
 	$(KUBECTL) wait --for=condition=available --timeout=1200s deployment --all -n $(NAMESPACE)
 	$(MAKE) deploy-lsd-server
 	$(KUBECTL) wait --for=condition=available --timeout=300s deployment --all -n $(NAMESPACE)
-delete-all: delete-qwen-2-5 delete-whisper delete-kokoro delete-postgres-mcp delete-lsd-server delete-voice-api delete-chat-ui
+delete-all: delete-qwen3-14b-awq delete-whisper delete-kokoro delete-postgres-mcp delete-lsd-server delete-voice-api delete-chat-ui
 
 ############ PostgreSQL and MCP Server ############
 deploy-postgres-mcp: deploy-postgres deploy-mcp
@@ -51,11 +52,11 @@ delete-kokoro:
 	$(KUBECTL) delete -f deployment-yamls/kokoro-deployment.yaml -n $(NAMESPACE) || true
 	$(KUBECTL) delete sa kokoro-sa -n $(NAMESPACE) || true
 
-############ Qwen-2.5:7b AI Model ############
-deploy-qwen-2-5:
-	$(KUBECTL) apply -f deployment-yamls/qwen-2-5-deployment.yaml -n $(NAMESPACE)
-delete-qwen-2-5:
-	$(KUBECTL) delete -f deployment-yamls/qwen-2-5-deployment.yaml -n $(NAMESPACE) || true
+############ Qwen3-14B-AWQ AI Model ############
+deploy-qwen3-14b-awq:
+	$(KUBECTL) apply -f deployment-yamls/qwen3-14b-awq-deployment.yaml -n $(NAMESPACE)
+delete-qwen3-14b-awq:
+	$(KUBECTL) delete -f deployment-yamls/qwen3-14b-awq-deployment.yaml -n $(NAMESPACE) || true
 
 ############ LlamaStackDistribution ############
 deploy-lsd-server:

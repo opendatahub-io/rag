@@ -8,9 +8,9 @@ spec:
     containerSpec:
       env:
         - name: INFERENCE_MODEL
-          value: qwen2-5
+          value: qwen3-14b-awq
         - name: VLLM_URL
-          value: 'http://qwen2-5-predictor:80/v1'
+          value: 'http://qwen3-14b-awq-predictor:80/v1'
         - name: MILVUS_DB_PATH
           value: /.llama/distributions/remote-vllm/milvus.db
       name: llama-stack

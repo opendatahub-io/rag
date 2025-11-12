@@ -2,7 +2,7 @@
 FROM registry.access.redhat.com/ubi9/python-312:latest
 
 ENV LLAMASTACK_URL="http://localhost:8321"
-ENV INFERENCE_MODEL="vllm-inference/qwen2-5"
+ENV INFERENCE_MODEL="vllm-inference/qwen3-14b-awq"
 ENV VECTOR_STORE_NAME="redbank-kb-vector-store"
 ENV WHISPER_MODEL="whisper-large-v3-turbo-quantized"
 ENV WHISPER_URL="http://localhost:8080/v1"

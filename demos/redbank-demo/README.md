@@ -26,7 +26,7 @@ This guide assumes RHOAI 3.0+ is installed on an OpenShift 4.19.9+ cluster.
   - [Create AWS S3 Bucket](#create-aws-s3-bucket)
   - [Create Data Science Pipeline Server](#create-data-science-pipeline-server)
   - [Create a Pipeline](#create-a-pipeline)
-- [Deploy AI Models (STT / TTS / Qwen-2.5:7b), MCP + PostgreSQL, ChatBot UI, and Llama Stack Server](#deploy-ai-models-stt--tts--qwen-257b-mcp--postgresql-chatbot-ui-and-llama-stack-server)
+- [Deploy AI Models (STT / TTS / Qwen3-14B-AWQ), MCP + PostgreSQL, ChatBot UI, and Llama Stack Server](#deploy-ai-models-stt--tts--qwen3-14b-awq-mcp--postgresql-chatbot-ui-and-llama-stack-server)
 - [Run the Data Science Pipeline to create Red Bank knowledge base](#run-the-data-science-pipeline-to-create-red-bank-knowledge-base)
 - [Verify all models, RAG, and MCP tool functionality](#verify-all-models-rag-and-mcp-tool-functionality)
 - [Play with the Red Bank Demo ChatBot UI](#play-with-the-red-bank-demo-chatbot-ui)
@@ -163,7 +163,7 @@ To create a Data Science Pipeline, we need to set up an AWS S3 bucket to store p
 
 ---
 
-## Deploy AI Models (STT / TTS / Qwen-2.5:7b), MCP + PostgreSQL, ChatBot UI, and Llama Stack Server
+## Deploy AI Models (STT / TTS / Qwen3-14B-AWQ), MCP + PostgreSQL, ChatBot UI, and Llama Stack Server
 
 > **Note:** All models use 1 GPU each. This demo has been tested with 3 `g5.2xlarge` nodes (A10g NVIDIA GPU), but might work with other NVIDIA GPU instances.
 

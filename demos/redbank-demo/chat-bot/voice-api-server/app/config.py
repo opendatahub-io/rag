@@ -27,7 +27,7 @@ class Settings:
     tts_route = "/tts"
     tts_voice = "default"
     vdb_url = os.getenv("VDB_URL", "http://localhost:8002")
-    inference_model = os.getenv("INFERENCE_MODEL", "vllm-inference/qwen2-5")
+    inference_model = os.getenv("INFERENCE_MODEL", "vllm-inference/qwen3-14b-awq")
     vector_store_name = os.getenv("VECTOR_STORE_NAME", "redbank-kb-vector-store")
     whisper_url = os.getenv("WHISPER_URL", "http://localhost:80/v1")
     mcp_url = os.getenv("MCP_URL", "http://redbank-mcp-server:8000/mcp")
