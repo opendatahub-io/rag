@@ -8,7 +8,7 @@ fire==0.7.0
 kfp[kubernetes]>= 2.13.0
 
 # Vector database and LlamaStack
-llama-stack==0.2.12
+llama-stack==0.2.20
 llama-stack-client==0.2.14
 
 # Audio processing and ASR
