@@ -85,6 +85,12 @@ def register_vector_store_and_files(
 
     embedding_dimension = matching_model.metadata["embedding_dimension"]
 
+    # Warm up the embedding model
+    response = client.embeddings.create(
+        model=embedding_model_id,
+        input="warmup",
+    )
+
     # Create vector store from uploaded files
     try:
         vector_store = client.vector_stores.create(
@@ -118,7 +124,7 @@ def vector_store_files_pipeline(
     pdf_filenames: str = "redbankfinancial_about.pdf, redbankfinancial_faq.pdf",
     vector_store_name: str = "redbank-kb-vector-store",
     service_url: str = "http://redbank-lsd-service:8321",
-    embedding_model_id: str = "ibm-granite/granite-embedding-125m-english",
+    embedding_model_id: str = "ibm-granite/granite-embedding-125m",
     max_tokens: int = 512,
     chunk_overlap_tokens: int = 64,
     use_gpu: bool = False,
