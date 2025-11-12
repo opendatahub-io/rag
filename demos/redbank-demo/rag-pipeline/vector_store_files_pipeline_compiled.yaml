@@ -4,7 +4,7 @@
 # Inputs:
 #    base_url: str [Default: 'https://raw.githubusercontent.com/opendatahub-io/rag/redbank/demos/redbank-demo/pdf']
 #    chunk_overlap_tokens: int [Default: 64.0]
-#    embedding_model_id: str [Default: 'ibm-granite/granite-embedding-125m-english']
+#    embedding_model_id: str [Default: 'ibm-granite/granite-embedding-125m']
 #    max_tokens: int [Default: 512.0]
 #    pdf_filenames: str [Default: 'redbankfinancial_about.pdf, redbankfinancial_faq.pdf']
 #    service_url: str [Default: 'http://redbank-lsd-service:8321']
@@ -260,7 +260,9 @@ deploymentSpec:
           \        )\n\n    if matching_model.api_model_type != \"embedding\":\n \
           \       raise ValueError(f\"Model '{embedding_model_id}' is not an embedding\
           \ model\")\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
-          ]\n\n    # Create vector store from uploaded files\n    try:\n        vector_store\
+          ]\n\n    # Warm up the embedding model\n    response = client.embeddings.create(\n\
+          \        model=embedding_model_id,\n        input=\"warmup\",\n    )\n\n\
+          \    # Create vector store from uploaded files\n    try:\n        vector_store\
           \ = client.vector_stores.create(\n            name=vector_store_name,\n\
           \            file_ids=file_ids,\n            chunking_strategy={\n     \
           \           \"type\": \"static\",\n                \"static\": {\n     \
@@ -342,7 +344,9 @@ deploymentSpec:
           \        )\n\n    if matching_model.api_model_type != \"embedding\":\n \
           \       raise ValueError(f\"Model '{embedding_model_id}' is not an embedding\
           \ model\")\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
-          ]\n\n    # Create vector store from uploaded files\n    try:\n        vector_store\
+          ]\n\n    # Warm up the embedding model\n    response = client.embeddings.create(\n\
+          \        model=embedding_model_id,\n        input=\"warmup\",\n    )\n\n\
+          \    # Create vector store from uploaded files\n    try:\n        vector_store\
           \ = client.vector_stores.create(\n            name=vector_store_name,\n\
           \            file_ids=file_ids,\n            chunking_strategy={\n     \
           \           \"type\": \"static\",\n                \"static\": {\n     \
@@ -409,7 +413,7 @@ root:
         isOptional: true
         parameterType: NUMBER_INTEGER
       embedding_model_id:
-        defaultValue: ibm-granite/granite-embedding-125m-english
+        defaultValue: ibm-granite/granite-embedding-125m
         description: Model ID for embedding generation
         isOptional: true
         parameterType: STRING
