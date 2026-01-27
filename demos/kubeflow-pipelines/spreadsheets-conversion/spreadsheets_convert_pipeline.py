@@ -14,59 +14,85 @@
 
 # ruff: noqa: PLC0415,UP007,UP035,UP006,E712
 # SPDX-License-Identifier: Apache-2.0
-from typing import Iterator, List, Tuple, Dict
+from typing import List
 import logging
 
 from kfp import compiler, dsl
 from kfp.kubernetes import add_node_selector_json, add_toleration_json
 
 PYTHON_BASE_IMAGE = "registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168"
-
-# Workbench Runtime Image: Pytorch with CUDA and Python 3.11 (UBI 9)
-# The images for each release can be found in
-# https://github.com/red-hat-data-services/rhoai-disconnected-install-helper/blob/main/rhoai-2.21.md
-PYTORCH_CUDA_IMAGE = "quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py311-ubi9@sha256:4706be608af3f33c88700ef6ef6a99e716fc95fc7d2e879502e81c0022fd840e"
+LLAMA_STACK_CLIENT_VERSION = "0.4.2"
 
 _log = logging.getLogger(__name__)
 
 
 @dsl.component(
     base_image=PYTHON_BASE_IMAGE,
-    packages_to_install=["llama-stack-client", "fire", "requests"],
+    packages_to_install=[
+        f"llama-stack-client=={LLAMA_STACK_CLIENT_VERSION}",
+        "fire",
+        "requests",
+    ],
 )
-def register_vector_db(
+def create_vector_store(
     service_url: str,
-    vector_db_id: str,
-    embed_model_id: str,
-):
+    vector_store_name: str,
+    embedding_model_id: str,
+    max_tokens: int,
+    chunk_overlap_tokens: int,
+) -> str:
+    """Create an empty vector store for file_search (Responses API). Returns vector_store.id."""
     from llama_stack_client import LlamaStackClient
 
     client = LlamaStackClient(base_url=service_url)
 
     models = client.models.list()
-    matching_model = next(
-        (m for m in models if m.provider_resource_id == embed_model_id), None
-    )
+    matching_model = next((m for m in models if m.id == embedding_model_id), None)
 
     if not matching_model:
+        available = [m.id for m in models]
         raise ValueError(
-            f"Model with ID '{embed_model_id}' not found on LlamaStack server."
+            f"Model '{embedding_model_id}' not found. Available: {available}"
         )
 
-    if matching_model.model_type != "embedding":
-        raise ValueError(f"Model '{embed_model_id}' is not an embedding model")
-
-    embedding_dimension = matching_model.metadata["embedding_dimension"]
-
-    _ = client.vector_dbs.register(
-        vector_db_id=vector_db_id,
-        embedding_model=matching_model.identifier,
-        embedding_dimension=embedding_dimension,
-        provider_id="milvus",
+    model_type = (
+        matching_model.custom_metadata.get("model_type")
+        if matching_model.custom_metadata
+        else None
     )
-    print(
-        f"Registered vector DB '{vector_db_id}' with embedding model '{embed_model_id}'."
+    if model_type != "embedding":
+        raise ValueError(
+            f"Model '{embedding_model_id}' is not an embedding model (type={model_type})"
+        )
+
+    embedding_dimension = int(
+        float(matching_model.custom_metadata.get("embedding_dimension"))
     )
+
+    # Warm up the embedding model
+    client.embeddings.create(
+        model=embedding_model_id,
+        input="warmup",
+    )
+
+    vector_store = client.vector_stores.create(
+        name=vector_store_name,
+        file_ids=[],
+        chunking_strategy={
+            "type": "static",
+            "static": {
+                "max_chunk_size_tokens": max_tokens,
+                "chunk_overlap_tokens": chunk_overlap_tokens,
+            },
+        },
+        extra_body={
+            "embedding_model": embedding_model_id,
+            "embedding_dimension": embedding_dimension,
+            "provider_id": "milvus",
+        },
+    )
+    print(f"Created vector store '{vector_store_name}' (id={vector_store.id})")
+    return vector_store.id
 
 
 @dsl.component(
@@ -126,49 +152,31 @@ def create_spreadsheet_splits(
 
 
 @dsl.component(
-    base_image=PYTORCH_CUDA_IMAGE,
+    base_image=PYTHON_BASE_IMAGE,
     packages_to_install=[
-        "docling",
-        "docling-core",
-        "transformers",
-        "sentence-transformers",
-        "llama-stack",
-        "llama-stack-client",
-        "pymilvus",
-        "fire",
+        f"llama-stack-client=={LLAMA_STACK_CLIENT_VERSION}",
         "pandas>=2.3.0",
         "openpyxl>=3.1.5",
     ],
 )
-def docling_convert_and_ingest_spreadsheets(
+def convert_and_upload_spreadsheets(
     input_path: dsl.InputPath("input-spreadsheets"),
     spreadsheet_split: List[str],
-    embed_model_id: str,
-    max_tokens: int,
     service_url: str,
-    vector_db_id: str,
+    vector_store_id: str,
 ):
+    import io
+    import logging
     import pathlib
-    import pandas as pd
-    from docling.datamodel.base_models import ConversionStatus
-    from docling.datamodel.document import ConversionResult
-    from docling.document_converter import DocumentConverter
-    from docling_core.types.doc.document import DoclingDocument
     import shutil
     import tempfile
-    import uuid
 
-    from transformers import AutoTokenizer
-    from sentence_transformers import SentenceTransformer
-    from docling_core.transforms.chunker.hybrid_chunker import HybridChunker
-    import logging
+    import pandas as pd
     from llama_stack_client import LlamaStackClient
-    import json
 
     _log = logging.getLogger(__name__)
 
-    # Create a truly local temp directory for processing
-    local_processing_dir = pathlib.Path(tempfile.mkdtemp(prefix="docling-local-"))
+    local_processing_dir = pathlib.Path(tempfile.mkdtemp(prefix="spreadsheets-"))
     _log.info(f"Local processing directory: {local_processing_dir}")
 
     def convert_excel_to_csv(
@@ -184,12 +192,10 @@ def docling_convert_and_ingest_spreadsheets(
             if file_path.suffix.lower() == ".csv":
                 new_path = output_path / file_path.name
                 try:
-                    # First, try to read it as a normal CSV. 'infer' handles uncompressed files.
                     df = pd.read_csv(file_path, compression="infer", engine="python")
                     _log.info(f"Read {file_path.name} as a standard CSV.")
 
                 except (UnicodeDecodeError, EOFError):
-                    # If it fails with a decoding error, it's likely a misnamed compressed file.
                     _log.warning(
                         f"Standard read failed for {file_path.name}. Attempting gzip decompression."
                     )
@@ -208,23 +214,18 @@ def docling_convert_and_ingest_spreadsheets(
                 df.to_csv(new_path, index=False)
                 processed_csv_files.append(new_path)
 
-            # Check if the file is an Excel format
             elif file_path.suffix.lower() in [".xlsx", ".xls", ".xlsm"]:
                 _log.info(f"Converting {file_path.name} to CSV format...")
-
                 try:
-                    # Use pandas to read all sheets from the Excel file
                     excel_sheets = pd.read_excel(file_path, sheet_name=None)
-
                     for sheet_name, df in excel_sheets.items():
                         new_csv_filename = f"{file_path.stem}_{sheet_name}.csv"
                         new_csv_path = output_path / new_csv_filename
                         df.to_csv(new_csv_path, index=False, header=True)
                         processed_csv_files.append(new_csv_path)
                         _log.info(
-                            f"Successfully converted sheet '{sheet_name}' to '{new_csv_path.name}'"
+                            f"Converted sheet '{sheet_name}' to '{new_csv_path.name}'"
                         )
-
                 except Exception as e:
                     _log.error(f"Excel conversion failed for {file_path.name}: {e}")
                     continue
@@ -233,172 +234,66 @@ def docling_convert_and_ingest_spreadsheets(
 
         return processed_csv_files
 
-    # ---- Embedding Helper functions ----
-    def setup_chunker_and_embedder(
-        embed_model_id: str, max_tokens: int
-    ) -> Tuple[SentenceTransformer, HybridChunker]:
-        tokenizer = AutoTokenizer.from_pretrained(embed_model_id)
-        embedding_model = SentenceTransformer(embed_model_id)
-        chunker = HybridChunker(
-            tokenizer=tokenizer, max_tokens=max_tokens, merge_peers=True
-        )
-
-        return embedding_model, chunker
-
-    def embed_text(text: str, embedding_model: SentenceTransformer) -> list[float]:
-        return embedding_model.encode([text], normalize_embeddings=True).tolist()[0]
-
-    def create_chunks_with_embeddings(
-        converted_data: DoclingDocument,
-        embedding_model: SentenceTransformer,
-        chunker: HybridChunker,
-        file_name: str,
-    ) -> List[Dict]:
-        _log.info(f"Docling Converted data: {converted_data}")
-
-        chunks_with_embeddings = []
-        for chunk in chunker.chunk(dl_doc=converted_data):
-            _log.info(f"Chunk: {chunk}")
-
-            raw_chunk = chunker.contextualize(chunk)
-            _log.info(f"Raw chunk: {raw_chunk}")
-
-            embedding = embed_text(raw_chunk, embedding_model)
-            _log.info(f"Embedding: {embedding}")
-
-            chunk_id = str(uuid.uuid4())
-            content_token_count = chunker.tokenizer.count_tokens(raw_chunk)
-
-            # Prepare metadata object
-            metadata_obj = {
-                "file_name": file_name,
-                "document_id": chunk_id,
-                "token_count": content_token_count,
-            }
-
-            metadata_str = json.dumps(metadata_obj)
-            metadata_token_count = chunker.tokenizer.count_tokens(metadata_str)
-            metadata_obj["metadata_token_count"] = metadata_token_count
-
-            # Create a new chunk with embedding
-            new_chunk_with_embedding = {
-                "content": raw_chunk,
-                "mime_type": "text/markdown",
-                "embedding": embedding,
-                "metadata": metadata_obj,
-            }
-
-            _log.info(f"New embedding: {new_chunk_with_embedding}")
-
-            chunks_with_embeddings.append(new_chunk_with_embedding)
-
-        _log.info(f"Chunks with embeddings: {chunks_with_embeddings}")
-
-        return chunks_with_embeddings
-
-    def insert_chunks_with_embeddings_to_vector_db(
-        chunks_with_embeddings: List[Dict],
-        vector_db_id: str,
-        client: LlamaStackClient,
-    ) -> None:
-        _log.info(
-            f"Inserting chunks with embeddings to vector database: {chunks_with_embeddings}"
-        )
-
-        if chunks_with_embeddings:
-            try:
-                client.vector_io.insert(
-                    vector_db_id=vector_db_id, chunks=chunks_with_embeddings
-                )
-            except Exception as e:
-                _log.error(f"Failed to insert embeddings into vector database: {e}")
-
-    def process_conversion_results(
-        conv_results: Iterator[ConversionResult], client: LlamaStackClient
-    ) -> None:
-        processed_docs = 0
-        embedding_model, chunker = setup_chunker_and_embedder(
-            embed_model_id, max_tokens
-        )
-        for conv_res in conv_results:
-            if conv_res.status != ConversionStatus.SUCCESS:
-                _log.warning(
-                    f"Conversion failed for {conv_res.input.file.stem}: {conv_res.status}"
-                )
-                continue
-
-            processed_docs += 1
-            file_name = conv_res.input.file.stem
-            document = conv_res.document
-
-            if document is None:
-                _log.warning(f"Document conversion failed for {file_name}")
-                continue
-
-            chunks_with_embeddings = create_chunks_with_embeddings(
-                document, embedding_model, chunker, file_name
-            )
-
-            insert_chunks_with_embeddings_to_vector_db(
-                chunks_with_embeddings, vector_db_id, client
-            )
-
-        _log.info(f"Processed {processed_docs} documents successfully.")
-
     input_path = pathlib.Path(input_path)
-
-    # Copy input files to the local processing dir
     input_spreadsheets_files = [input_path / name for name in spreadsheet_split]
     csv_files = convert_excel_to_csv(input_spreadsheets_files, local_processing_dir)
-
-    _log.info(f"CSV files for Docling: {csv_files}")
-
-    docling_csv_converter = DocumentConverter()
-
-    # Convert all spreadsheet files to text
-    conv_results = docling_csv_converter.convert_all(
-        csv_files,
-        raises_on_error=True,
-    )
+    _log.info(f"CSV files to upload: {[p.name for p in csv_files]}")
 
     client = LlamaStackClient(base_url=service_url)
+    processed = 0
 
-    process_conversion_results(conv_results, client)
+    for csv_path in csv_files:
+        content = csv_path.read_text(encoding="utf-8", errors="replace")
+        file = client.files.create(
+            file=(csv_path.name, io.BytesIO(content.encode("utf-8")), "text/csv"),
+            purpose="assistants",
+        )
+        client.vector_stores.files.create(
+            vector_store_id=vector_store_id,
+            file_id=file.id,
+        )
+        _log.info(
+            f"Uploaded {csv_path.name} (file_id={file.id}) and added to vector store"
+        )
+        processed += 1
 
-    # Clean up the local processing directory
+    _log.info(f"Processed {processed} files; added to vector store {vector_store_id}")
     shutil.rmtree(local_processing_dir)
-    _log.info(f"Cleaned up local processing directory: {local_processing_dir}")
 
 
 @dsl.pipeline()
-def docling_convert_pipeline(
+def spreadsheet_convert_pipeline(
     base_url: str = "https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/spreadsheets",
     spreadsheet_filenames: str = "people.xlsx, sample_sales_data.xlsm, test_customers.csv",
     num_workers: int = 1,
-    vector_db_id: str = "csv-vector-db",
-    service_url: str = "http://lsd-llama-milvus-service:8321",
-    embed_model_id: str = "ibm-granite/granite-embedding-125m-english",
+    vector_store_name: str = "csv-vector-store",
+    service_url: str = "http://lsd-milvus-service:8321",
+    embedding_model_id: str = "sentence-transformers/ibm-granite/granite-embedding-125m-english",
     max_tokens: int = 512,
-    use_gpu: bool = True,  # use only if you have additional gpu worker
+    chunk_overlap_tokens: int = 64,
+    use_gpu: bool = False,  # set to True only if you have additional gpu worker
 ) -> None:
     """
-    Converts spreadsheets (csv and excel) to text using Docling and generates embeddings
+    Converts spreadsheets (Excel to CSV with pandas) and uploads each as a file to a vector store for the Responses API
     :param base_url: Base URL to fetch spreadsheets
     :param spreadsheet_filenames: Comma-separated list of spreadsheets filenames to download and convert
-    :param num_workers: Number of docling worker pods to use
-    :param vector_db_id: ID of the vector database to store embeddings
+    :param num_workers: Number of parallel workers
+    :param vector_store_name: Name of the vector store
     :param service_url: URL of the LlamaStack service
-    :param embed_model_id: Model ID for embedding generation
+    :param embedding_model_id: Model ID for embedding generation
     :param max_tokens: Maximum number of tokens per chunk
-    :param use_gpu: boolean to enable/disable gpu in the docling workers
+    :param chunk_overlap_tokens: Chunk overlap in tokens
+    :param use_gpu: boolean to enable/disable gpu for the convert workers
     :return:
     """
-    register_task = register_vector_db(
+    create_vector_store_task = create_vector_store(
         service_url=service_url,
-        vector_db_id=vector_db_id,
-        embed_model_id=embed_model_id,
+        vector_store_name=vector_store_name,
+        embedding_model_id=embedding_model_id,
+        max_tokens=max_tokens,
+        chunk_overlap_tokens=chunk_overlap_tokens,
     )
-    register_task.set_caching_options(False)
+    create_vector_store_task.set_caching_options(False)
 
     import_task = import_spreadsheet_files(
         base_url=base_url,
@@ -413,13 +308,11 @@ def docling_convert_pipeline(
 
     with dsl.ParallelFor(spreadsheet_splits.output) as spreadsheet_split:
         with dsl.If(use_gpu == True):
-            convert_task = docling_convert_and_ingest_spreadsheets(
+            convert_task = convert_and_upload_spreadsheets(
                 input_path=import_task.output,
                 spreadsheet_split=spreadsheet_split,
-                embed_model_id=embed_model_id,
-                max_tokens=max_tokens,
                 service_url=service_url,
-                vector_db_id=vector_db_id,
+                vector_store_id=create_vector_store_task.output,
             )
             convert_task.set_caching_options(False)
             convert_task.set_cpu_request("500m")
@@ -440,13 +333,11 @@ def docling_convert_pipeline(
             )
             add_node_selector_json(convert_task, {})
         with dsl.Else():
-            convert_task = docling_convert_and_ingest_spreadsheets(
+            convert_task = convert_and_upload_spreadsheets(
                 input_path=import_task.output,
                 spreadsheet_split=spreadsheet_split,
-                embed_model_id=embed_model_id,
-                max_tokens=max_tokens,
                 service_url=service_url,
-                vector_db_id=vector_db_id,
+                vector_store_id=create_vector_store_task.output,
             )
             convert_task.set_caching_options(False)
             convert_task.set_cpu_request("500m")
@@ -457,6 +348,6 @@ def docling_convert_pipeline(
 
 if __name__ == "__main__":
     compiler.Compiler().compile(
-        pipeline_func=docling_convert_pipeline,
+        pipeline_func=spreadsheet_convert_pipeline,
         package_path=__file__.replace(".py", "_compiled.yaml"),
     )

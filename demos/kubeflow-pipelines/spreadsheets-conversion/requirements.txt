@@ -1,6 +1,10 @@
-docling >= 2.0.0
-kfp[kubernetes] >= 2.13.0
-llama-stack >= 0.1.0
+kfp[kubernetes]>=2.13.0
+langchain-groq
+langchain-huggingface
+llama-stack-client==0.4.2
 openpyxl>=3.1.5
 pandas>=2.3.0
-sqlalchemy >= 2.0.0
+ragas==0.2.15
+RapidFuzz>=3.13.0
+sacrebleu>=2.5.1
+sentence-transformers>=5.0.0

@@ -1,38 +1,35 @@
-# Kubeflow Docling Spreadsheets Conversion Pipeline for RAG
-This document explains the **Kubeflow Docling Spreadsheets Conversion Pipeline** - a Kubeflow pipeline that processes spreadsheets of different formats like "*.csv", "*.xlsx", "*.xls", "*.xlsm" with Docling to extract text and generate embeddings for Retrieval-Augmented Generation (RAG) applications. The pipeline supports execution on both GPU and CPU-only nodes.
+# Kubeflow Spreadsheets Conversion Pipeline for RAG
+This document explains the **Kubeflow Spreadsheets Conversion Pipeline** - a Kubeflow pipeline that processes spreadsheets ("*.csv", "*.xlsx", "*.xls", "*.xlsm"), converts Excel to CSV with pandas, uploads each as a file, and adds them to a vector store for the Retrieval-Augmented Generation (RAG) applications. The pipeline supports execution on both GPU and CPU-only nodes.
 
+> Note: This demo was tested using the default KServe behavior on OpenShift AI (`Headless` RawDeployment). If you are using `Headed` mode, change the `VLLM_URL` port to `80` in the [llamastackdistribution.yaml](../../common-deployments/llamastackdistribution.yaml).
 
 ## Pipeline Overview
-The pipeline transforms spreadsheet files into searchable vector embeddings through the following stages:
+The pipeline transforms spreadsheet files into a vector store for RAG:
 
 ```mermaid
 
 graph TD
 
-A[Register Vector DB] --> B[Import spreadsheet files]
+A[Create Vector Store] --> B[Import spreadsheet files]
 
 B --> C[Create spreadsheet splits]
 
 C --> D[Convert all spreadsheets to CSV]
 
-D --> E[Conversion using Docling]
+D --> E[Upload each CSV as file]
 
-E --> F[Text Chunking]
+E --> F[Add files to Vector Store - chunking & embedding]
 
-F --> G[Generate Embeddings]
-
-G --> H[Store chunks with embeddings in Vector Database]
-
-H --> I[Ready for RAG Queries]
+F --> G[Ready for RAG Queries]
 
 ```
 
 
 ## Pipeline Components
 
-### 1. **Vector Database Registration** (`register_vector_db`)
+### 1. **Create Vector Store** (`create_vector_store`)
 
--  **Purpose**: Sets up the vector database with the proper configuration.
+-  **Purpose**: Creates an empty vector store for file_search (Responses API).
 
 
 ### 2. **Spreadsheets Import** (`import_spreadsheet_files`)
@@ -47,11 +44,9 @@ H --> I[Ready for RAG Queries]
 
 
 
-### 4. **Spreadsheet Conversion and Embedding Generation** (`docling_convert_and_ingest_spreadsheets`)
+### 4. **Convert and Upload Spreadsheets** (`convert_and_upload_spreadsheets`)
 
-
-
--  **Purpose**: Main processing component that extracts data from spreadsheet rows, chunks the text, and generates vector embeddings.
+-  **Purpose**: Converts Excel to CSV with pandas, uploads each CSV as a file via `client.files.create`, and adds it to the vector store with `client.vector_stores.files.create`.
 
 ## Supported Spreadsheets Formats
 
@@ -82,14 +77,13 @@ The pipeline enables rich RAG applications that can answer questions about sprea
 ## 🚀 Getting Started
 
 ### Prerequisites
-- [Data Science Project in OpenShift AI with a configured Workbench](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_cloud_service/1/html/getting_started)
-
-	- [Configuring a pipeline server](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/latest/html/working_with_data_science_pipelines/managing-data-science-pipelines_ds-pipelines#configuring-a-pipeline-server_ds-pipelines)
-
-	- A LlamaStack service with a vector database backend deployed (follow our [official deployment documentation](https://github.com/opendatahub-io/rag/blob/main/DEPLOYMENT.md))
-
-- GPU-enabled nodes are highly recommended for faster processing.
-- You can still use only CPU nodes but it will take longer.
+- Red Hat OpenShift AI v3.0+
+- Data science project created with a configured pipeline server and workbench with Python 3.12.
+- LlamaStack Operator enabled in the DSC resource. See [Working with Llama Stack](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/working_with_llama_stack/index).
+- LlamaStackDistribution deployed and configured with the `qwen3-14b-awq` instruct model:
+    - See [common-deployments](../../common-deployments). Deploy the components in this order: first apply `postgres-deployment.yaml` and `llama-stack-config.yaml`, then apply `qwen3-14b-awq-deployment.yaml` and wait for it to be ready, and finally apply `llamastackdistribution.yaml`.
+    - Alternatively, you can use your own instruct model.
+- 1–2 NVIDIA GPUs (one for the instruct model, and optionally one for the pipeline run)
 
 
 **Pipeline Parameters**
@@ -100,15 +94,17 @@ The pipeline enables rich RAG applications that can answer questions about sprea
 
 -  `num_workers`: Number of parallel workers (default: 1)
 
--  `vector_db_id`: ID of the vector database to store embeddings
+-  `vector_store_name`: Name of the vector store (for file_search / Responses API)
 
 -  `service_url`: URL of the LlamaStack service
 
--  `embed_model_id`: Embedding model to use (default: `ibm-granite/granite-embedding-125m-english`)
+-  `embedding_model_id`: Embedding model to use (default: `sentence-transformers/ibm-granite/granite-embedding-125m-english`)
 
 -  `max_tokens`: Maximum tokens per chunk (default: 512)
 
--  `use_gpu`: Whether to use GPU for processing (default: true)
+-  `chunk_overlap_tokens`: Chunk overlap in tokens (default: 64)
+
+-  `use_gpu`: Whether to use GPU for processing (default: false)
 
 
 
@@ -116,23 +112,23 @@ The pipeline enables rich RAG applications that can answer questions about sprea
 
 ```
 # Install dependencies for pipeline
-cd demos/kfp/docling/spreadsheets-conversion
+cd demos/kubeflow-pipelines/spreadsheets-conversion
 pip3 install -r requirements.txt
 
 # Compile the Kubeflow pipeline for running with help of GPU or use existing pipeline
-# set use_gpu = True in docling_convert_pipeline() in docling_spreadsheets_convert_pipeline.py
-python3 docling_spreadsheets_convert_pipeline.py
+# set use_gpu = True in spreadsheet_convert_pipeline() in spreadsheets_convert_pipeline.py
+python3 spreadsheets_convert_pipeline.py
 ```
 
 ### Creating the Pipeline for running on CPU only
 ```
 # Install dependencies for pipeline
-cd demos/kfp/docling/spreadsheets-conversion
+cd demos/kubeflow-pipelines/spreadsheets-conversion
 pip3 install -r requirements.txt
 
 # Compile the Kubeflow pipeline for running on CPU only or use existing pipeline
-# set use_gpu = False in docling_convert_pipeline() in docling_spreadsheets_convert_pipeline.py
-python3 docling_spreadsheets_convert_pipeline.py
+# set use_gpu = False in spreadsheet_convert_pipeline() in spreadsheets_convert_pipeline.py
+python3 spreadsheets_convert_pipeline.py
 ```
 
 ### Import Kubeflow pipeline to OpenShift AI
@@ -140,20 +136,11 @@ python3 docling_spreadsheets_convert_pipeline.py
 	- [Running a data science pipeline generated from Python code](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_cloud_service/1/html/openshift_ai_tutorial_-_fraud_detection_example/implementing-pipelines#running-a-pipeline-generated-from-python-code)
 - Configure the pipeline parameters as needed
 
+### Prompt the LLM (Responses API)
 
+Once your files are embedded and indexed, query them using the Responses API by running [spreadsheets_rag_responses.ipynb](spreadsheets_rag_responses.ipynb) (same pattern as [asr-conversion/asr_rag_responses.ipynb](../asr-conversion/asr_rag_responses.ipynb)).
 
+1. In your Workbench, clone the repo and open the notebook. Install deps: `pip3 install -r requirements.txt` from the `spreadsheets-conversion` directory, then restart the kernel.
+2. Run through the notebook to prompt the LLM with `client.responses.create()` and `file_search` (vector stores), and optionally evaluate with RAGAS.
 
-### Query RAG Agent in your Workbench within a Data Science project on OpenShift AI
-1. Open your Workbench
-2. Clone the rag repo and use main branch
-	- Use this link `https://github.com/opendatahub-io/rag.git` for cloning the repo
-
-	- [Collaborating on Jupyter notebooks by using Git](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_cloud_service/1/html/working_with_connected_applications/using_basic_workbenches#collaborating-on-jupyter-notebooks-by-using-git_connected-apps)
-3. Install dependencies for Jupyter Notebook with RAG Agent
-
-```
-cd demos/kfp/docling/spreadsheets-conversion/rag-agent
-pip3 install -r requirements.txt
-```
-
-4. Follow the instructions in the corresponding RAG Jupyter Notebook `spreadsheets_rag_agent.ipynb` in `demos/kfp/docling/spreadsheets-conversion/rag-agent` to query the content ingested by the pipeline.
+> **Note:** The notebook expects a vector store named `csv-vector-store` (or change it in the notebook). This pipeline creates and populates that vector store.

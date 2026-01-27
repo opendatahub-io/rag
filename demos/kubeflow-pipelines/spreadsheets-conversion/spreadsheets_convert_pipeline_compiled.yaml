@@ -1,0 +1,734 @@
+# PIPELINE DEFINITION
+# Name: spreadsheet-convert-pipeline
+# Description: Converts spreadsheets (Excel to CSV with pandas) and uploads each as a file to a vector store for the Responses API
+# Inputs:
+#    base_url: str [Default: 'https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/spreadsheets']
+#    chunk_overlap_tokens: int [Default: 64.0]
+#    embedding_model_id: str [Default: 'sentence-transformers/ibm-granite/granite-embedding-125m-english']
+#    max_tokens: int [Default: 512.0]
+#    num_workers: int [Default: 1.0]
+#    service_url: str [Default: 'http://lsd-milvus-service:8321']
+#    spreadsheet_filenames: str [Default: 'people.xlsx, sample_sales_data.xlsm, test_customers.csv']
+#    use_gpu: bool [Default: False]
+#    vector_store_name: str [Default: 'csv-vector-store']
+components:
+  comp-condition-3:
+    dag:
+      tasks:
+        convert-and-upload-spreadsheets:
+          cachingOptions: {}
+          componentRef:
+            name: comp-convert-and-upload-spreadsheets
+          inputs:
+            artifacts:
+              input_path:
+                componentInputArtifact: pipelinechannel--import-spreadsheet-files-output_path
+            parameters:
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              spreadsheet_split:
+                componentInputParameter: pipelinechannel--create-spreadsheet-splits-Output-loop-item
+              vector_store_id:
+                componentInputParameter: pipelinechannel--create-vector-store-Output
+          taskInfo:
+            name: convert-and-upload-spreadsheets
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-spreadsheet-files-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--create-vector-store-Output:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+  comp-condition-4:
+    dag:
+      tasks:
+        convert-and-upload-spreadsheets-2:
+          cachingOptions: {}
+          componentRef:
+            name: comp-convert-and-upload-spreadsheets-2
+          inputs:
+            artifacts:
+              input_path:
+                componentInputArtifact: pipelinechannel--import-spreadsheet-files-output_path
+            parameters:
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              spreadsheet_split:
+                componentInputParameter: pipelinechannel--create-spreadsheet-splits-Output-loop-item
+              vector_store_id:
+                componentInputParameter: pipelinechannel--create-vector-store-Output
+          taskInfo:
+            name: convert-and-upload-spreadsheets-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-spreadsheet-files-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--create-vector-store-Output:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+  comp-condition-branches-2:
+    dag:
+      tasks:
+        condition-3:
+          componentRef:
+            name: comp-condition-3
+          inputs:
+            artifacts:
+              pipelinechannel--import-spreadsheet-files-output_path:
+                componentInputArtifact: pipelinechannel--import-spreadsheet-files-output_path
+            parameters:
+              pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-spreadsheet-splits-Output-loop-item
+              pipelinechannel--create-vector-store-Output:
+                componentInputParameter: pipelinechannel--create-vector-store-Output
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+          taskInfo:
+            name: condition-3
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--use_gpu'] == true
+        condition-4:
+          componentRef:
+            name: comp-condition-4
+          inputs:
+            artifacts:
+              pipelinechannel--import-spreadsheet-files-output_path:
+                componentInputArtifact: pipelinechannel--import-spreadsheet-files-output_path
+            parameters:
+              pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-spreadsheet-splits-Output-loop-item
+              pipelinechannel--create-vector-store-Output:
+                componentInputParameter: pipelinechannel--create-vector-store-Output
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+          taskInfo:
+            name: condition-4
+          triggerPolicy:
+            condition: '!(inputs.parameter_values[''pipelinechannel--use_gpu''] ==
+              true)'
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-spreadsheet-files-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--create-vector-store-Output:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+  comp-convert-and-upload-spreadsheets:
+    executorLabel: exec-convert-and-upload-spreadsheets
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        service_url:
+          parameterType: STRING
+        spreadsheet_split:
+          parameterType: LIST
+        vector_store_id:
+          parameterType: STRING
+  comp-convert-and-upload-spreadsheets-2:
+    executorLabel: exec-convert-and-upload-spreadsheets-2
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        service_url:
+          parameterType: STRING
+        spreadsheet_split:
+          parameterType: LIST
+        vector_store_id:
+          parameterType: STRING
+  comp-create-spreadsheet-splits:
+    executorLabel: exec-create-spreadsheet-splits
+    inputDefinitions:
+      artifacts:
+        input_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        num_splits:
+          parameterType: NUMBER_INTEGER
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: LIST
+  comp-create-vector-store:
+    executorLabel: exec-create-vector-store
+    inputDefinitions:
+      parameters:
+        chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        embedding_model_id:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        service_url:
+          parameterType: STRING
+        vector_store_name:
+          parameterType: STRING
+    outputDefinitions:
+      parameters:
+        Output:
+          parameterType: STRING
+  comp-for-loop-1:
+    dag:
+      tasks:
+        condition-branches-2:
+          componentRef:
+            name: comp-condition-branches-2
+          inputs:
+            artifacts:
+              pipelinechannel--import-spreadsheet-files-output_path:
+                componentInputArtifact: pipelinechannel--import-spreadsheet-files-output_path
+            parameters:
+              pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+                componentInputParameter: pipelinechannel--create-spreadsheet-splits-Output-loop-item
+              pipelinechannel--create-vector-store-Output:
+                componentInputParameter: pipelinechannel--create-vector-store-Output
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+          taskInfo:
+            name: condition-branches-2
+    inputDefinitions:
+      artifacts:
+        pipelinechannel--import-spreadsheet-files-output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+      parameters:
+        pipelinechannel--create-spreadsheet-splits-Output:
+          parameterType: LIST
+        pipelinechannel--create-spreadsheet-splits-Output-loop-item:
+          parameterType: LIST
+        pipelinechannel--create-vector-store-Output:
+          parameterType: STRING
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+  comp-import-spreadsheet-files:
+    executorLabel: exec-import-spreadsheet-files
+    inputDefinitions:
+      parameters:
+        base_url:
+          parameterType: STRING
+        spreadsheet_filenames:
+          parameterType: STRING
+    outputDefinitions:
+      artifacts:
+        output_path:
+          artifactType:
+            schemaTitle: system.Artifact
+            schemaVersion: 0.0.1
+deploymentSpec:
+  executors:
+    exec-convert-and-upload-spreadsheets:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - convert_and_upload_spreadsheets
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
+          \ 'pandas>=2.3.0' 'openpyxl>=3.1.5'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.15.2' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef convert_and_upload_spreadsheets(\n    input_path: dsl.InputPath(\"\
+          input-spreadsheets\"),\n    spreadsheet_split: List[str],\n    service_url:\
+          \ str,\n    vector_store_id: str,\n):\n    import io\n    import logging\n\
+          \    import pathlib\n    import shutil\n    import tempfile\n\n    import\
+          \ pandas as pd\n    from llama_stack_client import LlamaStackClient\n\n\
+          \    _log = logging.getLogger(__name__)\n\n    local_processing_dir = pathlib.Path(tempfile.mkdtemp(prefix=\"\
+          spreadsheets-\"))\n    _log.info(f\"Local processing directory: {local_processing_dir}\"\
+          )\n\n    def convert_excel_to_csv(\n        input_spreadsheet_files: List[pathlib.Path],\
+          \ output_path: pathlib.Path\n    ) -> List[pathlib.Path]:\n        processed_csv_files\
+          \ = []\n\n        for file_path in input_spreadsheet_files:\n          \
+          \  if not file_path.exists():\n                _log.info(f\"Skipping missing\
+          \ file: {file_path}\")\n                continue\n\n            if file_path.suffix.lower()\
+          \ == \".csv\":\n                new_path = output_path / file_path.name\n\
+          \                try:\n                    df = pd.read_csv(file_path, compression=\"\
+          infer\", engine=\"python\")\n                    _log.info(f\"Read {file_path.name}\
+          \ as a standard CSV.\")\n\n                except (UnicodeDecodeError, EOFError):\n\
+          \                    _log.warning(\n                        f\"Standard\
+          \ read failed for {file_path.name}. Attempting gzip decompression.\"\n \
+          \                   )\n                    try:\n                      \
+          \  # Second, try reading it again, but force gzip decompression.\n     \
+          \                   df = pd.read_csv(file_path, compression=\"gzip\", engine=\"\
+          python\")\n                        _log.info(\n                        \
+          \    f\"Successfully read {file_path.name} with forced gzip.\"\n       \
+          \                 )\n                    except Exception as e:\n      \
+          \                  _log.error(\n                            f\"Could not\
+          \ read {file_path.name} with any method. Error: {e}\"\n                \
+          \        )\n                        continue\n\n                df.to_csv(new_path,\
+          \ index=False)\n                processed_csv_files.append(new_path)\n\n\
+          \            elif file_path.suffix.lower() in [\".xlsx\", \".xls\", \".xlsm\"\
+          ]:\n                _log.info(f\"Converting {file_path.name} to CSV format...\"\
+          )\n                try:\n                    excel_sheets = pd.read_excel(file_path,\
+          \ sheet_name=None)\n                    for sheet_name, df in excel_sheets.items():\n\
+          \                        new_csv_filename = f\"{file_path.stem}_{sheet_name}.csv\"\
+          \n                        new_csv_path = output_path / new_csv_filename\n\
+          \                        df.to_csv(new_csv_path, index=False, header=True)\n\
+          \                        processed_csv_files.append(new_csv_path)\n    \
+          \                    _log.info(\n                            f\"Converted\
+          \ sheet '{sheet_name}' to '{new_csv_path.name}'\"\n                    \
+          \    )\n                except Exception as e:\n                    _log.error(f\"\
+          Excel conversion failed for {file_path.name}: {e}\")\n                 \
+          \   continue\n            else:\n                _log.info(f\"Skipping unsupported\
+          \ file type: {file_path.name}\")\n\n        return processed_csv_files\n\
+          \n    input_path = pathlib.Path(input_path)\n    input_spreadsheets_files\
+          \ = [input_path / name for name in spreadsheet_split]\n    csv_files = convert_excel_to_csv(input_spreadsheets_files,\
+          \ local_processing_dir)\n    _log.info(f\"CSV files to upload: {[p.name\
+          \ for p in csv_files]}\")\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \    processed = 0\n\n    for csv_path in csv_files:\n        content =\
+          \ csv_path.read_text(encoding=\"utf-8\", errors=\"replace\")\n        file\
+          \ = client.files.create(\n            file=(csv_path.name, io.BytesIO(content.encode(\"\
+          utf-8\")), \"text/csv\"),\n            purpose=\"assistants\",\n       \
+          \ )\n        client.vector_stores.files.create(\n            vector_store_id=vector_store_id,\n\
+          \            file_id=file.id,\n        )\n        _log.info(\n         \
+          \   f\"Uploaded {csv_path.name} (file_id={file.id}) and added to vector\
+          \ store\"\n        )\n        processed += 1\n\n    _log.info(f\"Processed\
+          \ {processed} files; added to vector store {vector_store_id}\")\n    shutil.rmtree(local_processing_dir)\n\
+          \n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+        resources:
+          accelerator:
+            count: '1'
+            resourceCount: '1'
+            resourceType: nvidia.com/gpu
+            type: nvidia.com/gpu
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+    exec-convert-and-upload-spreadsheets-2:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - convert_and_upload_spreadsheets
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
+          \ 'pandas>=2.3.0' 'openpyxl>=3.1.5'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.15.2' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef convert_and_upload_spreadsheets(\n    input_path: dsl.InputPath(\"\
+          input-spreadsheets\"),\n    spreadsheet_split: List[str],\n    service_url:\
+          \ str,\n    vector_store_id: str,\n):\n    import io\n    import logging\n\
+          \    import pathlib\n    import shutil\n    import tempfile\n\n    import\
+          \ pandas as pd\n    from llama_stack_client import LlamaStackClient\n\n\
+          \    _log = logging.getLogger(__name__)\n\n    local_processing_dir = pathlib.Path(tempfile.mkdtemp(prefix=\"\
+          spreadsheets-\"))\n    _log.info(f\"Local processing directory: {local_processing_dir}\"\
+          )\n\n    def convert_excel_to_csv(\n        input_spreadsheet_files: List[pathlib.Path],\
+          \ output_path: pathlib.Path\n    ) -> List[pathlib.Path]:\n        processed_csv_files\
+          \ = []\n\n        for file_path in input_spreadsheet_files:\n          \
+          \  if not file_path.exists():\n                _log.info(f\"Skipping missing\
+          \ file: {file_path}\")\n                continue\n\n            if file_path.suffix.lower()\
+          \ == \".csv\":\n                new_path = output_path / file_path.name\n\
+          \                try:\n                    df = pd.read_csv(file_path, compression=\"\
+          infer\", engine=\"python\")\n                    _log.info(f\"Read {file_path.name}\
+          \ as a standard CSV.\")\n\n                except (UnicodeDecodeError, EOFError):\n\
+          \                    _log.warning(\n                        f\"Standard\
+          \ read failed for {file_path.name}. Attempting gzip decompression.\"\n \
+          \                   )\n                    try:\n                      \
+          \  # Second, try reading it again, but force gzip decompression.\n     \
+          \                   df = pd.read_csv(file_path, compression=\"gzip\", engine=\"\
+          python\")\n                        _log.info(\n                        \
+          \    f\"Successfully read {file_path.name} with forced gzip.\"\n       \
+          \                 )\n                    except Exception as e:\n      \
+          \                  _log.error(\n                            f\"Could not\
+          \ read {file_path.name} with any method. Error: {e}\"\n                \
+          \        )\n                        continue\n\n                df.to_csv(new_path,\
+          \ index=False)\n                processed_csv_files.append(new_path)\n\n\
+          \            elif file_path.suffix.lower() in [\".xlsx\", \".xls\", \".xlsm\"\
+          ]:\n                _log.info(f\"Converting {file_path.name} to CSV format...\"\
+          )\n                try:\n                    excel_sheets = pd.read_excel(file_path,\
+          \ sheet_name=None)\n                    for sheet_name, df in excel_sheets.items():\n\
+          \                        new_csv_filename = f\"{file_path.stem}_{sheet_name}.csv\"\
+          \n                        new_csv_path = output_path / new_csv_filename\n\
+          \                        df.to_csv(new_csv_path, index=False, header=True)\n\
+          \                        processed_csv_files.append(new_csv_path)\n    \
+          \                    _log.info(\n                            f\"Converted\
+          \ sheet '{sheet_name}' to '{new_csv_path.name}'\"\n                    \
+          \    )\n                except Exception as e:\n                    _log.error(f\"\
+          Excel conversion failed for {file_path.name}: {e}\")\n                 \
+          \   continue\n            else:\n                _log.info(f\"Skipping unsupported\
+          \ file type: {file_path.name}\")\n\n        return processed_csv_files\n\
+          \n    input_path = pathlib.Path(input_path)\n    input_spreadsheets_files\
+          \ = [input_path / name for name in spreadsheet_split]\n    csv_files = convert_excel_to_csv(input_spreadsheets_files,\
+          \ local_processing_dir)\n    _log.info(f\"CSV files to upload: {[p.name\
+          \ for p in csv_files]}\")\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \    processed = 0\n\n    for csv_path in csv_files:\n        content =\
+          \ csv_path.read_text(encoding=\"utf-8\", errors=\"replace\")\n        file\
+          \ = client.files.create(\n            file=(csv_path.name, io.BytesIO(content.encode(\"\
+          utf-8\")), \"text/csv\"),\n            purpose=\"assistants\",\n       \
+          \ )\n        client.vector_stores.files.create(\n            vector_store_id=vector_store_id,\n\
+          \            file_id=file.id,\n        )\n        _log.info(\n         \
+          \   f\"Uploaded {csv_path.name} (file_id={file.id}) and added to vector\
+          \ store\"\n        )\n        processed += 1\n\n    _log.info(f\"Processed\
+          \ {processed} files; added to vector store {vector_store_id}\")\n    shutil.rmtree(local_processing_dir)\n\
+          \n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+        resources:
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+    exec-create-spreadsheet-splits:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - create_spreadsheet_splits
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.15.2'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef create_spreadsheet_splits(\n    input_path: dsl.InputPath(\"\
+          input-spreadsheets\"),\n    num_splits: int,\n) -> List[List[str]]:\n  \
+          \  import pathlib\n\n    # Split our entire directory of spreadsheet files\
+          \ into n batches, where n == num_splits\n    # Support common formats\n\
+          \    spreadsheet_extensions = [\"*.csv\", \"*.xlsx\", \"*.xls\", \"*.xlsm\"\
+          ]\n    all_spreadsheets = []\n\n    input_dir = pathlib.Path(input_path)\n\
+          \    for ext in spreadsheet_extensions:\n        all_spreadsheets.extend([path.name\
+          \ for path in input_dir.glob(ext)])\n\n    splits = [\n        batch\n \
+          \       for batch in (all_spreadsheets[i::num_splits] for i in range(num_splits))\n\
+          \        if batch\n    ]\n    return splits or [[]]\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+    exec-create-vector-store:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - create_vector_store
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
+          \ 'fire' 'requests'  &&  python3 -m pip install --quiet --no-warn-script-location\
+          \ 'kfp==2.15.2' '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"\
+          3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef create_vector_store(\n    service_url: str,\n    vector_store_name:\
+          \ str,\n    embedding_model_id: str,\n    max_tokens: int,\n    chunk_overlap_tokens:\
+          \ int,\n) -> str:\n    \"\"\"Create an empty vector store for file_search\
+          \ (Responses API). Returns vector_store.id.\"\"\"\n    from llama_stack_client\
+          \ import LlamaStackClient\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    models = client.models.list()\n    matching_model = next((m for m\
+          \ in models if m.id == embedding_model_id), None)\n\n    if not matching_model:\n\
+          \        available = [m.id for m in models]\n        raise ValueError(\n\
+          \            f\"Model '{embedding_model_id}' not found. Available: {available}\"\
+          \n        )\n\n    model_type = (\n        matching_model.custom_metadata.get(\"\
+          model_type\")\n        if matching_model.custom_metadata\n        else None\n\
+          \    )\n    if model_type != \"embedding\":\n        raise ValueError(\n\
+          \            f\"Model '{embedding_model_id}' is not an embedding model (type={model_type})\"\
+          \n        )\n\n    embedding_dimension = int(\n        float(matching_model.custom_metadata.get(\"\
+          embedding_dimension\"))\n    )\n\n    # Warm up the embedding model\n  \
+          \  client.embeddings.create(\n        model=embedding_model_id,\n      \
+          \  input=\"warmup\",\n    )\n\n    vector_store = client.vector_stores.create(\n\
+          \        name=vector_store_name,\n        file_ids=[],\n        chunking_strategy={\n\
+          \            \"type\": \"static\",\n            \"static\": {\n        \
+          \        \"max_chunk_size_tokens\": max_tokens,\n                \"chunk_overlap_tokens\"\
+          : chunk_overlap_tokens,\n            },\n        },\n        extra_body={\n\
+          \            \"embedding_model\": embedding_model_id,\n            \"embedding_dimension\"\
+          : embedding_dimension,\n            \"provider_id\": \"milvus\",\n     \
+          \   },\n    )\n    print(f\"Created vector store '{vector_store_name}' (id={vector_store.id})\"\
+          )\n    return vector_store.id\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+    exec-import-spreadsheet-files:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - import_spreadsheet_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'requests'  &&\
+          \  python3 -m pip install --quiet --no-warn-script-location 'kfp==2.15.2'\
+          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
+          $0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef import_spreadsheet_files(\n    base_url: str,\n    spreadsheet_filenames:\
+          \ str,\n    output_path: dsl.OutputPath(\"input-spreadsheets\"),\n):\n \
+          \   import os\n    import requests\n    import shutil\n\n    os.makedirs(output_path,\
+          \ exist_ok=True)\n    filenames = [f.strip() for f in spreadsheet_filenames.split(\"\
+          ,\") if f.strip()]\n\n    for filename in filenames:\n        url = f\"\
+          {base_url.rstrip('/')}/{filename}\"\n        file_path = os.path.join(output_path,\
+          \ filename)\n\n        try:\n            with requests.get(url, stream=True,\
+          \ timeout=30) as response:\n                response.raise_for_status()\n\
+          \                with open(file_path, \"wb\") as f:\n                  \
+          \  shutil.copyfileobj(response.raw, f)\n            print(f\"Downloaded\
+          \ {filename}\")\n        except requests.exceptions.RequestException as\
+          \ e:\n            print(f\"Failed to download {filename}: {e}, skipping.\"\
+          )\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+pipelineInfo:
+  description: Converts spreadsheets (Excel to CSV with pandas) and uploads each as
+    a file to a vector store for the Responses API
+  name: spreadsheet-convert-pipeline
+root:
+  dag:
+    tasks:
+      create-spreadsheet-splits:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-create-spreadsheet-splits
+        dependentTasks:
+        - import-spreadsheet-files
+        inputs:
+          artifacts:
+            input_path:
+              taskOutputArtifact:
+                outputArtifactKey: output_path
+                producerTask: import-spreadsheet-files
+          parameters:
+            num_splits:
+              componentInputParameter: num_workers
+        taskInfo:
+          name: create-spreadsheet-splits
+      create-vector-store:
+        cachingOptions: {}
+        componentRef:
+          name: comp-create-vector-store
+        inputs:
+          parameters:
+            chunk_overlap_tokens:
+              componentInputParameter: chunk_overlap_tokens
+            embedding_model_id:
+              componentInputParameter: embedding_model_id
+            max_tokens:
+              componentInputParameter: max_tokens
+            service_url:
+              componentInputParameter: service_url
+            vector_store_name:
+              componentInputParameter: vector_store_name
+        taskInfo:
+          name: create-vector-store
+      for-loop-1:
+        componentRef:
+          name: comp-for-loop-1
+        dependentTasks:
+        - create-spreadsheet-splits
+        - create-vector-store
+        - import-spreadsheet-files
+        inputs:
+          artifacts:
+            pipelinechannel--import-spreadsheet-files-output_path:
+              taskOutputArtifact:
+                outputArtifactKey: output_path
+                producerTask: import-spreadsheet-files
+          parameters:
+            pipelinechannel--create-spreadsheet-splits-Output:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-spreadsheet-splits
+            pipelinechannel--create-vector-store-Output:
+              taskOutputParameter:
+                outputParameterKey: Output
+                producerTask: create-vector-store
+            pipelinechannel--service_url:
+              componentInputParameter: service_url
+            pipelinechannel--use_gpu:
+              componentInputParameter: use_gpu
+        parameterIterator:
+          itemInput: pipelinechannel--create-spreadsheet-splits-Output-loop-item
+          items:
+            inputParameter: pipelinechannel--create-spreadsheet-splits-Output
+        taskInfo:
+          name: for-loop-1
+      import-spreadsheet-files:
+        cachingOptions:
+          enableCache: true
+        componentRef:
+          name: comp-import-spreadsheet-files
+        inputs:
+          parameters:
+            base_url:
+              componentInputParameter: base_url
+            spreadsheet_filenames:
+              componentInputParameter: spreadsheet_filenames
+        taskInfo:
+          name: import-spreadsheet-files
+  inputDefinitions:
+    parameters:
+      base_url:
+        defaultValue: https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/spreadsheets
+        description: Base URL to fetch spreadsheets
+        isOptional: true
+        parameterType: STRING
+      chunk_overlap_tokens:
+        defaultValue: 64.0
+        description: Chunk overlap in tokens
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      embedding_model_id:
+        defaultValue: sentence-transformers/ibm-granite/granite-embedding-125m-english
+        description: Model ID for embedding generation
+        isOptional: true
+        parameterType: STRING
+      max_tokens:
+        defaultValue: 512.0
+        description: Maximum number of tokens per chunk
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      num_workers:
+        defaultValue: 1.0
+        description: Number of parallel workers
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      service_url:
+        defaultValue: http://lsd-milvus-service:8321
+        description: URL of the LlamaStack service
+        isOptional: true
+        parameterType: STRING
+      spreadsheet_filenames:
+        defaultValue: people.xlsx, sample_sales_data.xlsm, test_customers.csv
+        description: Comma-separated list of spreadsheets filenames to download and
+          convert
+        isOptional: true
+        parameterType: STRING
+      use_gpu:
+        defaultValue: false
+        description: boolean to enable/disable gpu for the convert workers
+        isOptional: true
+        parameterType: BOOLEAN
+      vector_store_name:
+        defaultValue: csv-vector-store
+        description: Name of the vector store
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.15.2
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-convert-and-upload-spreadsheets:
+          nodeSelector:
+            nodeSelectorJson:
+              runtimeValue:
+                constant: {}
+          tolerations:
+          - effect: NoSchedule
+            key: nvidia.com/gpu
+            operator: Exists

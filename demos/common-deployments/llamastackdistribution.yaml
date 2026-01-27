@@ -11,6 +11,12 @@ spec:
           value: qwen3-14b-awq
         - name: VLLM_URL
           value: 'http://qwen3-14b-awq-predictor:8080/v1'
+        - name: POSTGRES_HOST
+          value: postgres-svc
+        - name: ENABLE_SENTENCE_TRANSFORMERS
+          value: 'true'
+        - name: EMBEDDING_PROVIDER
+          value: 'sentence-transformers'
       name: llama-stack
       port: 8321
     distribution:
@@ -22,3 +28,10 @@ spec:
       volumes:
         - emptyDir: {}
           name: llama-storage
+    userConfig:
+      configMapName: llama-stack-config
+  network:
+    exposeRoute: false
+    allowedFrom:
+      namespaces:
+        - "*"
