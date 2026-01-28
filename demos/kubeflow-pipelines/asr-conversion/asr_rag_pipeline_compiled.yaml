@@ -5,7 +5,7 @@
 #    audio_filenames: str [Default: 'RAG_use_cases.wav, RAG_customers.wav, RAG_benefits.m4a, RAG_vs_Regular_LLM_Output.m4a']
 #    base_url: str [Default: 'https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/audio-speech']
 #    chunk_overlap_tokens: int [Default: 64.0]
-#    embedding_model_id: str [Default: 'ibm-granite/granite-embedding-125m-english']
+#    embedding_model_id: str [Default: 'sentence-transformers/ibm-granite/granite-embedding-125m-english']
 #    max_tokens: int [Default: 512.0]
 #    service_url: str [Default: 'http://lsd-milvus-service:8321']
 #    use_gpu: bool [Default: False]
@@ -219,7 +219,7 @@ deploymentSpec:
         - -c
         - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
-          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.3.0'\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
           \ 'fire' 'requests' 'openai-whisper'  &&  python3 -m pip install --quiet\
           \ --no-warn-script-location 'kfp==2.14.3' '--no-deps' 'typing-extensions>=3.7.4,<5;\
           \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
@@ -246,10 +246,9 @@ deploymentSpec:
           \ stat\n            import pathlib\n            import shutil\n\n      \
           \      # Create temp directory\n            temp_dir = pathlib.Path(\"/tmp/ffmpeg_install\"\
           )\n            temp_dir.mkdir(exist_ok=True)\n\n            # Download static\
-          \ ffmpeg binary using pinned build version.\n            # Build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2025-12-01-12-56\n\
-          \            build_id = \"autobuild-2025-12-01-12-56\"\n            artifact\
-          \ = \"ffmpeg-N-121951-g7043522fe0-linux64-gpl.tar.xz\"\n            ffmpeg_url\
-          \ = f\"https://github.com/BtbN/FFmpeg-Builds/releases/download/{build_id}/{artifact}\"\
+          \ ffmpeg binary using pinned build version.\n            # Build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/latest\n\
+          \            build_id = \"latest\"\n            artifact = \"ffmpeg-n7.1-latest-linux64-gpl-7.1.tar.xz\"\
+          \n            ffmpeg_url = f\"https://github.com/BtbN/FFmpeg-Builds/releases/download/{build_id}/{artifact}\"\
           \n            ffmpeg_archive = temp_dir / \"ffmpeg-static.tar.xz\"\n\n \
           \           print(f\"Downloading ffmpeg from {ffmpeg_url}\")\n         \
           \   urllib.request.urlretrieve(ffmpeg_url, ffmpeg_archive)\n\n         \
@@ -305,13 +304,16 @@ deploymentSpec:
           \ process {filename.strip()}: {str(e)}\")\n            raise\n\n    print(\n\
           \        f\"Successfully processed and uploaded {len(file_ids)} transcripts:\
           \ {file_ids}\"\n    )\n\n    models = client.models.list()\n    matching_model\
-          \ = next(\n        (m for m in models if m.provider_resource_id == embedding_model_id),\
-          \ None\n    )\n\n    if not matching_model:\n        raise ValueError(\n\
-          \            f\"Model with ID '{embedding_model_id}' not found on LlamaStack\
-          \ server.\"\n        )\n\n    if matching_model.api_model_type != \"embedding\"\
-          :\n        raise ValueError(f\"Model '{embedding_model_id}' is not an embedding\
-          \ model\")\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
-          ]\n\n    # Warm up the embedding model\n    client.embeddings.create(\n\
+          \ = next((m for m in models if m.id == embedding_model_id), None)\n\n  \
+          \  if not matching_model:\n        available = [m.id for m in models]\n\
+          \        raise ValueError(\n            f\"Model '{embedding_model_id}'\
+          \ not found. Available: {available}\"\n        )\n\n    model_type = (\n\
+          \        matching_model.custom_metadata.get(\"model_type\")\n        if\
+          \ matching_model.custom_metadata\n        else None\n    )\n    if model_type\
+          \ != \"embedding\":\n        raise ValueError(\n            f\"Model '{embedding_model_id}'\
+          \ is not an embedding model (type={model_type})\"\n        )\n\n    embedding_dimension\
+          \ = int(\n        float(matching_model.custom_metadata.get(\"embedding_dimension\"\
+          ))\n    )\n\n    # Warm up the embedding model\n    client.embeddings.create(\n\
           \        model=embedding_model_id,\n        input=\"warmup\",\n    )\n\n\
           \    # Create empty vector store first, before inserting files.\n    # Purpose:\
           \ Depending on the size and number of files, attempting to create the vector\
@@ -362,7 +364,7 @@ deploymentSpec:
         - -c
         - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
           \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
-          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.3.0'\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
           \ 'fire' 'requests' 'openai-whisper'  &&  python3 -m pip install --quiet\
           \ --no-warn-script-location 'kfp==2.14.3' '--no-deps' 'typing-extensions>=3.7.4,<5;\
           \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
@@ -389,10 +391,9 @@ deploymentSpec:
           \ stat\n            import pathlib\n            import shutil\n\n      \
           \      # Create temp directory\n            temp_dir = pathlib.Path(\"/tmp/ffmpeg_install\"\
           )\n            temp_dir.mkdir(exist_ok=True)\n\n            # Download static\
-          \ ffmpeg binary using pinned build version.\n            # Build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2025-12-01-12-56\n\
-          \            build_id = \"autobuild-2025-12-01-12-56\"\n            artifact\
-          \ = \"ffmpeg-N-121951-g7043522fe0-linux64-gpl.tar.xz\"\n            ffmpeg_url\
-          \ = f\"https://github.com/BtbN/FFmpeg-Builds/releases/download/{build_id}/{artifact}\"\
+          \ ffmpeg binary using pinned build version.\n            # Build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/latest\n\
+          \            build_id = \"latest\"\n            artifact = \"ffmpeg-n7.1-latest-linux64-gpl-7.1.tar.xz\"\
+          \n            ffmpeg_url = f\"https://github.com/BtbN/FFmpeg-Builds/releases/download/{build_id}/{artifact}\"\
           \n            ffmpeg_archive = temp_dir / \"ffmpeg-static.tar.xz\"\n\n \
           \           print(f\"Downloading ffmpeg from {ffmpeg_url}\")\n         \
           \   urllib.request.urlretrieve(ffmpeg_url, ffmpeg_archive)\n\n         \
@@ -448,13 +449,16 @@ deploymentSpec:
           \ process {filename.strip()}: {str(e)}\")\n            raise\n\n    print(\n\
           \        f\"Successfully processed and uploaded {len(file_ids)} transcripts:\
           \ {file_ids}\"\n    )\n\n    models = client.models.list()\n    matching_model\
-          \ = next(\n        (m for m in models if m.provider_resource_id == embedding_model_id),\
-          \ None\n    )\n\n    if not matching_model:\n        raise ValueError(\n\
-          \            f\"Model with ID '{embedding_model_id}' not found on LlamaStack\
-          \ server.\"\n        )\n\n    if matching_model.api_model_type != \"embedding\"\
-          :\n        raise ValueError(f\"Model '{embedding_model_id}' is not an embedding\
-          \ model\")\n\n    embedding_dimension = matching_model.metadata[\"embedding_dimension\"\
-          ]\n\n    # Warm up the embedding model\n    client.embeddings.create(\n\
+          \ = next((m for m in models if m.id == embedding_model_id), None)\n\n  \
+          \  if not matching_model:\n        available = [m.id for m in models]\n\
+          \        raise ValueError(\n            f\"Model '{embedding_model_id}'\
+          \ not found. Available: {available}\"\n        )\n\n    model_type = (\n\
+          \        matching_model.custom_metadata.get(\"model_type\")\n        if\
+          \ matching_model.custom_metadata\n        else None\n    )\n    if model_type\
+          \ != \"embedding\":\n        raise ValueError(\n            f\"Model '{embedding_model_id}'\
+          \ is not an embedding model (type={model_type})\"\n        )\n\n    embedding_dimension\
+          \ = int(\n        float(matching_model.custom_metadata.get(\"embedding_dimension\"\
+          ))\n    )\n\n    # Warm up the embedding model\n    client.embeddings.create(\n\
           \        model=embedding_model_id,\n        input=\"warmup\",\n    )\n\n\
           \    # Create empty vector store first, before inserting files.\n    # Purpose:\
           \ Depending on the size and number of files, attempting to create the vector\
@@ -534,7 +538,7 @@ root:
         isOptional: true
         parameterType: NUMBER_INTEGER
       embedding_model_id:
-        defaultValue: ibm-granite/granite-embedding-125m-english
+        defaultValue: sentence-transformers/ibm-granite/granite-embedding-125m-english
         description: Model ID for embedding generation
         isOptional: true
         parameterType: STRING
