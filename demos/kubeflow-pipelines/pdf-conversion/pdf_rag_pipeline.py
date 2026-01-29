@@ -26,7 +26,7 @@ PYTORCH_CUDA_IMAGE = "quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py312-ubi9@
 
 @dsl.component(
     base_image=PYTORCH_CUDA_IMAGE,
-    packages_to_install=["llama-stack-client", "fire", "requests"],
+    packages_to_install=["llama-stack-client==0.4.2", "fire", "requests"],
 )
 def register_vector_store_and_files(
     service_url: str,
@@ -72,19 +72,27 @@ def register_vector_store_and_files(
     print(f"Successfully uploaded {len(file_ids)} files: {file_ids}")
 
     models = client.models.list()
-    matching_model = next(
-        (m for m in models if m.provider_resource_id == embedding_model_id), None
-    )
+    matching_model = next((m for m in models if m.id == embedding_model_id), None)
 
     if not matching_model:
+        available = [m.id for m in models]
         raise ValueError(
-            f"Model with ID '{embedding_model_id}' not found on LlamaStack server."
+            f"Model '{embedding_model_id}' not found. Available: {available}"
         )
 
-    if matching_model.api_model_type != "embedding":
-        raise ValueError(f"Model '{embedding_model_id}' is not an embedding model")
+    model_type = (
+        matching_model.custom_metadata.get("model_type")
+        if matching_model.custom_metadata
+        else None
+    )
+    if model_type != "embedding":
+        raise ValueError(
+            f"Model '{embedding_model_id}' is not an embedding model (type={model_type})"
+        )
 
-    embedding_dimension = matching_model.metadata["embedding_dimension"]
+    embedding_dimension = int(
+        float(matching_model.custom_metadata.get("embedding_dimension"))
+    )
 
     # Warm up the embedding model
     client.embeddings.create(
@@ -139,7 +147,7 @@ def vector_store_files_pipeline(
     pdf_filenames: str = "2203.01017v2.pdf, 2206.01062.pdf, 2305.03393v1-pg9.pdf, amt_handbook_sample.pdf, code_and_formula.pdf, multi_page.pdf, picture_classification.pdf, redp5110_sampled.pdf, right_to_left_01.pdf, right_to_left_02.pdf, right_to_left_03.pdf",
     vector_store_name: str = "pdf-vector-store",
     service_url: str = "http://lsd-milvus-service:8321",
-    embedding_model_id: str = "ibm-granite/granite-embedding-125m-english",
+    embedding_model_id: str = "sentence-transformers/ibm-granite/granite-embedding-125m-english",
     max_tokens: int = 512,
     chunk_overlap_tokens: int = 64,
     use_gpu: bool = False,

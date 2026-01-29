@@ -28,7 +28,7 @@ PYTORCH_CUDA_IMAGE = "quay.io/modh/odh-pipeline-runtime-pytorch-cuda-py312-ubi9@
 @dsl.component(
     base_image=PYTORCH_CUDA_IMAGE,
     packages_to_install=[
-        "llama-stack-client==0.3.0",
+        "llama-stack-client==0.4.2",
         "fire",
         "requests",
         "openai-whisper",
@@ -68,9 +68,9 @@ def register_vector_store_and_files(
             temp_dir.mkdir(exist_ok=True)
 
             # Download static ffmpeg binary using pinned build version.
-            # Build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/autobuild-2025-12-01-12-56
-            build_id = "autobuild-2025-12-01-12-56"
-            artifact = "ffmpeg-N-121951-g7043522fe0-linux64-gpl.tar.xz"
+            # Build: https://github.com/BtbN/FFmpeg-Builds/releases/tag/latest
+            build_id = "latest"
+            artifact = "ffmpeg-n7.1-latest-linux64-gpl-7.1.tar.xz"
             ffmpeg_url = f"https://github.com/BtbN/FFmpeg-Builds/releases/download/{build_id}/{artifact}"
             ffmpeg_archive = temp_dir / "ffmpeg-static.tar.xz"
 
@@ -181,19 +181,27 @@ def register_vector_store_and_files(
     )
 
     models = client.models.list()
-    matching_model = next(
-        (m for m in models if m.provider_resource_id == embedding_model_id), None
-    )
+    matching_model = next((m for m in models if m.id == embedding_model_id), None)
 
     if not matching_model:
+        available = [m.id for m in models]
         raise ValueError(
-            f"Model with ID '{embedding_model_id}' not found on LlamaStack server."
+            f"Model '{embedding_model_id}' not found. Available: {available}"
         )
 
-    if matching_model.api_model_type != "embedding":
-        raise ValueError(f"Model '{embedding_model_id}' is not an embedding model")
+    model_type = (
+        matching_model.custom_metadata.get("model_type")
+        if matching_model.custom_metadata
+        else None
+    )
+    if model_type != "embedding":
+        raise ValueError(
+            f"Model '{embedding_model_id}' is not an embedding model (type={model_type})"
+        )
 
-    embedding_dimension = matching_model.metadata["embedding_dimension"]
+    embedding_dimension = int(
+        float(matching_model.custom_metadata.get("embedding_dimension"))
+    )
 
     # Warm up the embedding model
     client.embeddings.create(
@@ -248,7 +256,7 @@ def vector_store_files_pipeline(
     audio_filenames: str = "RAG_use_cases.wav, RAG_customers.wav, RAG_benefits.m4a, RAG_vs_Regular_LLM_Output.m4a",
     vector_store_name: str = "asr-vector-store",
     service_url: str = "http://lsd-milvus-service:8321",
-    embedding_model_id: str = "ibm-granite/granite-embedding-125m-english",
+    embedding_model_id: str = "sentence-transformers/ibm-granite/granite-embedding-125m-english",
     max_tokens: int = 512,
     chunk_overlap_tokens: int = 64,
     use_gpu: bool = False,  # use only if you have additional gpu worker

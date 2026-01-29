@@ -1,8 +1,7 @@
 langchain-groq
 langchain-huggingface
 langchain-together
-llama-stack==0.3.0
-llama_stack_client==0.3.0
+llama-stack-client==0.4.2
 pandas==2.3.0
 ragas==0.2.15
 RapidFuzz==3.13.0
