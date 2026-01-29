@@ -77,9 +77,9 @@ The pipeline enables rich RAG applications that can answer questions about sprea
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Red Hat OpenShift AI v3.0+
+- Red Hat OpenShift AI v3.3+
 - Data science project created with a configured pipeline server and workbench with Python 3.12.
-- LlamaStack Operator enabled in the DSC resource. See [Working with Llama Stack](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.0/html/working_with_llama_stack/index).
+- LlamaStack Operator enabled in the DSC resource. See [Working with Llama Stack](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/working_with_llama_stack/index).
 - LlamaStackDistribution deployed and configured with the `qwen3-14b-awq` instruct model:
     - See [common-deployments](../../common-deployments). Deploy the components in this order: first apply `postgres-deployment.yaml` and `llama-stack-config.yaml`, then apply `qwen3-14b-awq-deployment.yaml` and wait for it to be ready, and finally apply `llamastackdistribution.yaml`.
     - Alternatively, you can use your own instruct model.

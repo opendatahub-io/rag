@@ -1,626 +1,86 @@
-# Docling OCR Image Conversion Pipeline for RAG
+# Kubeflow OCR Image Conversion Pipeline for RAG
+
+This document explains the **Kubeflow OCR (Optical Character Recognition) Image Conversion Pipeline** - a Kubeflow pipeline that processes images using OCR with Tesseract to extract text and generate embeddings for Retrieval-Augmented Generation (RAG) applications. The pipeline supports execution on both GPU and CPU-only nodes.
+
+> Note: This demo was tested using the default KServe behavior on OpenShift AI (`Headless` RawDeployment). If you are using `Headed` mode, change the `VLLM_URL` port to `80` in the [llamastackdistribution.yaml](../../common-deployments/llamastackdistribution.yaml).
 
 
-
-
-
-
-
-
-
-
-
-This document explains the **Docling OCR (Optical Character Recognition) Image Conversion Pipeline** - a Kubeflow pipeline that processes images using OCR with Docling to extract text and generate embeddings for Retrieval-Augmented Generation (RAG) applications. The pipeline supports execution on both GPU and CPU-only nodes.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 🔄 Pipeline Overview
-
-
-
-
-
-
-
-
-
-
-
-
-
+## Pipeline Overview
 The pipeline transforms images into searchable vector embeddings through the following stages:
-
-
-
-
-
-
-
-
-
-
-
-
 
 ```mermaid
 
-
-
-
-
-
-
-
-
-
-
 graph TD
 
+A[Download Images from Base URL] --> B[Install Tesseract OCR]
 
+B --> C[Extract Text from Images using OCR]
 
+C --> D[Upload OCR Text to LlamaStack]
 
+D --> E[Create Milvus Vector Store]
 
+E --> F[Add Files to Vector Store - Chunking & Embedding]
 
-
-
-
-
-
-A[Image URLs] --> B[Download Images]
-
-
-
-
-
-
-
-
-
-
-
-B --> C[Split Images for Parallel Processing]
-
-
-
-
-
-
-
-
-
-
-
-C --> D[OCR Text Extraction with Docling]
-
-
-
-
-
-
-
-
-
-
-
-D --> E[Text Chunking]
-
-
-
-
-
-
-
-
-
-
-
-E --> F[Generate Embeddings]
-
-
-
-
-
-
-
-
-
-
-
-F --> G[Store in Vector Database]
-
-
-
-
-
-
-
-
-
-
-
-G --> H[Ready for RAG Queries]
-
-
-
-
-
-
-
-
-
-
-
+F --> G[Ready for RAG Queries]
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-## 🏗️ Pipeline Components
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 1. **Vector Database Registration** (`register_vector_db`)
-
-
-
-
-
-
-
-
-
-
-
--  **Purpose**: Sets up the vector database with proper configuration
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 2. **Image Import** (`import_test_images`)
-
-
-
-
-
-
-
-
-
-
-
--  **Purpose**: Downloads images from remote URLs
-
-
-
-
-
-
-
-
-
-
-
-### 3. **Image Splitting** (`create_image_splits`)
-
-
-
-
-
-
-
-
-
-
-
--  **Purpose**: Distributes images across parallel workers
-
-
-
-
-
-
-
-
-
-
-
--  **Process**: Splits images into equal batches for parallel processing
-
-
-
-
-
-
-
-
-
-
-
-
-
-### 4. **OCR and Embedding Generation** (`docling_convert_and_ingest_images`)
-
-
-
-
-
-
-
-
-
-
-
--  **Purpose**: Main processing component - extracts text and generates embeddings
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## 🔄 RAG Query Flow
-
-
-
-
-
-
-
-
-
-
-
-
-
-1.  **User Query** → Embedding Model → Query Vector
-
-
-
-
-
-
-
-
-
-
-
-2.  **Vector Search** → Milvus → Similar Chunks
-
-
-
-
-
-
-
-
-
-
-
-3.  **Context Assembly** → Markdown Content + Metadata
-
-
-
-
-
-
-
-
-
-
-
-4.  **LLM Generation** → Final Answer with text content from images
-
-
-
-
-
-
-
-
-
-
-
-
-
-The pipeline enables rich RAG applications that can answer questions about visual content by leveraging the structured text extracted from images.
-
-
-
-
-
-
-
-
-
-
-
-
+## Supported Image Formats
+
+-  `.png`
+-  `.jpg`
+-  `.jpeg`
+-  `.tiff`
+-  `.bmp`
+-  `.webp`
 
 ## 🚀 Getting Started
-
-
-
-
-
-
-
-
-
 ### Prerequisites
 
-- [Data Science Project in OpenShift AI with a configured Workbench](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_cloud_service/1/html/getting_started)
+- Red Hat OpenShift AI v3.3+
+- Data science project created with a configured pipeline server and workbench with Python 3.12.
+- LlamaStack Operator enabled in the DSC resource. See [Working with Llama Stack](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/3.3/html/working_with_llama_stack/index).
+- LlamaStackDistribution deployed and configured with the `qwen3-14b-awq` instruct model:
+    - See [common-deployments](../../common-deployments). Deploy the components in this order: first apply `postgres-deployment.yaml` and `llama-stack-config.yaml`, then apply `qwen3-14b-awq-deployment.yaml` and wait for it to be ready, and finally apply `llamastackdistribution.yaml`.
+    - Alternatively, you can use your own instruct model.
+- 1–2 NVIDIA GPUs (one for the instruct model, and optionally one for the pipeline run)
 
 
+### Import and run the KubeFlow Pipeline
 
+Import the "[ocr_rag_pipeline_compiled.yaml](ocr_rag_pipeline_compiled.yaml)" KubeFlow Pipeline into your pipeline server, then run the pipeline to insert your image files into the vector store.
 
-
-- [Configuring a pipeline server](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed/latest/html/working_with_data_science_pipelines/managing-data-science-pipelines_ds-pipelines#configuring-a-pipeline-server_ds-pipelines)
-
-
-
-
-
-- A LlamaStack service with a vector database backend deployed (follow our [official deployment documentation](https://github.com/opendatahub-io/rag/blob/main/DEPLOYMENT.md))
-
-
-
-
-
-
-
-
-
-- GPU-enabled nodes are highly recommended for faster processing.
-
-
-
-- You can still use only CPU nodes
-
-
-
+When running the pipeline, you can customize the following parameters:
 
 **Pipeline Parameters**
+- `base_url`: The base web URL where the source image files are located.
+- `image_filenames`: Comma-separated list of image filenames to download from the base_url
+- `vector_store_name`: Milvus vector store name
+- `service_url`: Milvus service URL
+- `embedding_model_id`: Embedding model to use
+- `max_tokens`: Maximum tokens per chunk
+- `chunk_overlap_tokens`: Chunk overlap size in tokens
+- `use_gpu`: Enable/disable GPU acceleration
 
+> Note: The compiled pipeline was generated by running `python ocr_rag_pipeline.py`.
 
 
+## Prompt the LLM
 
+Once your files are embedded and indexed, you can query them by running through the example notebook [ocr_rag_responses.ipynb](ocr_rag_responses.ipynb)
 
+1. In your Jupyter Notebook environment import the [requirements.txt](requirements.txt) file and the [ocr_rag_responses.ipynb](ocr_rag_responses.ipynb) notebook.
 
+2. After installing the dependencies from the `requirements.txt` file, restart the `kernel` to apply the updates.
 
+3. Then run through the RAG Jupyter Notebook `ocr_rag_responses.ipynb` to query the content ingested by the pipeline.
 
 
+## Additional Feature (Optional) - RAGAS
+In the same example notebook [ocr_rag_responses.ipynb](ocr_rag_responses.ipynb), you can evaluate the RAG outputs using RAGAS.
 
+We will use two key metrics to show the performance of the RAG server:
 
--  `base_url`: URL where image files are hosted
+1. [Faithfulness](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/faithfulness/) - measures how factually consistent a response is with the retrieved context. It ranges from 0 to 1, with higher scores indicating better consistency.
 
-
-
-
-
-
-
-
-
--  `image_filenames`: Comma-separated list of images to process
-
-
-
-
-
-
-
-
-
--  `num_workers`: Number of parallel workers (default: 1)
-
-
-
-
-
-
-
-
-
--  `vector_db_id`: ID of the vector database to store embeddings
-
-
-
-
-
-
-
-
-
--  `service_url`: URL of the LlamaStack service
-
-
-
-
-
-
-
-
-
--  `embed_model_id`: Embedding model to use (default: `ibm-granite/granite-embedding-125m-english`)
-
-
-
-
-
-
-
-
-
--  `max_tokens`: Maximum tokens per chunk (default: 512)
-
-
-
-
-
-
-
-
-
--  `use_gpu`: Whether to use GPU for processing (default: true)
-
-
-
-
-### Creating the Pipeline for running on GPU node
-
-
-
-```
-# Install dependencies for pipeline
-cd demos/kfp/docling/ocr-image-conversion
-pip3 install -r requirements.txt
-
-# Compile the Kubeflow pipeline for running with help of GPU or use existing pipeline
-# set use_gpu = True in docling_convert_pipeline() in docling_ocr_images_convert_pipeline.py
-python3 docling_ocr_images_convert_pipeline.py
-```
-
-
-
-### Creating the Pipeline for running on CPU only
-
-
-
-```
-# Install dependencies for pipeline
-cd demos/kfp/docling/ocr-image-conversion
-pip3 install -r requirements.txt
-
-# Compile the Kubeflow pipeline for running on CPU only or use existing pipeline
-# set use_gpu = False in docling_convert_pipeline() in docling_ocr_images_convert_pipeline.py
-python3 docling_ocr_images_convert_pipeline.py
-```
-
-
-
-
-
-### Import Kubeflow pipeline to OpenShift AI
-
-
-
-
-
-
-
-- Import the compiled YAML to in Pipeline server in your Data Science project in OpenShift AI
-
-
-
-
-
-- [Running a data science pipeline generated from Python code](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_cloud_service/1/html/openshift_ai_tutorial_-_fraud_detection_example/implementing-pipelines#running-a-pipeline-generated-from-python-code)
-
-
-
-
-
-
-
-
-
-- Configure the pipeline parameters as needed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Query RAG Agent in your Workbench within a Data Science project on OpenShift AI
-
-
-
-1. Open your Workbench
-
-
-
-2. Clone the rag repo and use main branch
-
-
-
-	- Use this link `https://github.com/opendatahub-io/rag.git` for cloning the repo
-
-
-
-	- [Collaborating on Jupyter notebooks by using Git](https://docs.redhat.com/en/documentation/red_hat_openshift_ai_cloud_service/1/html/working_with_connected_applications/using_basic_workbenches#collaborating-on-jupyter-notebooks-by-using-git_connected-apps)
-
-
-
-3. Install dependencies for Jupyter Notebook with RAG Agent
-
-
-
-```
-cd demos/kfp/docling/ocr-image-conversion/rag-agent
-pip3 install -r requirements.txt
-```
-
-
-
-4. Follow the instructions in the corresponding RAG Jupyter Notebook `ocr_images_rag_agent.ipynb` to query the content ingested by the pipeline.
+2. [Response Relevancy](https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/answer_relevance/) - metric measures how relevant a response is to the user input. Higher scores indicate better alignment with the user input, while lower scores are given if the response is incomplete or includes redundant information.

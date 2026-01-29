@@ -1,0 +1,545 @@
+# PIPELINE DEFINITION
+# Name: vector-store-files-pipeline
+# Description: Converts images to text using OCR and generates embeddings
+# Inputs:
+#    base_url: str [Default: 'https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/images']
+#    chunk_overlap_tokens: int [Default: 64.0]
+#    embedding_model_id: str [Default: 'sentence-transformers/ibm-granite/granite-embedding-125m-english']
+#    image_filenames: str [Default: 'RAG_flow_diagram.png, RAG_key_market_usecases.png']
+#    max_tokens: int [Default: 512.0]
+#    service_url: str [Default: 'http://lsd-milvus-service:8321']
+#    use_gpu: bool [Default: False]
+#    vector_store_name: str [Default: 'ocr-vector-store']
+components:
+  comp-condition-2:
+    dag:
+      tasks:
+        register-vector-store-and-files:
+          cachingOptions: {}
+          componentRef:
+            name: comp-register-vector-store-and-files
+          inputs:
+            parameters:
+              base_url:
+                componentInputParameter: pipelinechannel--base_url
+              chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              image_filenames:
+                componentInputParameter: pipelinechannel--image_filenames
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: register-vector-store-and-files
+    inputDefinitions:
+      parameters:
+        pipelinechannel--base_url:
+          parameterType: STRING
+        pipelinechannel--chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--embedding_model_id:
+          parameterType: STRING
+        pipelinechannel--image_filenames:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_store_name:
+          parameterType: STRING
+  comp-condition-3:
+    dag:
+      tasks:
+        register-vector-store-and-files-2:
+          cachingOptions: {}
+          componentRef:
+            name: comp-register-vector-store-and-files-2
+          inputs:
+            parameters:
+              base_url:
+                componentInputParameter: pipelinechannel--base_url
+              chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              image_filenames:
+                componentInputParameter: pipelinechannel--image_filenames
+              max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              service_url:
+                componentInputParameter: pipelinechannel--service_url
+              vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: register-vector-store-and-files-2
+    inputDefinitions:
+      parameters:
+        pipelinechannel--base_url:
+          parameterType: STRING
+        pipelinechannel--chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--embedding_model_id:
+          parameterType: STRING
+        pipelinechannel--image_filenames:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_store_name:
+          parameterType: STRING
+  comp-condition-branches-1:
+    dag:
+      tasks:
+        condition-2:
+          componentRef:
+            name: comp-condition-2
+          inputs:
+            parameters:
+              pipelinechannel--base_url:
+                componentInputParameter: pipelinechannel--base_url
+              pipelinechannel--chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              pipelinechannel--embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              pipelinechannel--image_filenames:
+                componentInputParameter: pipelinechannel--image_filenames
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: condition-2
+          triggerPolicy:
+            condition: inputs.parameter_values['pipelinechannel--use_gpu'] == true
+        condition-3:
+          componentRef:
+            name: comp-condition-3
+          inputs:
+            parameters:
+              pipelinechannel--base_url:
+                componentInputParameter: pipelinechannel--base_url
+              pipelinechannel--chunk_overlap_tokens:
+                componentInputParameter: pipelinechannel--chunk_overlap_tokens
+              pipelinechannel--embedding_model_id:
+                componentInputParameter: pipelinechannel--embedding_model_id
+              pipelinechannel--image_filenames:
+                componentInputParameter: pipelinechannel--image_filenames
+              pipelinechannel--max_tokens:
+                componentInputParameter: pipelinechannel--max_tokens
+              pipelinechannel--service_url:
+                componentInputParameter: pipelinechannel--service_url
+              pipelinechannel--use_gpu:
+                componentInputParameter: pipelinechannel--use_gpu
+              pipelinechannel--vector_store_name:
+                componentInputParameter: pipelinechannel--vector_store_name
+          taskInfo:
+            name: condition-3
+          triggerPolicy:
+            condition: '!(inputs.parameter_values[''pipelinechannel--use_gpu''] ==
+              true)'
+    inputDefinitions:
+      parameters:
+        pipelinechannel--base_url:
+          parameterType: STRING
+        pipelinechannel--chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--embedding_model_id:
+          parameterType: STRING
+        pipelinechannel--image_filenames:
+          parameterType: STRING
+        pipelinechannel--max_tokens:
+          parameterType: NUMBER_INTEGER
+        pipelinechannel--service_url:
+          parameterType: STRING
+        pipelinechannel--use_gpu:
+          parameterType: BOOLEAN
+        pipelinechannel--vector_store_name:
+          parameterType: STRING
+  comp-register-vector-store-and-files:
+    executorLabel: exec-register-vector-store-and-files
+    inputDefinitions:
+      parameters:
+        base_url:
+          parameterType: STRING
+        chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        embedding_model_id:
+          parameterType: STRING
+        image_filenames:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        service_url:
+          parameterType: STRING
+        vector_store_name:
+          parameterType: STRING
+  comp-register-vector-store-and-files-2:
+    executorLabel: exec-register-vector-store-and-files-2
+    inputDefinitions:
+      parameters:
+        base_url:
+          parameterType: STRING
+        chunk_overlap_tokens:
+          parameterType: NUMBER_INTEGER
+        embedding_model_id:
+          parameterType: STRING
+        image_filenames:
+          parameterType: STRING
+        max_tokens:
+          parameterType: NUMBER_INTEGER
+        service_url:
+          parameterType: STRING
+        vector_store_name:
+          parameterType: STRING
+deploymentSpec:
+  executors:
+    exec-register-vector-store-and-files:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_vector_store_and_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
+          \ 'fire' 'requests' 'pytesseract' 'Pillow'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.14.3' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef register_vector_store_and_files(\n    service_url: str,\n   \
+          \ vector_store_name: str,\n    embedding_model_id: str,\n    max_tokens:\
+          \ int,\n    chunk_overlap_tokens: int,\n    base_url: str,\n    image_filenames:\
+          \ str,\n):\n    import io\n    import os\n    import tempfile\n    import\
+          \ requests\n    import pytesseract\n    from PIL import Image\n    from\
+          \ llama_stack_client import LlamaStackClient\n\n    def download_and_install_tesseract():\n\
+          \        import subprocess\n        import pathlib\n\n        try:\n   \
+          \         subprocess.run([\"tesseract\", \"--version\"], capture_output=True,\
+          \ check=True)\n            print(\"Tesseract OCR is already installed\"\
+          )\n            return\n        except (subprocess.CalledProcessError, FileNotFoundError):\n\
+          \            pass\n\n        print(\"Downloading Tesseract OCR...\")\n\n\
+          \        import urllib.request\n\n        install_dir = pathlib.Path(\"\
+          /tmp/tesseract\")\n        install_dir.mkdir(exist_ok=True)\n        bin_dir\
+          \ = pathlib.Path(\"/tmp/bin\")\n        bin_dir.mkdir(exist_ok=True)\n\n\
+          \        # Download Tesseract AppImage (self-contained with tessdata)\n\
+          \        url = \"https://github.com/AlexanderP/tesseract-appimage/releases/download/v5.5.2/tesseract-5.5.2-x86_64.AppImage\"\
+          \n        appimage = install_dir / \"tesseract.AppImage\"\n        urllib.request.urlretrieve(url,\
+          \ appimage)\n        os.chmod(appimage, 0o755)\n\n        subprocess.run(\n\
+          \            [str(appimage), \"--appimage-extract\"],\n            cwd=str(install_dir),\n\
+          \            check=True,\n            capture_output=True,\n        )\n\n\
+          \        # Create wrapper script to call extracted AppRun\n        wrapper\
+          \ = bin_dir / \"tesseract\"\n        wrapper.write_text(\n            f'#!/bin/sh\\\
+          nexec \"{install_dir}/squashfs-root/AppRun\" \"$@\"\\n'\n        )\n   \
+          \     os.chmod(wrapper, 0o755)\n\n        os.environ[\"PATH\"] = f\"{bin_dir}:{os.environ.get('PATH',\
+          \ '')}\"\n\n        subprocess.run([\"tesseract\", \"--version\"], capture_output=True,\
+          \ check=True)\n        print(\"Tesseract OCR installed successfully\")\n\
+          \n    download_and_install_tesseract()\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    # Process images and upload OCR text\n    file_ids = []\n    for filename\
+          \ in image_filenames.split(\",\"):\n        source = f\"{base_url}/{filename.strip()}\"\
+          \n        print(f\"Downloading and processing image: {source}\")\n\n   \
+          \     try:\n            # Download the image file\n            response\
+          \ = requests.get(source)\n            response.raise_for_status()\n\n  \
+          \          # Save to temporary file\n            with tempfile.NamedTemporaryFile(suffix=\"\
+          .png\", delete=False) as tmp_image:\n                tmp_image.write(response.content)\n\
+          \                tmp_image_path = tmp_image.name\n\n            try:\n \
+          \               # Perform OCR on the image\n                print(f\"Performing\
+          \ OCR on {filename.strip()}...\")\n                image = Image.open(tmp_image_path)\n\
+          \                ocr_text = pytesseract.image_to_string(image)\n       \
+          \         print(f\"OCR complete: {len(ocr_text)} characters extracted\"\
+          )\n\n                # Upload OCR text as text file\n                file_basename\
+          \ = filename.strip().rsplit(\".\", 1)[0] + \".txt\"\n                text_content\
+          \ = io.BytesIO(ocr_text.encode(\"utf-8\"))\n\n                file = client.files.create(\n\
+          \                    file=(file_basename, text_content, \"text/plain\"),\n\
+          \                    purpose=\"assistants\",\n                )\n      \
+          \          file_ids.append(file.id)\n                print(\n          \
+          \          f\"Successfully uploaded OCR text {file_basename} (file_id: {file.id})\"\
+          \n                )\n\n            finally:\n                # Clean up\
+          \ temp file\n                os.unlink(tmp_image_path)\n\n        except\
+          \ Exception as e:\n            print(f\"ERROR: Failed to process {filename.strip()}:\
+          \ {str(e)}\")\n            raise\n\n    print(f\"Successfully processed\
+          \ and uploaded {len(file_ids)} OCR texts: {file_ids}\")\n\n    models =\
+          \ client.models.list()\n    matching_model = next((m for m in models if\
+          \ m.id == embedding_model_id), None)\n\n    if not matching_model:\n   \
+          \     available = [m.id for m in models]\n        raise ValueError(\n  \
+          \          f\"Model '{embedding_model_id}' not found. Available: {available}\"\
+          \n        )\n\n    model_type = (\n        matching_model.custom_metadata.get(\"\
+          model_type\")\n        if matching_model.custom_metadata\n        else None\n\
+          \    )\n    if model_type != \"embedding\":\n        raise ValueError(\n\
+          \            f\"Model '{embedding_model_id}' is not an embedding model (type={model_type})\"\
+          \n        )\n\n    embedding_dimension = int(\n        float(matching_model.custom_metadata.get(\"\
+          embedding_dimension\"))\n    )\n\n    # Warm up the embedding model\n  \
+          \  client.embeddings.create(\n        model=embedding_model_id,\n      \
+          \  input=\"warmup\",\n    )\n\n    # Create empty vector store first, before\
+          \ inserting files.\n    # Purpose: Depending on the size and number of files,\
+          \ attempting to create the vector store\n    # and add files in a single\
+          \ step may lead to timeouts.\n    try:\n        vector_store = client.vector_stores.create(\n\
+          \            name=vector_store_name,\n            file_ids=[],\n       \
+          \     chunking_strategy={\n                \"type\": \"static\",\n     \
+          \           \"static\": {\n                    \"max_chunk_size_tokens\"\
+          : max_tokens,\n                    \"chunk_overlap_tokens\": chunk_overlap_tokens,\n\
+          \                },\n            },\n            extra_body={\n        \
+          \        \"embedding_model\": embedding_model_id,\n                \"embedding_dimension\"\
+          : embedding_dimension,\n                \"provider_id\": \"milvus\",\n \
+          \           },\n        )\n        print(\n            f\"Successfully created\
+          \ vector store '{vector_store_name}' with ID: {vector_store.id}\"\n    \
+          \    )\n    except Exception as e:\n        print(f\"ERROR: Failed to create\
+          \ vector store '{vector_store_name}': {str(e)}\")\n        raise\n\n   \
+          \ # Add files to vector store\n    try:\n        for file_id in file_ids:\n\
+          \            print(f\"Adding file_id '{file_id}' to vector store '{vector_store_name}'\"\
+          )\n            client.vector_stores.files.create(\n                vector_store_id=vector_store.id,\n\
+          \                file_id=file_id,\n            )\n        vector_store =\
+          \ client.vector_stores.retrieve(vector_store.id)\n        print(f\"Vector\
+          \ store details: {vector_store}\")\n    except Exception as e:\n       \
+          \ print(f\"WARNING: Some files failed to be added to vector store: {str(e)}\"\
+          )\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+        resources:
+          accelerator:
+            count: '1'
+            resourceCount: '1'
+            resourceType: nvidia.com/gpu
+            type: nvidia.com/gpu
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+    exec-register-vector-store-and-files-2:
+      container:
+        args:
+        - --executor_input
+        - '{{$}}'
+        - --function_to_execute
+        - register_vector_store_and_files
+        command:
+        - sh
+        - -c
+        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
+          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
+          \ python3 -m pip install --quiet --no-warn-script-location 'llama-stack-client==0.4.2'\
+          \ 'fire' 'requests' 'pytesseract' 'Pillow'  &&  python3 -m pip install --quiet\
+          \ --no-warn-script-location 'kfp==2.14.3' '--no-deps' 'typing-extensions>=3.7.4,<5;\
+          \ python_version<\"3.9\"' && \"$0\" \"$@\"\n"
+        - sh
+        - -ec
+        - 'program_path=$(mktemp -d)
+
+
+          printf "%s" "$0" > "$program_path/ephemeral_component.py"
+
+          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
+
+          '
+        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
+          \ *\n\ndef register_vector_store_and_files(\n    service_url: str,\n   \
+          \ vector_store_name: str,\n    embedding_model_id: str,\n    max_tokens:\
+          \ int,\n    chunk_overlap_tokens: int,\n    base_url: str,\n    image_filenames:\
+          \ str,\n):\n    import io\n    import os\n    import tempfile\n    import\
+          \ requests\n    import pytesseract\n    from PIL import Image\n    from\
+          \ llama_stack_client import LlamaStackClient\n\n    def download_and_install_tesseract():\n\
+          \        import subprocess\n        import pathlib\n\n        try:\n   \
+          \         subprocess.run([\"tesseract\", \"--version\"], capture_output=True,\
+          \ check=True)\n            print(\"Tesseract OCR is already installed\"\
+          )\n            return\n        except (subprocess.CalledProcessError, FileNotFoundError):\n\
+          \            pass\n\n        print(\"Downloading Tesseract OCR...\")\n\n\
+          \        import urllib.request\n\n        install_dir = pathlib.Path(\"\
+          /tmp/tesseract\")\n        install_dir.mkdir(exist_ok=True)\n        bin_dir\
+          \ = pathlib.Path(\"/tmp/bin\")\n        bin_dir.mkdir(exist_ok=True)\n\n\
+          \        # Download Tesseract AppImage (self-contained with tessdata)\n\
+          \        url = \"https://github.com/AlexanderP/tesseract-appimage/releases/download/v5.5.2/tesseract-5.5.2-x86_64.AppImage\"\
+          \n        appimage = install_dir / \"tesseract.AppImage\"\n        urllib.request.urlretrieve(url,\
+          \ appimage)\n        os.chmod(appimage, 0o755)\n\n        subprocess.run(\n\
+          \            [str(appimage), \"--appimage-extract\"],\n            cwd=str(install_dir),\n\
+          \            check=True,\n            capture_output=True,\n        )\n\n\
+          \        # Create wrapper script to call extracted AppRun\n        wrapper\
+          \ = bin_dir / \"tesseract\"\n        wrapper.write_text(\n            f'#!/bin/sh\\\
+          nexec \"{install_dir}/squashfs-root/AppRun\" \"$@\"\\n'\n        )\n   \
+          \     os.chmod(wrapper, 0o755)\n\n        os.environ[\"PATH\"] = f\"{bin_dir}:{os.environ.get('PATH',\
+          \ '')}\"\n\n        subprocess.run([\"tesseract\", \"--version\"], capture_output=True,\
+          \ check=True)\n        print(\"Tesseract OCR installed successfully\")\n\
+          \n    download_and_install_tesseract()\n\n    client = LlamaStackClient(base_url=service_url)\n\
+          \n    # Process images and upload OCR text\n    file_ids = []\n    for filename\
+          \ in image_filenames.split(\",\"):\n        source = f\"{base_url}/{filename.strip()}\"\
+          \n        print(f\"Downloading and processing image: {source}\")\n\n   \
+          \     try:\n            # Download the image file\n            response\
+          \ = requests.get(source)\n            response.raise_for_status()\n\n  \
+          \          # Save to temporary file\n            with tempfile.NamedTemporaryFile(suffix=\"\
+          .png\", delete=False) as tmp_image:\n                tmp_image.write(response.content)\n\
+          \                tmp_image_path = tmp_image.name\n\n            try:\n \
+          \               # Perform OCR on the image\n                print(f\"Performing\
+          \ OCR on {filename.strip()}...\")\n                image = Image.open(tmp_image_path)\n\
+          \                ocr_text = pytesseract.image_to_string(image)\n       \
+          \         print(f\"OCR complete: {len(ocr_text)} characters extracted\"\
+          )\n\n                # Upload OCR text as text file\n                file_basename\
+          \ = filename.strip().rsplit(\".\", 1)[0] + \".txt\"\n                text_content\
+          \ = io.BytesIO(ocr_text.encode(\"utf-8\"))\n\n                file = client.files.create(\n\
+          \                    file=(file_basename, text_content, \"text/plain\"),\n\
+          \                    purpose=\"assistants\",\n                )\n      \
+          \          file_ids.append(file.id)\n                print(\n          \
+          \          f\"Successfully uploaded OCR text {file_basename} (file_id: {file.id})\"\
+          \n                )\n\n            finally:\n                # Clean up\
+          \ temp file\n                os.unlink(tmp_image_path)\n\n        except\
+          \ Exception as e:\n            print(f\"ERROR: Failed to process {filename.strip()}:\
+          \ {str(e)}\")\n            raise\n\n    print(f\"Successfully processed\
+          \ and uploaded {len(file_ids)} OCR texts: {file_ids}\")\n\n    models =\
+          \ client.models.list()\n    matching_model = next((m for m in models if\
+          \ m.id == embedding_model_id), None)\n\n    if not matching_model:\n   \
+          \     available = [m.id for m in models]\n        raise ValueError(\n  \
+          \          f\"Model '{embedding_model_id}' not found. Available: {available}\"\
+          \n        )\n\n    model_type = (\n        matching_model.custom_metadata.get(\"\
+          model_type\")\n        if matching_model.custom_metadata\n        else None\n\
+          \    )\n    if model_type != \"embedding\":\n        raise ValueError(\n\
+          \            f\"Model '{embedding_model_id}' is not an embedding model (type={model_type})\"\
+          \n        )\n\n    embedding_dimension = int(\n        float(matching_model.custom_metadata.get(\"\
+          embedding_dimension\"))\n    )\n\n    # Warm up the embedding model\n  \
+          \  client.embeddings.create(\n        model=embedding_model_id,\n      \
+          \  input=\"warmup\",\n    )\n\n    # Create empty vector store first, before\
+          \ inserting files.\n    # Purpose: Depending on the size and number of files,\
+          \ attempting to create the vector store\n    # and add files in a single\
+          \ step may lead to timeouts.\n    try:\n        vector_store = client.vector_stores.create(\n\
+          \            name=vector_store_name,\n            file_ids=[],\n       \
+          \     chunking_strategy={\n                \"type\": \"static\",\n     \
+          \           \"static\": {\n                    \"max_chunk_size_tokens\"\
+          : max_tokens,\n                    \"chunk_overlap_tokens\": chunk_overlap_tokens,\n\
+          \                },\n            },\n            extra_body={\n        \
+          \        \"embedding_model\": embedding_model_id,\n                \"embedding_dimension\"\
+          : embedding_dimension,\n                \"provider_id\": \"milvus\",\n \
+          \           },\n        )\n        print(\n            f\"Successfully created\
+          \ vector store '{vector_store_name}' with ID: {vector_store.id}\"\n    \
+          \    )\n    except Exception as e:\n        print(f\"ERROR: Failed to create\
+          \ vector store '{vector_store_name}': {str(e)}\")\n        raise\n\n   \
+          \ # Add files to vector store\n    try:\n        for file_id in file_ids:\n\
+          \            print(f\"Adding file_id '{file_id}' to vector store '{vector_store_name}'\"\
+          )\n            client.vector_stores.files.create(\n                vector_store_id=vector_store.id,\n\
+          \                file_id=file_id,\n            )\n        vector_store =\
+          \ client.vector_stores.retrieve(vector_store.id)\n        print(f\"Vector\
+          \ store details: {vector_store}\")\n    except Exception as e:\n       \
+          \ print(f\"WARNING: Some files failed to be added to vector store: {str(e)}\"\
+          )\n\n"
+        image: registry.redhat.io/ubi9/python-312@sha256:e80ff3673c95b91f0dafdbe97afb261eab8244d7fd8b47e20ffcbcfee27fb168
+        resources:
+          cpuLimit: 4.0
+          cpuRequest: 0.5
+          memoryLimit: 6.442450944
+          memoryRequest: 2.147483648
+          resourceCpuLimit: '4'
+          resourceCpuRequest: 500m
+          resourceMemoryLimit: 6Gi
+          resourceMemoryRequest: 2Gi
+pipelineInfo:
+  description: Converts images to text using OCR and generates embeddings
+  name: vector-store-files-pipeline
+root:
+  dag:
+    tasks:
+      condition-branches-1:
+        componentRef:
+          name: comp-condition-branches-1
+        inputs:
+          parameters:
+            pipelinechannel--base_url:
+              componentInputParameter: base_url
+            pipelinechannel--chunk_overlap_tokens:
+              componentInputParameter: chunk_overlap_tokens
+            pipelinechannel--embedding_model_id:
+              componentInputParameter: embedding_model_id
+            pipelinechannel--image_filenames:
+              componentInputParameter: image_filenames
+            pipelinechannel--max_tokens:
+              componentInputParameter: max_tokens
+            pipelinechannel--service_url:
+              componentInputParameter: service_url
+            pipelinechannel--use_gpu:
+              componentInputParameter: use_gpu
+            pipelinechannel--vector_store_name:
+              componentInputParameter: vector_store_name
+        taskInfo:
+          name: condition-branches-1
+  inputDefinitions:
+    parameters:
+      base_url:
+        defaultValue: https://raw.githubusercontent.com/opendatahub-io/rag/main/demos/testing-data/images
+        description: Base URL to fetch image files from
+        isOptional: true
+        parameterType: STRING
+      chunk_overlap_tokens:
+        defaultValue: 64.0
+        description: Number of overlapping tokens between chunks
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      embedding_model_id:
+        defaultValue: sentence-transformers/ibm-granite/granite-embedding-125m-english
+        description: Model ID for embedding generation
+        isOptional: true
+        parameterType: STRING
+      image_filenames:
+        defaultValue: RAG_flow_diagram.png, RAG_key_market_usecases.png
+        description: Comma-separated list of image filenames to download and convert
+        isOptional: true
+        parameterType: STRING
+      max_tokens:
+        defaultValue: 512.0
+        description: Maximum number of tokens per chunk
+        isOptional: true
+        parameterType: NUMBER_INTEGER
+      service_url:
+        defaultValue: http://lsd-milvus-service:8321
+        description: URL of the LlamaStack service
+        isOptional: true
+        parameterType: STRING
+      use_gpu:
+        defaultValue: false
+        description: boolean to enable/disable gpu
+        isOptional: true
+        parameterType: BOOLEAN
+      vector_store_name:
+        defaultValue: ocr-vector-store
+        description: Name of the vector store to store embeddings
+        isOptional: true
+        parameterType: STRING
+schemaVersion: 2.1.0
+sdkVersion: kfp-2.14.3
+---
+platforms:
+  kubernetes:
+    deploymentSpec:
+      executors:
+        exec-register-vector-store-and-files:
+          nodeSelector:
+            nodeSelectorJson:
+              runtimeValue:
+                constant: {}
+          tolerations:
+          - effect: NoSchedule
+            key: nvidia.com/gpu
+            operator: Exists
