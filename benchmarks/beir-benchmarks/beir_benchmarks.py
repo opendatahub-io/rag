@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import argparse
+import io
 import os
 import uuid
 import pathlib
@@ -20,8 +21,7 @@ from beir import util, LoggingHandler
 from beir.datasets.data_loader import GenericDataLoader
 
 from llama_stack.core.library_client import LlamaStackAsLibraryClient
-from llama_stack.apis.tools import RAGQueryConfig
-from llama_stack_client.types import Document
+
 from llama_stack_client import LlamaStackClient
 
 import numpy as np
@@ -33,9 +33,13 @@ import time
 
 DEFAULT_DATASET_NAMES = ["scifact"]
 DEFAULT_CUSTOM_DATASETS_URLS = []
-DEFAULT_EMBEDDING_MODELS = ["granite-embedding-30m", "granite-embedding-125m"]
+DEFAULT_EMBEDDING_MODELS = [
+    "sentence-transformers/ibm-granite/granite-embedding-30m-english",
+    "sentence-transformers/ibm-granite/granite-embedding-125m-english",
+]
 DEFAULT_BATCH_SIZE = 150
 DEFAULT_VECTOR_DB_PROVIDER_ID = "milvus"
+DEFAULT_SEARCH_MODE = "vector"
 
 """
 TODO: Add an arg for specifying the benchmark type when new benchmarks are added.
@@ -85,6 +89,13 @@ def parse_args():
         help=f"Vector DB provider ID (default: {DEFAULT_VECTOR_DB_PROVIDER_ID})",
     )
 
+    parser.add_argument(
+        "--search-mode",
+        type=str,
+        default="vector",
+        help=f"Search mode (default: {DEFAULT_SEARCH_MODE})",
+    )
+
     return parser.parse_args()
 
 
@@ -106,13 +117,13 @@ class LlamaStackRAGRetriever:
         self,
         llama_stack_client: LlamaStackAsLibraryClient,
         vector_db_id: str,
-        query_config: RAGQueryConfig,
         top_k: int = 10,
+        search_mode: str = "vector",
     ):
         self.llama_stack_client = llama_stack_client
         self.vector_db_id = vector_db_id
-        self.query_config = query_config
         self.top_k = top_k
+        self.search_mode = search_mode
 
     def retrieve(self, queries: dict[str, str], top_k=None):
         results = {}
@@ -121,16 +132,31 @@ class LlamaStackRAGRetriever:
 
         for qid, query in queries.items():
             start_time = time.perf_counter()
-            rag_results = self.llama_stack_client.tool_runtime.rag_tool.query(
-                vector_db_ids=[self.vector_db_id],
-                content=query,
-                query_config={**self.query_config, "max_chunks": top_k},
+
+            rag_results = self.llama_stack_client.vector_stores.search(
+                vector_store_id=self.vector_db_id,
+                query=query,
+                search_mode=self.search_mode,
+                max_num_results=top_k,
             )
+
             end_time = time.perf_counter()
             times[qid] = end_time - start_time
 
-            doc_ids = rag_results.metadata.get("document_ids", [])
-            scores = {doc_id: 1.0 - (i * 0.01) for i, doc_id in enumerate(doc_ids)}
+            # Extract corpus document IDs from filenames and use scores directly from search results
+            scores = {}
+            for result in rag_results.data:
+                if result.attributes and "filename" in result.attributes:
+                    filename = result.attributes.get("filename")
+                    if filename.endswith(".txt"):
+                        corpus_doc_id = filename[:-4]  # Remove '.txt'
+                        score = (
+                            float(result.score)
+                            if hasattr(result, "score") and result.score is not None
+                            else 0.0
+                        )
+                        if corpus_doc_id not in scores or score > scores[corpus_doc_id]:
+                            scores[corpus_doc_id] = score
 
             results[qid] = scores
 
@@ -165,23 +191,47 @@ def inject_documents(
 ) -> str:
     vector_db_id = f"beir-rag-eval-{embedding_model}-{uuid.uuid4().hex}"
 
-    embedding_dimension = llama_stack_client.models.retrieve(
-        model_id=embedding_model
-    ).metadata["embedding_dimension"]
+    models = llama_stack_client.models.list()
+    em = next(
+        (
+            m
+            for m in models
+            if m.custom_metadata.get("model_type") == "embedding"
+            and m.id == embedding_model
+        ),
+        None,
+    )
+    if em is None:
+        raise ValueError(
+            f"Embedding model '{embedding_model}' not found or is not an embedding model"
+        )
+    embedding_model_id = em.id
+    embedding_dimension = em.custom_metadata.get("embedding_dimension")
 
     if embedding_dimension is None:
         raise ValueError(
-            f"Embedding dimension not found in model metadata for {embedding_model}"
+            f"Embedding dimension not found in model metadata for {embedding_model_id}"
         )
 
+    # Create vector store with empty file_ids initially
     vector_store = llama_stack_client.vector_stores.create(
         name=vector_db_id,
-        embedding_model=embedding_model,
-        embedding_dimension=embedding_dimension,
-        provider_id=vector_db_provider_id,
+        file_ids=[],
+        chunking_strategy={
+            "type": "static",
+            "static": {
+                "max_chunk_size_tokens": 512,
+                "chunk_overlap_tokens": 128,
+            },
+        },
+        extra_body={
+            "embedding_model": embedding_model_id,
+            "embedding_dimension": embedding_dimension,
+            "provider_id": vector_db_provider_id,
+        },
     )
 
-    # Convert corpus into Documents and process in batches
+    # Convert corpus into files and process in batches
     corpus_items = list(corpus.items())
     total_docs = len(corpus_items)
 
@@ -189,28 +239,40 @@ def inject_documents(
 
     for i in range(0, total_docs, batch_size):
         batch_items = corpus_items[i : i + batch_size]
-        documents_batch = [
-            Document(
-                document_id=doc_id,
-                content=data["title"] + " " + data["text"],
-                mime_type="text/plain",
-                metadata={},
-            )
-            for doc_id, data in batch_items
-        ]
+        batch_file_ids = []
 
         print(
-            f"Inserting batch {i // batch_size + 1}/{(total_docs + batch_size - 1) // batch_size} ({len(documents_batch)} docs)"
+            f"Processing batch {i // batch_size + 1}/{(total_docs + batch_size - 1) // batch_size} ({len(batch_items)} docs)"
         )
 
-        llama_stack_client.tool_runtime.rag_tool.insert(
-            documents=documents_batch,
-            vector_db_id=vector_store.id,
-            chunk_size_in_tokens=512,
-            timeout=3600,
-        )
+        for doc_id, data in batch_items:
+            content = data["title"] + " " + data["text"]
+            file_content = io.BytesIO(content.encode("utf-8"))
+            filename = f"{doc_id}.txt"
 
-    print(f"Successfully inserted all {total_docs} documents")
+            try:
+                file = llama_stack_client.files.create(
+                    file=(filename, file_content, "text/plain"),
+                    purpose="assistants",
+                )
+                batch_file_ids.append(file.id)
+            except Exception as e:
+                print(f"ERROR: Failed to create file for document {doc_id}: {str(e)}")
+                raise
+
+        # Add files to vector store
+        print(
+            f"Adding {len(batch_file_ids)} files to vector store (batch {i // batch_size + 1})"
+        )
+        for file_id in batch_file_ids:
+            try:
+                llama_stack_client.vector_stores.files.create(
+                    vector_store_id=vector_store.id,
+                    file_id=file_id,
+                )
+            except Exception as e:
+                print(f"ERROR: Failed to add file {file_id} to vector store: {str(e)}")
+                raise
     return vector_store
 
 
@@ -318,6 +380,7 @@ class BenchmarkEmbeddingModels:
         batch_size: int,
         vector_db_provider_id: str,
         embedding_models: list[str],
+        search_mode: str,
     ):
         self.llama_stack_client = llama_stack_client
         self.datasets = datasets
@@ -325,11 +388,14 @@ class BenchmarkEmbeddingModels:
         self.batch_size = batch_size
         self.vector_db_provider_id = vector_db_provider_id
         self.embedding_models = embedding_models
+        self.search_mode = search_mode
 
     def evaluate_retrieval(
         self,
     ):
         results_dir = os.path.join(pathlib.Path(__file__).parent.absolute(), "results")
+        # Create results directory at the start to ensure it exists
+        os.makedirs(results_dir, exist_ok=True)
         all_scores = {}
 
         custom_datasets_pairs = {}
@@ -357,9 +423,11 @@ class BenchmarkEmbeddingModels:
                     embedding_model,
                 )
 
-                query_config = RAGQueryConfig(max_chunks=10, mode="vector").model_dump()
                 retriever = LlamaStackRAGRetriever(
-                    llama_stack_client, vector_store.id, query_config, top_k=10
+                    self.llama_stack_client,
+                    vector_store.id,
+                    top_k=10,
+                    search_mode=self.search_mode,
                 )
 
                 print("Retrieving")
@@ -384,11 +452,11 @@ class BenchmarkEmbeddingModels:
 
                 all_scores[dataset_name][embedding_model] = scores
 
-                os.makedirs(results_dir, exist_ok=True)
+                safe_embedding_model = embedding_model.replace("/", "_")
                 util.save_runfile(
                     os.path.join(
                         results_dir,
-                        f"{dataset_name}-{vector_store.id}-{embedding_model}.run.trec",
+                        f"{dataset_name}-{vector_store.id}-{safe_embedding_model}-{self.search_mode}.run.trec",
                     ),
                     results,
                 )
@@ -415,8 +483,10 @@ if __name__ == "__main__":
     if llama_stack_url:
         llama_stack_client = LlamaStackClient(base_url=llama_stack_url)
     else:
-        llama_stack_client = LlamaStackAsLibraryClient("./run.yaml")
-        llama_stack_client.initialize()
+        print(
+            "No Llama Stack URL provided, please set the LLAMA_STACK_URL environment variable"
+        )
+        exit(1)
 
     """
     TODO: When adding a new benchmark add a check to see which of the available benchmarks to use and set a generic variable to the benchmark class.
@@ -443,6 +513,7 @@ if __name__ == "__main__":
         args.batch_size,
         args.vector_db_provider_id,
         args.embedding_models,
+        args.search_mode,
     )
     all_scores = embedding_models_benchmark.evaluate_retrieval()
     print_scores(all_scores)

@@ -28,17 +28,22 @@ uv pip install -r requirements.txt
 
 Prepare your environment by running:
 ``` bash
-# The run.yaml file is based on starter distro https://github.com/llamastack/llama-stack/tree/v0.2.23/llama_stack/distributions/starter
+# The config.yaml file is based on starter distro https://github.com/llamastack/llama-stack/blob/v0.4.2/src/llama_stack/distributions/starter/config.yaml
 # We run a build here to install all of the dependencies for the starter distro
-llama stack build --distro starter --image-type venv
+uv run --with llama-stack llama stack list-deps starter | xargs -L1 uv pip install
+```
+
+Start the Llama Stack Server:
+``` bash
+MILVUS_URL=milvus uv run --with llama-stack llama stack run config.yaml
 ```
 
 ## Quick Start
 
 1. **Run a basic benchmark**:
 ```bash
-# Runs the embedding models benchmark by default
-MILVUS_URL=milvus uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
+# Runs the embedding models benchmark by default with inline Milvus
+LLAMA_STACK_URL=http://localhost:8321 MILVUS_URL=milvus uv run python beir_benchmarks.py --dataset-names scifact --embedding-models sentence-transformers/ibm-granite/granite-embedding-125m-english
 ```
 
 2. **View results**: Results will be saved in the `results/` directory with detailed evaluation metrics.
@@ -51,7 +56,7 @@ beir-benchmarks/
 ├── beir_benchmarks.py                 # Main benchmarking script for multiple benchmarks
 ├── benchmarking_embedding_models.md   # Detailed documentation and guide
 ├── requirements.txt                   # Python dependencies
-└── run.yaml                           # Llama Stack configuration
+└── config.yaml                           # Llama Stack configuration
 ```
 
 ## Usage Examples
@@ -59,13 +64,13 @@ beir-benchmarks/
 ### Basic Usage
 ```bash
 # Run benchmark with default settings
-MILVUS_URL=milvus uv run python beir_benchmarks.py
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py
 
 # Specify custom dataset and model
-MILVUS_URL=milvus uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py --dataset-names scifact --embedding-models granite-embedding-125m
 
 # Run with custom batch size
-MILVUS_URL=milvus uv run python beir_benchmarks.py --batch-size 100
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py --batch-size 100
 ```
 
 ### Advanced Configuration

@@ -19,25 +19,18 @@ uv pip install -r requirements.txt
 
 Prepare your environment by running:
 ``` bash
-# The run.yaml file is based on starter distro https://github.com/llamastack/llama-stack/tree/v0.2.23/llama_stack/distributions/starter
+# The config.yaml file is based on starter distro https://github.com/llamastack/llama-stack/blob/v0.4.2/src/llama_stack/distributions/starter/config.yaml
 # We run a build here to install all of the dependencies for the starter distro
-llama stack build --distro starter --image-type venv
+uv run --with llama-stack llama stack list-deps starter | xargs -L1 uv pip install
 ```
 
 ## Running Instructions
 
 ### Basic Usage
-To run the script with default settings:
+To run the script with a custom Llama Stack server and default settings:
 
 ```bash
-# This will run the script with the provided run.yaml using LlamaStackAsLibraryClient
-MILVUS_URL=milvus uv run python beir_benchmarks.py
-```
-
-To run the script with a custom Llama Stack server:
-
-```bash
-LLAMA_STACK_URL="http://localhost:8321" MILVUS_URL=milvus uv run python beir_benchmarks.py
+LLAMA_STACK_URL="http://localhost:8321" uv run python beir_benchmarks.py
 ```
 
 ## Supported Embedding Models
@@ -52,7 +45,7 @@ It is possible to add more embedding models using the [Llama Stack Python Client
 Below is an example of how you can add more embedding models to the models list.
 ``` bash
 # First run the llama stack server via the run file
-MILVUS_URL=milvus uv run llama stack run run.yaml
+MILVUS_URL=milvus uv run llama stack run config.yaml
 ```
 ``` bash
 # Adding the all-MiniLM-L6-v2 model via the llama-stack-client
@@ -68,11 +61,31 @@ llama-stack-client models register all-MiniLM-L6-v2 --provider-id sentence-trans
 
 - **Type:** String
 - **Default:** `"milvus"`
+- **Note:** Make sure to run your Llama Stack Server with the appropriate Vector Store providers before running the script.
 
 **Example:**
 ```bash
-# Set the provider to remote Milvus
---vector-db-provider-id "remote-milvus"
+# Set the provider to Milvus remote
+--vector-db-provider-id milvus-remote
+
+# set the provider to pgvector
+--vector-db-provider-id pgvector
+```
+
+#### `--search-mode`
+**Description:** Specifies which search mode to use for vector search
+
+- **Type:** String
+- **Default:** `"vector"`
+- **Note:** There are only 3 modes supported vector, hybrid and keyword. Check that your provider supports the search mode of your choosing.
+
+**Example:**
+```bash
+# Sets the search mode to hybrid
+--search-mode hybrid
+
+# Sets the search mode to keyword
+--search-mode keyword
 ```
 
 #### `--dataset-names`
@@ -97,7 +110,7 @@ llama-stack-client models register all-MiniLM-L6-v2 --provider-id sentence-trans
 
 - **Type:** List of strings
 - **Default:** `["granite-embedding-30m", "granite-embedding-125m"]`
-- **Requirement:** Embedding models must be defined in the `run.yaml` file
+- **Requirement:** Embedding models must be defined in the `config.yaml` file
 - **Purpose:** Compare performance across different embedding models
 
 **Example:**
@@ -174,29 +187,34 @@ dataset-name.zip/
 
 **Basic benchmarking with default settings:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py
 ```
 
 **Basic benchmarking with larger batch size:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py --batch-size 300
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py --batch-size 300
+```
+
+**Basic benchmarking with hybrid search mode:**
+```bash
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py --search-mode hybrid
 ```
 
 **Benchmark multiple datasets:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py \
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py \
  --dataset-names scifact scidocs
 ```
 
 **Compare specific embedding models:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py \
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py \
   --embedding-models granite-embedding-30m all-MiniLM-L6-v2
 ```
 
 **Use custom datasets:**
 ```bash
-ENABLE_OLLAMA=ollama ENABLE_MILVUS=milvus OLLAMA_INFERENCE_MODEL="meta-llama/Llama-3.2-3B-Instruct" uv run python beir_benchmarks.py \
+LLAMA_STACK_URL=http://localhost:8321 uv run python beir_benchmarks.py \
   --dataset-names my-dataset \
   --custom-datasets-urls https://example.com/my-beir-dataset.zip
 ```

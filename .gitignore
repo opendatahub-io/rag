@@ -4,3 +4,7 @@
 .venv
 .env
 **/__pycache__/
+
+# Beir benchmarks results and datasets
+benchmarks/beir-benchmarks/results/
+benchmarks/beir-benchmarks/datasets/
