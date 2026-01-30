@@ -10,7 +10,7 @@ llama-index-llms-ibm==0.4.0
 llama-index-llms-llama-api==0.4.1
 llama-index-llms-openai-like==0.4.0
 llama-index-readers-docling==0.3.3
-llama_stack==0.2.9
+llama_stack==0.4.4
 mcp==1.9.3
 milvus-lite==2.4.12
 opentelemetry-api==1.34.0
