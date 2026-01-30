@@ -1,5 +1,5 @@
 llama-stack-client==0.3.0
-llama_stack==0.3.0
+llama_stack==0.4.4
 llama_stack_provider_ragas
 PyPDF2
 sdg_hub
