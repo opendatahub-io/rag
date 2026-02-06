@@ -29,7 +29,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: postgres
-          image: pgvector/pgvector:pg16
+          image: registry.redhat.io/rhel8/postgresql-16@sha256:fcd388c3094e6c2ea2189f48e4b9a8a596f4a7906d74b1a3c474006a65c1e9a6
           ports:
             - containerPort: 5432
           securityContext:
@@ -38,17 +38,15 @@ spec:
               drop:
                 - ALL
           env:
-            - name: POSTGRES_DB
+            - name: POSTGRESQL_DATABASE
               value: llamastack
-            - name: POSTGRES_USER
+            - name: POSTGRESQL_USER
               value: llamastack
-            - name: POSTGRES_PASSWORD
+            - name: POSTGRESQL_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: postgres-secret
                   key: password
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
           lifecycle:
             postStart:
               exec:
@@ -57,10 +55,10 @@ spec:
                   - -c
                   - |
                     sleep 5
-                    PGPASSWORD=${POSTGRES_PASSWORD} psql -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB} -c "CREATE EXTENSION IF NOT EXISTS vector;" || true
+                    PGPASSWORD=${POSTGRESQL_PASSWORD} psql -h localhost -U ${POSTGRESQL_USER} -d ${POSTGRESQL_DATABASE} -c "CREATE EXTENSION IF NOT EXISTS vector;" || true
           volumeMounts:
             - name: pgdata
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/pgsql/data
       volumes:
         - name: pgdata
           persistentVolumeClaim:
