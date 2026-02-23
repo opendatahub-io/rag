@@ -1,4 +1,5 @@
-openai>=1.0.0
 jupyter
-Pillow
+llama-stack>=0.4.2
 matplotlib
+openai>=1.22.0
+Pillow

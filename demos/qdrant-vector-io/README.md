@@ -73,17 +73,17 @@ The startups dataset is a 500-record subset. The notebooks use 25-50 records per
 
 ## Architecture
 
-```
-┌─────────────┐     ┌──────────────┐     ┌─────────┐
-│  Jupyter     │────▶│  Llama Stack  │────▶│  Qdrant │
-│  Notebooks   │     │  (port 8321)  │     │ (6333)  │
-│              │     │               │     │         │
-│  OpenAI      │     │  ┌──────────┐ │     │ Vector  │
-│  Python SDK  │     │  │ Ollama   │ │     │ Store   │
-│              │     │  │ nomic-   │ │     │         │
-└─────────────┘     │  │ embed    │ │     └─────────┘
-                    │  └──────────┘ │
-                    └──────────────┘
+```text
+┌──────────────┐     ┌───────────────┐     ┌──────────┐
+│   Jupyter    │────▶│  Llama Stack  │────▶│  Qdrant  │
+│  Notebooks   │     │  (port 8321)  │     │  (6333)  │
+│              │     │               │     │          │
+│   OpenAI     │     │ ┌───────────┐ │     │  Vector  │
+│  Python SDK  │     │ │  Ollama   │ │     │  Store   │
+│              │     │ │  nomic-   │ │     │          │
+└──────────────┘     │ │  embed    │ │     └──────────┘
+                     │ └───────────┘ │
+                     └───────────────┘
 ```
 
 All operations use the **OpenAI-compatible API** via the standard `openai` Python client pointed at the Llama Stack server.
@@ -94,14 +94,15 @@ All operations use the **OpenAI-compatible API** via the standard `openai` Pytho
 
 ```python
 from openai import OpenAI
+
 client = OpenAI(base_url="http://localhost:8321/v1/", api_key="none")
 
 store = client.vector_stores.create(
     name="my_store",
     extra_body={
         "provider_id": "qdrant",
-        "embedding_model": "ollama/nomic-embed-text:latest"
-    }
+        "embedding_model": "ollama/nomic-embed-text:latest",
+    },
 )
 ```
 
@@ -113,7 +114,7 @@ results = client.vector_stores.search(
     query="search query",
     max_num_results=5,
     ranking_options={"score_threshold": 0.5},
-    extra_body={"search_mode": "hybrid"}  # "vector", "keyword", or "hybrid"
+    extra_body={"search_mode": "hybrid"},  # "vector", "keyword", or "hybrid"
 )
 ```
 
@@ -124,6 +125,6 @@ results = client.vector_stores.search(
     vector_store_id=store.id,
     query="search query",
     filters={"type": "eq", "key": "category", "value": "software"},
-    extra_body={"search_mode": "vector"}
+    extra_body={"search_mode": "vector"},
 )
 ```
