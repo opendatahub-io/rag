@@ -1,3 +1,4 @@
+cryptography>=46.0.5
 jupyter
 llama-stack>=0.4.2
 matplotlib
