@@ -65,7 +65,7 @@ Run them in order (01 through 04). Each notebook is self-contained: it creates a
 
 | File | Size | Description |
 |------|------|-------------|
-| `data/startups_demo.json` | 500 records | Startup company descriptions (JSON Lines) |
+| `data/startups_demo.jsonl` | 500 records | Startup company descriptions (JSON Lines) |
 | `data/multilingual/` | 6 files | Articles in English, Spanish, Italian |
 | `data/images/` | 5 images + captions | Sample images with multilingual captions |
 
