@@ -1,0 +1,44 @@
+{
+  "images": [
+    {
+      "id": "img-1",
+      "filename": "image-1.png",
+      "caption": "A serene mountain landscape with snow-capped peaks and a clear blue sky",
+      "caption_es": "Un paisaje montañoso sereno con picos nevados y un cielo azul claro",
+      "caption_it": "Un paesaggio montano sereno con cime innevate e un cielo azzurro",
+      "tags": ["nature", "mountains", "landscape", "snow"]
+    },
+    {
+      "id": "img-2",
+      "filename": "image-2.png",
+      "caption": "A modern city skyline at night with illuminated buildings",
+      "caption_es": "Un horizonte de ciudad moderna de noche con edificios iluminados",
+      "caption_it": "Lo skyline di una città moderna di notte con edifici illuminati",
+      "tags": ["city", "urban", "night", "architecture"]
+    },
+    {
+      "id": "img-3",
+      "filename": "image-3.png",
+      "caption": "A tropical beach with palm trees and crystal clear water",
+      "caption_es": "Una playa tropical con palmeras y agua cristalina",
+      "caption_it": "Una spiaggia tropicale con palme e acqua cristallina",
+      "tags": ["beach", "tropical", "ocean", "vacation"]
+    },
+    {
+      "id": "img-4",
+      "filename": "image-4.png",
+      "caption": "A forest path covered with autumn leaves in golden colors",
+      "caption_es": "Un camino del bosque cubierto con hojas de otoño en colores dorados",
+      "caption_it": "Un sentiero forestale coperto di foglie autunnali dai colori dorati",
+      "tags": ["forest", "autumn", "nature", "path"]
+    },
+    {
+      "id": "img-5",
+      "filename": "image-5.png",
+      "caption": "A futuristic technology concept with digital elements",
+      "caption_es": "Un concepto de tecnología futurista con elementos digitales",
+      "caption_it": "Un concetto tecnologico futuristico con elementi digitali",
+      "tags": ["technology", "futuristic", "digital", "innovation"]
+    }
+  ]
+}

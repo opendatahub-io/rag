@@ -1,0 +1,6 @@
+cryptography>=46.0.5
+jupyter
+llama-stack>=0.4.2
+matplotlib
+openai>=1.22.0
+Pillow
