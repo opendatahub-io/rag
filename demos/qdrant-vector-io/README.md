@@ -38,12 +38,7 @@ llama stack run starter --port 8321
 Verify the Qdrant provider is active:
 
 ```bash
-curl -s http://localhost:8321/v1/providers | python3 -c "
-import json, sys
-for p in json.load(sys.stdin).get('data', []):
-    if 'qdrant' in p.get('provider_id', ''):
-        print(f\"  {p['provider_id']}: {p['provider_type']}\")
-"
+curl -s http://localhost:8321/v1/providers/qdrant
 ```
 
 ### Install Python Dependencies
