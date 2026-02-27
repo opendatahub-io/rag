@@ -97,12 +97,6 @@ spec:
               key: EMBEDDING_MODEL
               name: kubeflow-ragas-config
               optional: true
-        - name: TRUSTYAI_EMBEDDING_MODEL
-          valueFrom:
-            configMapKeyRef:
-              key: EMBEDDING_MODEL
-              name: kubeflow-ragas-config
-              optional: true
         - name: KUBEFLOW_PIPELINES_TOKEN
           valueFrom:
             secretKeyRef:

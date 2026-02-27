@@ -301,7 +301,7 @@ data:
           embedding_dimension: ${env.EMBEDDING_DIMENSION:=768}
         model_id: ${env.EMBEDDING_MODEL:=nomic-ai/nomic-embed-text-v1.5}
         provider_id: ${env.EMBEDDING_PROVIDER:=sentence-transformers}
-        provider_model_id: ${env.EMBEDDING_PROVIDER_MODEL_ID:=nomic-ai/nomic-embed-text-v1.5}
+        provider_model_id: ${env.EMBEDDING_PROVIDER_MODEL_ID:=sentence-transformers/nomic-ai/nomic-embed-text-v1.5}
         model_type: embedding
       shields: []
       vector_dbs: []
