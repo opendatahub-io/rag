@@ -1,5 +1,7 @@
 .PHONY: deploy-all delete-all deploy-qwen3-14b-awq delete-qwen3-14b-awq \
-deploy-lsd-server delete-lsd-server deploy-configs delete-configs
+deploy-lsd-server delete-lsd-server deploy-configs delete-configs \
+deploy-postgres delete-postgres deploy-minio delete-minio \
+deploy-dspa delete-dspa
 
 NAMESPACE := ragas-evaluation
 KUBECTL := kubectl
@@ -11,19 +13,23 @@ endif
 deploy-all:
 	$(KUBECTL) create namespace $(NAMESPACE) || true
 	$(MAKE) deploy-configs
+	$(MAKE) deploy-minio
+	$(MAKE) deploy-postgres
+	$(MAKE) deploy-dspa
 	$(MAKE) deploy-qwen3-14b-awq
 	$(KUBECTL) wait --for=condition=available --timeout=1200s deployment --all -n $(NAMESPACE) || true
 	$(MAKE) deploy-lsd-server
 	$(KUBECTL) wait --for=condition=available --timeout=300s deployment --all -n $(NAMESPACE) || true
 
-delete-all: delete-lsd-server delete-qwen3-14b-awq delete-configs
-	$(KUBECTL) delete namespace $(NAMESPACE) || true
+delete-all: delete-lsd-server delete-qwen3-14b-awq delete-dspa delete-postgres delete-minio delete-configs
 
 deploy-configs:
 	$(KUBECTL) apply -f deployment-yamls/aws-credentials.yaml -n $(NAMESPACE)
 	$(KUBECTL) apply -f deployment-yamls/kubeflow-ragas-config.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f deployment-yamls/llama-stack-config.yaml -n $(NAMESPACE)
 
 delete-configs:
+	$(KUBECTL) delete -f deployment-yamls/llama-stack-config.yaml -n $(NAMESPACE) || true
 	$(KUBECTL) delete -f deployment-yamls/kubeflow-ragas-config.yaml -n $(NAMESPACE) || true
 	$(KUBECTL) delete -f deployment-yamls/aws-credentials.yaml -n $(NAMESPACE) || true
 
@@ -38,3 +44,23 @@ deploy-lsd-server:
 
 delete-lsd-server:
 	$(KUBECTL) delete -f deployment-yamls/llama-stack-distribution.yaml -n $(NAMESPACE) || true
+
+deploy-postgres:
+	$(KUBECTL) apply -f ../common-deployments/postgres-deployment.yaml -n $(NAMESPACE)
+
+delete-postgres:
+	$(KUBECTL) delete -f ../common-deployments/postgres-deployment.yaml -n $(NAMESPACE) || true
+
+deploy-minio:
+	$(KUBECTL) apply -f ../common-deployments/minio-deployment.yaml -n $(NAMESPACE)
+
+delete-minio:
+	$(KUBECTL) delete -f ../common-deployments/minio-deployment.yaml -n $(NAMESPACE) || true
+
+deploy-dspa:
+	$(KUBECTL) apply -f deployment-yamls/dspa-deployment.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f deployment-yamls/llama-stack-network-policy.yaml -n $(NAMESPACE)
+
+delete-dspa:
+	$(KUBECTL) delete -f deployment-yamls/llama-stack-network-policy.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f deployment-yamls/dspa-deployment.yaml -n $(NAMESPACE) || true

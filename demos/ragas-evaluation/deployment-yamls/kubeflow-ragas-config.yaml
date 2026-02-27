@@ -6,11 +6,11 @@ metadata:
 data:
   EMBEDDING_MODEL: "sentence-transformers/nomic-ai/nomic-embed-text-v1.5"
   KUBEFLOW_LLAMA_STACK_URL: "http://lsd-ragas-example-service:8321"
-  # use the following command to get the endpoint:
-  # echo "https://$(oc get route ds-pipeline-dspa -n ragas-evaluation -o jsonpath='{.spec.host}')"
-  KUBEFLOW_PIPELINES_ENDPOINT: ""
+  # Using HTTP on port 8888 (podToPodTLS is disabled for easier internal communication)
+  KUBEFLOW_PIPELINES_ENDPOINT: "http://ds-pipeline-dspa.ragas-evaluation.svc.cluster.local:8888"
   KUBEFLOW_NAMESPACE: "ragas-evaluation"
-  KUBEFLOW_BASE_IMAGE: "quay.io/diegosquayorg/my-ragas-provider-image:latest"
-  # set the S3 prefix to the bucket you want to use for results
-  KUBEFLOW_RESULTS_S3_PREFIX: "s3://<your-bucket-name>/ragas-results"
+  KUBEFLOW_BASE_IMAGE: "registry.access.redhat.com/ubi9/python-312:latest"
+  KUBEFLOW_RESULTS_S3_PREFIX: "s3://ragas-evaluation-s3-bucket/ragas-results"
+  KUBEFLOW_RESULTS_S3_ENDPOINT: "http://minio-service.ragas-evaluation.svc.cluster.local:9000"
+  KUBEFLOW_RESULTS_S3_PATH_STYLE: "true"
   KUBEFLOW_S3_CREDENTIALS_SECRET_NAME: "aws-credentials"

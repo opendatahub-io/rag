@@ -18,10 +18,25 @@ spec:
           value: "false"
         - name: VLLM_API_TOKEN
           value: "fake"
+        - name: ENABLE_SENTENCE_TRANSFORMERS
+          value: "true"
+        - name: EMBEDDING_PROVIDER
+          value: "sentence-transformers"
         - name: MILVUS_DB_PATH
           value: ~/milvus.db
-        - name: FMS_ORCHESTRATOR_URL
-          value: "http://localhost"
+        - name: POSTGRES_HOST
+          value: postgres-svc
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          value: llamastack
+        - name: POSTGRES_USER
+          value: llamastack
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
         - name: KUBEFLOW_PIPELINES_ENDPOINT
           valueFrom:
             configMapKeyRef:
@@ -58,7 +73,31 @@ spec:
               key: KUBEFLOW_S3_CREDENTIALS_SECRET_NAME
               name: kubeflow-ragas-config
               optional: true
+        - name: KUBEFLOW_RESULTS_S3_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_RESULTS_S3_ENDPOINT
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_RESULTS_S3_PATH_STYLE
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_RESULTS_S3_PATH_STYLE
+              name: kubeflow-ragas-config
+              optional: true
         - name: EMBEDDING_MODEL
+          valueFrom:
+            configMapKeyRef:
+              key: EMBEDDING_MODEL
+              name: kubeflow-ragas-config
+              optional: true
+        - name: EMBEDDING_PROVIDER_MODEL_ID
+          valueFrom:
+            configMapKeyRef:
+              key: EMBEDDING_MODEL
+              name: kubeflow-ragas-config
+              optional: true
+        - name: TRUSTYAI_EMBEDDING_MODEL
           valueFrom:
             configMapKeyRef:
               key: EMBEDDING_MODEL
@@ -82,13 +121,15 @@ spec:
               key: AWS_SECRET_ACCESS_KEY
               name: aws-credentials
               optional: true
-        - name: AWS_DEFAULT_REGION
-          valueFrom:
-            secretKeyRef:
-              key: AWS_DEFAULT_REGION
-              name: aws-credentials
-              optional: true
       name: llama-stack
       port: 8321
     distribution:
       name: rh-dev
+    userConfig:
+      configMapName: llama-stack-config
+  network:
+    exposeRoute: false
+    allowedFrom:
+      # Allow access from all namespaces
+      namespaces:
+        - "*"
