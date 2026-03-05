@@ -4,7 +4,8 @@ metadata:
   name: kubeflow-ragas-config
   namespace: ragas-evaluation
 data:
-  EMBEDDING_MODEL: "sentence-transformers/nomic-ai/nomic-embed-text-v1.5"
+  TRUSTYAI_EMBEDDING_MODEL: "sentence-transformers/ibm-granite/granite-embedding-125m-english"
+  EMBEDDING_MODEL: "ibm-granite/granite-embedding-125m-english"
   KUBEFLOW_LLAMA_STACK_URL: "http://lsd-ragas-example-service:8321"
   # Using HTTP on port 8888 (podToPodTLS is disabled for easier internal communication)
   KUBEFLOW_PIPELINES_ENDPOINT: "http://ds-pipeline-dspa.ragas-evaluation.svc.cluster.local:8888"

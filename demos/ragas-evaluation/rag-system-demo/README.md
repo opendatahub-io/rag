@@ -16,7 +16,7 @@
 This demo showcases how to generate synthetic RAG evaluation datasets using the SDG Hub RAG Flow and evaluate them using the RAGAS Llama Stack Eval Provider developed by the Trusty AI team. The demo demonstrates:
 
 1. **Synthetic Dataset Generation**: Using SDG Hub to create questions with ground truth context from documents
-2. **Real World Scenario with Document Ingestion and LLM Answers**: An LLM is tasked with answering the syntheticly generated questions by searching its own Vector Store for data.
+2. **Real World Scenario with Document Ingestion and LLM Answers**: An LLM is tasked with answering the synthetically generated questions by searching its own Vector Store for data.
 3. **RAGAS Evaluation**: Using the RAGAS provider to evaluate RAG systems with metrics like faithfulness, answer relevancy, context precision, and context recall
 
 The demo includes notebooks for dataset generation and evaluation, running on Red Hat OpenShift AI.
@@ -189,5 +189,38 @@ make delete-all
    - Post-process the results for evaluation
 
 **Note:** The notebook includes an example using the IBM Annual Report 2024 PDF (`ibm-annual-report-2024.pdf`). You can use your own documents by modifying the input dataset preparation section.
+
+### Run RAG Inference
+
+**Steps:**
+
+1. In the same JupyterNotebook environment, open the `2.rag_inference.ipynb` file.
+2. Follow the notebook steps to:
+   - Connect to Llama Stack and discover available inference and embedding models
+   - Upload the same source PDF used in notebook 1
+   - Create a vector store (Milvus-backed) with chunked embeddings
+   - Load synthetic questions from `rag_evaluation_dataset.jsonl`
+   - Run each question through the RAG pipeline using `file_search`
+   - Save RAG answers and retrieved contexts to `rag_inference_dataset.jsonl`
+
+> [!WARNING]
+> **By default trust_remote_code is set to False for sentence transformers and cannot be changed**
+> Only Embedding models that work with trust_remote_code=False will work with this demo e.g. `ibm-granite/granite-embedding-125m-english`
+
+**Note:** Ensure `rag_evaluation_dataset.jsonl` exists (from notebook 1) and the source PDF (e.g. `ibm-annual-report-2024.pdf`) is in the current directory. Optionally run the cleanup cell to delete the vector store when finished.
+
+### Run RAGAS Evaluation
+
+**Steps:**
+
+1. In the same JupyterNotebook environment, open the `3.ragas-evaluation.ipynb` file.
+2. Follow the notebook steps to:
+   - Load the RAG inference dataset from `rag_inference_dataset.jsonl`
+   - Register the dataset with Llama Stack (Datasets API)
+   - Configure RAGAS evaluation metrics (e.g. answer relevancy, context precision, faithfulness, context recall)
+   - Run evaluation using the RAGAS provider (remote mode via Kubeflow Pipelines)
+   - Display and analyze the results (per-question scores and aggregate metrics)
+
+**Note:** Complete notebooks 1 and 2 first so that `rag_inference_dataset.jsonl` exists. You can enable or disable individual RAGAS metrics in the benchmark registration step.
 
 ---

@@ -1,5 +1,5 @@
 llama-stack-client==0.5.0
 llama_stack==0.5.0
 llama_stack_provider_ragas==0.6.0
-PyPDF2
-sdg_hub
+PyPDF2==3.0.1
+sdg_hub==0.8.6

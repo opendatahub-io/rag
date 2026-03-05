@@ -26,10 +26,10 @@ delete-all: delete-lsd-server delete-qwen3-14b-awq delete-dspa delete-postgres d
 deploy-configs:
 	$(KUBECTL) apply -f ../shared-resources/aws-credentials.yaml -n $(NAMESPACE)
 	$(KUBECTL) apply -f ../shared-resources/kubeflow-ragas-config.yaml -n $(NAMESPACE)
-	$(KUBECTL) apply -f ../shared-resources/llama-stack-config.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f deployment-yamls/llama-stack-config.yaml -n $(NAMESPACE)
 
 delete-configs:
-	$(KUBECTL) delete -f ../shared-resources/llama-stack-config.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f deployment-yamls/llama-stack-config.yaml -n $(NAMESPACE) || true
 	$(KUBECTL) delete -f ../shared-resources/kubeflow-ragas-config.yaml -n $(NAMESPACE) || true
 	$(KUBECTL) delete -f ../shared-resources/aws-credentials.yaml -n $(NAMESPACE) || true
 

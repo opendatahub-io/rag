@@ -155,7 +155,7 @@ data:
         provider_type: remote::trustyai_ragas
         module: llama_stack_provider_ragas.remote==0.6.0
         config:
-          embedding_model: ${env.EMBEDDING_MODEL}
+          embedding_model: ${env.TRUSTYAI_EMBEDDING_MODEL}
           kubeflow_config:
             results_s3_endpoint: ${env.KUBEFLOW_RESULTS_S3_ENDPOINT}
             results_s3_prefix: ${env.KUBEFLOW_RESULTS_S3_PREFIX}
@@ -299,9 +299,9 @@ data:
         model_type: llm
       - metadata:
           embedding_dimension: ${env.EMBEDDING_DIMENSION:=768}
-        model_id: ${env.EMBEDDING_MODEL:=nomic-ai/nomic-embed-text-v1.5}
-        provider_id: ${env.EMBEDDING_PROVIDER:=sentence-transformers}
-        provider_model_id: ${env.EMBEDDING_PROVIDER_MODEL_ID:=sentence-transformers/nomic-ai/nomic-embed-text-v1.5}
+        model_id: ${env.EMBEDDING_MODEL:=granite-embedding-125m-english}
+        provider_id: ${env.EMBEDDING_PROVIDER:=vllm-embedding}
+        provider_model_id: ${env.EMBEDDING_PROVIDER_MODEL_ID:=ibm-granite/granite-embedding-125m-english}
         model_type: embedding
       shields: []
       vector_dbs: []

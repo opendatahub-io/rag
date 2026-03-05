@@ -91,6 +91,12 @@ spec:
               key: EMBEDDING_MODEL
               name: kubeflow-ragas-config
               optional: true
+        - name: TRUSTYAI_EMBEDDING_MODEL
+          valueFrom:
+            configMapKeyRef:
+              key: TRUSTYAI_EMBEDDING_MODEL
+              name: kubeflow-ragas-config
+              optional: true
         - name: EMBEDDING_PROVIDER_MODEL_ID
           valueFrom:
             configMapKeyRef:

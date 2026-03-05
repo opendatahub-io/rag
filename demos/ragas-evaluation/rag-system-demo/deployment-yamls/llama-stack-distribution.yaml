@@ -121,7 +121,7 @@ spec:
         - name: TRUSTYAI_EMBEDDING_MODEL
           valueFrom:
             configMapKeyRef:
-              key: EMBEDDING_MODEL
+              key: TRUSTYAI_EMBEDDING_MODEL
               name: kubeflow-ragas-config
               optional: true
         - name: KUBEFLOW_PIPELINES_TOKEN
@@ -165,3 +165,8 @@ spec:
       name: rh-dev
     userConfig:
       configMapName: llama-stack-config
+  network:
+    exposeRoute: false
+    allowedFrom:
+      namespaces:
+        - "*"
