@@ -26,6 +26,13 @@ data:
           max_tokens: ${env.VLLM_MAX_TOKENS:=4096}
           api_token: ${env.VLLM_API_TOKEN:=fake}
           tls_verify: ${env.VLLM_TLS_VERIFY:=true}
+      - provider_id: ${env.VLLM_URL_2:+vllm-inference-2}
+        provider_type: remote::vllm
+        config:
+          base_url: ${env.VLLM_URL_2:=}
+          max_tokens: ${env.VLLM_MAX_TOKENS_2:=4096}
+          api_token: ${env.VLLM_API_TOKEN_2:=fake}
+          tls_verify: ${env.VLLM_TLS_VERIFY_2:=true}
       - provider_id: ${env.VLLM_EMBEDDING_URL:+vllm-embedding}
         provider_type: remote::vllm
         config:
@@ -121,7 +128,7 @@ data:
       safety:
         - provider_id: trustyai_fms
           provider_type: remote::trustyai_fms
-          module: llama_stack_provider_trustyai_fms==0.3.2
+          module: llama_stack_provider_trustyai_fms==0.4.0
           config:
             orchestrator_url: ${env.FMS_ORCHESTRATOR_URL:=}
             ssl_cert_path: ${env.FMS_SSL_CERT_PATH:=}
@@ -142,7 +149,7 @@ data:
       eval:
       - provider_id: trustyai_lmeval
         provider_type: remote::trustyai_lmeval
-        module: llama_stack_provider_lmeval==0.4.2
+        module: llama_stack_provider_lmeval==0.5.0
         config:
           use_k8s: ${env.TRUSTYAI_LMEVAL_USE_K8S:=true}
           base_url: ${env.VLLM_URL:=http://localhost:8000/v1}
@@ -151,32 +158,32 @@ data:
         module: llama_stack_provider_ragas.inline==0.6.0
         config:
           embedding_model: ${env.TRUSTYAI_EMBEDDING_MODEL:=}
-      - provider_id: ${env.KUBEFLOW_LLAMA_STACK_URL:+trustyai_ragas_remote}
+      - provider_id: ${env.ENABLE_KUBEFLOW_RAGAS:+trustyai_ragas_remote}
         provider_type: remote::trustyai_ragas
         module: llama_stack_provider_ragas.remote==0.6.0
         config:
-          embedding_model: ${env.EMBEDDING_MODEL}
-          kubeflow_config:
-            results_s3_endpoint: ${env.KUBEFLOW_RESULTS_S3_ENDPOINT}
-            results_s3_prefix: ${env.KUBEFLOW_RESULTS_S3_PREFIX}
-            s3_credentials_secret_name: ${env.KUBEFLOW_S3_CREDENTIALS_SECRET_NAME}
-            pipelines_endpoint: ${env.KUBEFLOW_PIPELINES_ENDPOINT}
-            namespace: ${env.KUBEFLOW_NAMESPACE}
-            llama_stack_url: ${env.KUBEFLOW_LLAMA_STACK_URL}
-            base_image: ${env.KUBEFLOW_BASE_IMAGE}
-            pipelines_api_token: ${env.KUBEFLOW_PIPELINES_TOKEN:=}
-      - provider_id: ${env.ENABLE_KUBEFLOW_GARAK:+trustyai_garak_remote}
-        provider_type: remote::trustyai_garak
-        module: llama_stack_provider_trustyai_garak==0.1.8
-        config:
-          llama_stack_url: ${env.KUBEFLOW_LLAMA_STACK_URL:=}
+          embedding_model: ${env.TRUSTYAI_EMBEDDING_MODEL:=}
           kubeflow_config:
             results_s3_prefix: ${env.KUBEFLOW_RESULTS_S3_PREFIX:=}
             s3_credentials_secret_name: ${env.KUBEFLOW_S3_CREDENTIALS_SECRET_NAME:=}
             pipelines_endpoint: ${env.KUBEFLOW_PIPELINES_ENDPOINT:=}
             namespace: ${env.KUBEFLOW_NAMESPACE:=}
+            llama_stack_url: ${env.KUBEFLOW_LLAMA_STACK_URL:=}
             base_image: ${env.KUBEFLOW_BASE_IMAGE:=}
             pipelines_api_token: ${env.KUBEFLOW_PIPELINES_TOKEN:=}
+            results_s3_endpoint: ${env.KUBEFLOW_RESULTS_S3_ENDPOINT:=https://s3.us-east-1.amazonaws.com}
+            results_s3_path_style: ${env.KUBEFLOW_RESULTS_S3_PATH_STYLE:=false}
+      - provider_id: ${env.ENABLE_KUBEFLOW_GARAK:+trustyai_garak_remote}
+        provider_type: remote::trustyai_garak
+        module: llama_stack_provider_trustyai_garak==0.2.0
+        config:
+          llama_stack_url: ${env.KUBEFLOW_LLAMA_STACK_URL:=}
+          kubeflow_config:
+            pipelines_endpoint: ${env.KUBEFLOW_PIPELINES_ENDPOINT:=}
+            namespace: ${env.KUBEFLOW_NAMESPACE:=}
+            garak_base_image: ${env.KUBEFLOW_GARAK_BASE_IMAGE:=}
+            pipelines_api_token: ${env.KUBEFLOW_PIPELINES_TOKEN:=}
+            experiment_name: ${env.KUBEFLOW_EXPERIMENT_NAME:=}
       datasetio:
       - provider_id: huggingface
         provider_type: remote::huggingface
@@ -277,31 +284,13 @@ data:
         prompts:
           namespace: prompts
           backend: kv_default
-    vector_stores:
-      default_provider_id: milvus
-      default_embedding_model:
-        provider_id: sentence-transformers
-        model_id: nomic-ai/nomic-embed-text-v1.5
-      file_search_params:
-        header_template: "knowledge_search tool found {num_chunks} chunks:\nBEGIN of knowledge_search tool results.\n"
-        footer_template: "END of knowledge_search tool results.\n"
-      context_prompt_params:
-        chunk_annotation_template: "Result {index}\nContent: {chunk.content}\nMetadata: {metadata}\n"
-        context_template: "The above results were retrieved to help answer the users query: \"{query}\". Use them as supporting information only. {annotation_instruction}\n"
-      annotation_prompt_params:
-        enable_annotations: true
-        annotation_instruction_template: "Cite sources immediately at the end of sentences using <|file-id|> format."
     registered_resources:
       models:
-      - metadata: {}
-        model_id: ${env.INFERENCE_MODEL}
-        provider_id: vllm-inference
-        model_type: llm
       - metadata:
           embedding_dimension: ${env.EMBEDDING_DIMENSION:=768}
-        model_id: ${env.EMBEDDING_MODEL:=nomic-ai/nomic-embed-text-v1.5}
-        provider_id: ${env.EMBEDDING_PROVIDER:=sentence-transformers}
-        provider_model_id: ${env.EMBEDDING_PROVIDER_MODEL_ID:=nomic-ai/nomic-embed-text-v1.5}
+        model_id: ${env.EMBEDDING_MODEL:=granite-embedding-125m-english}
+        provider_id: ${env.EMBEDDING_PROVIDER:=vllm-embedding}
+        provider_model_id: ${env.EMBEDDING_PROVIDER_MODEL_ID:=ibm-granite/granite-embedding-125m-english}
         model_type: embedding
       shields: []
       vector_dbs: []
@@ -338,17 +327,33 @@ data:
           - garak_scoring
         provider_id: trustyai_garak_remote
         provider_benchmark_id: quick
-      - benchmark_id: ${env.ENABLE_KUBEFLOW_GARAK:+trustyai_garak::standard}
+      - benchmark_id: ${env.ENABLE_KUBEFLOW_GARAK:+trustyai_garak::avid}
         dataset_id: garak
         scoring_functions:
           - garak_scoring
         provider_id: trustyai_garak_remote
-        provider_benchmark_id: standard
+        provider_benchmark_id: trustyai_garak::avid
+      - benchmark_id: ${env.ENABLE_KUBEFLOW_GARAK:+trustyai_garak::quality}
+        dataset_id: garak
+        scoring_functions:
+          - garak_scoring
+        provider_id: trustyai_garak_remote
+        provider_benchmark_id: trustyai_garak::quality
+      - benchmark_id: ${env.ENABLE_KUBEFLOW_GARAK:+trustyai_garak::cwe}
+        dataset_id: garak
+        scoring_functions:
+          - garak_scoring
+        provider_id: trustyai_garak_remote
+        provider_benchmark_id: trustyai_garak::cwe
       tool_groups:
       - toolgroup_id: builtin::websearch
         provider_id: tavily-search
       - toolgroup_id: builtin::rag
         provider_id: rag-runtime
+    vector_stores:
+      annotation_prompt_params:
+        enable_annotations: true
+        annotation_instruction_template: "Cite sources immediately at the end of sentences using <|file-id|> format."
     telemetry:
       enabled: true
     server:

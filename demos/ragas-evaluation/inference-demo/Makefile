@@ -24,20 +24,20 @@ deploy-all:
 delete-all: delete-lsd-server delete-qwen3-14b-awq delete-dspa delete-postgres delete-minio delete-configs
 
 deploy-configs:
-	$(KUBECTL) apply -f deployment-yamls/aws-credentials.yaml -n $(NAMESPACE)
-	$(KUBECTL) apply -f deployment-yamls/kubeflow-ragas-config.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../shared-resources/aws-credentials.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../shared-resources/kubeflow-ragas-config.yaml -n $(NAMESPACE)
 	$(KUBECTL) apply -f deployment-yamls/llama-stack-config.yaml -n $(NAMESPACE)
 
 delete-configs:
 	$(KUBECTL) delete -f deployment-yamls/llama-stack-config.yaml -n $(NAMESPACE) || true
-	$(KUBECTL) delete -f deployment-yamls/kubeflow-ragas-config.yaml -n $(NAMESPACE) || true
-	$(KUBECTL) delete -f deployment-yamls/aws-credentials.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../shared-resources/kubeflow-ragas-config.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../shared-resources/aws-credentials.yaml -n $(NAMESPACE) || true
 
 deploy-qwen3-14b-awq:
-	$(KUBECTL) apply -f deployment-yamls/qwen3-14b-awq-deployment.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../../common-deployments/qwen3-14b-awq-deployment.yaml -n $(NAMESPACE)
 
 delete-qwen3-14b-awq:
-	$(KUBECTL) delete -f deployment-yamls/qwen3-14b-awq-deployment.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../../common-deployments/qwen3-14b-awq-deployment.yaml -n $(NAMESPACE) || true
 
 deploy-lsd-server:
 	$(KUBECTL) apply -f deployment-yamls/llama-stack-distribution.yaml -n $(NAMESPACE)
@@ -46,21 +46,21 @@ delete-lsd-server:
 	$(KUBECTL) delete -f deployment-yamls/llama-stack-distribution.yaml -n $(NAMESPACE) || true
 
 deploy-postgres:
-	$(KUBECTL) apply -f ../common-deployments/postgres-deployment.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../../common-deployments/postgres-deployment.yaml -n $(NAMESPACE)
 
 delete-postgres:
-	$(KUBECTL) delete -f ../common-deployments/postgres-deployment.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../../common-deployments/postgres-deployment.yaml -n $(NAMESPACE) || true
 
 deploy-minio:
-	$(KUBECTL) apply -f ../common-deployments/minio-deployment.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../../common-deployments/minio-deployment.yaml -n $(NAMESPACE)
 
 delete-minio:
-	$(KUBECTL) delete -f ../common-deployments/minio-deployment.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../../common-deployments/minio-deployment.yaml -n $(NAMESPACE) || true
 
 deploy-dspa:
-	$(KUBECTL) apply -f deployment-yamls/dspa-deployment.yaml -n $(NAMESPACE)
-	$(KUBECTL) apply -f deployment-yamls/llama-stack-network-policy.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../shared-resources/dspa-deployment.yaml -n $(NAMESPACE)
+	$(KUBECTL) apply -f ../shared-resources/llama-stack-network-policy.yaml -n $(NAMESPACE)
 
 delete-dspa:
-	$(KUBECTL) delete -f deployment-yamls/llama-stack-network-policy.yaml -n $(NAMESPACE) || true
-	$(KUBECTL) delete -f deployment-yamls/dspa-deployment.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../shared-resources/llama-stack-network-policy.yaml -n $(NAMESPACE) || true
+	$(KUBECTL) delete -f ../shared-resources/dspa-deployment.yaml -n $(NAMESPACE) || true

@@ -1,0 +1,172 @@
+apiVersion: llamastack.io/v1alpha1
+kind: LlamaStackDistribution
+metadata:
+  name: lsd-ragas-example
+  namespace: ragas-evaluation
+spec:
+  replicas: 1
+  server:
+    containerSpec:
+      env:
+        - name: VLLM_MAX_TOKENS
+          value: "4096"
+        - name: INFERENCE_MODEL
+          valueFrom:
+            secretKeyRef:
+              key: INFERENCE_MODEL
+              name: inference-models-secret
+              optional: false
+        - name: VLLM_URL
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_URL
+              name: inference-models-secret
+              optional: false
+        - name: VLLM_TLS_VERIFY
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_TLS_VERIFY
+              name: inference-models-secret
+              optional: false
+        - name: VLLM_API_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_API_TOKEN
+              name: inference-models-secret
+              optional: false
+        - name: INFERENCE_MODEL_2
+          valueFrom:
+            secretKeyRef:
+              key: INFERENCE_MODEL_2
+              name: inference-models-secret
+              optional: false
+        - name: VLLM_URL_2
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_URL_2
+              name: inference-models-secret
+              optional: false
+        - name: VLLM_API_TOKEN_2
+          valueFrom:
+            secretKeyRef:
+              key: VLLM_API_TOKEN_2
+              name: inference-models-secret
+              optional: false
+        - name: MILVUS_DB_PATH
+          value: ~/milvus.db
+        - name: FMS_ORCHESTRATOR_URL
+          value: "http://localhost"
+        - name: ENABLE_KUBEFLOW_RAGAS
+          value: trustyai_ragas_remote
+        - name: KUBEFLOW_PIPELINES_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_PIPELINES_ENDPOINT
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_NAMESPACE
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_NAMESPACE
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_BASE_IMAGE
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_BASE_IMAGE
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_LLAMA_STACK_URL
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_LLAMA_STACK_URL
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_RESULTS_S3_PREFIX
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_RESULTS_S3_PREFIX
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_S3_CREDENTIALS_SECRET_NAME
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_S3_CREDENTIALS_SECRET_NAME
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_RESULTS_S3_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_RESULTS_S3_ENDPOINT
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_RESULTS_S3_PATH_STYLE
+          valueFrom:
+            configMapKeyRef:
+              key: KUBEFLOW_RESULTS_S3_PATH_STYLE
+              name: kubeflow-ragas-config
+              optional: true
+        - name: EMBEDDING_MODEL
+          valueFrom:
+            configMapKeyRef:
+              key: EMBEDDING_MODEL
+              name: kubeflow-ragas-config
+              optional: true
+        - name: EMBEDDING_PROVIDER_MODEL_ID
+          valueFrom:
+            configMapKeyRef:
+              key: EMBEDDING_MODEL
+              name: kubeflow-ragas-config
+              optional: true
+        - name: TRUSTYAI_EMBEDDING_MODEL
+          valueFrom:
+            configMapKeyRef:
+              key: TRUSTYAI_EMBEDDING_MODEL
+              name: kubeflow-ragas-config
+              optional: true
+        - name: KUBEFLOW_PIPELINES_TOKEN
+          valueFrom:
+            secretKeyRef:
+              key: KUBEFLOW_PIPELINES_TOKEN
+              name: kubeflow-pipelines-token
+              optional: true
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: AWS_ACCESS_KEY_ID
+              name: aws-credentials
+              optional: true
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: AWS_SECRET_ACCESS_KEY
+              name: aws-credentials
+              optional: true
+        - name: POSTGRES_HOST
+          value: postgres-svc
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_DB
+          value: llamastack
+        - name: POSTGRES_USER
+          value: llamastack
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: ENABLE_SENTENCE_TRANSFORMERS
+          value: 'true'
+        - name: EMBEDDING_PROVIDER
+          value: 'sentence-transformers'
+      name: llama-stack
+      port: 8321
+    distribution:
+      name: rh-dev
+    userConfig:
+      configMapName: llama-stack-config
+  network:
+    exposeRoute: false
+    allowedFrom:
+      namespaces:
+        - "*"
